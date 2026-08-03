@@ -29,10 +29,7 @@
     padding: 20px;
     line-height: 1.6;
   }
-  .wrap {
-    width: 100%;
-    max-width: 480px;
-  }
+  .wrap { width: 100%; max-width: 480px; }
   .card {
     background: var(--card);
     border-radius: 26px;
@@ -48,7 +45,6 @@
     to   { opacity: 1; transform: none; }
   }
 
-  /* Intro */
   .badge {
     display: inline-block;
     background: var(--soft);
@@ -73,17 +69,27 @@
     background-clip: text;
     color: transparent;
   }
-  .lead {
-    color: var(--muted);
-    font-size: 15px;
-    margin: 0 0 22px;
+  .lead { color: var(--muted); font-size: 15px; margin: 0 0 22px; }
+  .emoji-row { font-size: 34px; text-align: center; margin: 6px 0 22px; letter-spacing: 6px; }
+
+  label.fld { display:block; font-size:13px; font-weight:800; color:var(--muted); margin:0 0 8px 2px; }
+  .name-input {
+    width: 100%;
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    border: 2px solid #ece9ff;
+    background: #fbfaff;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 8px;
+    outline: none;
+    transition: border-color .12s ease, background .12s ease;
   }
-  .emoji-row {
-    font-size: 34px;
-    text-align: center;
-    margin: 6px 0 22px;
-    letter-spacing: 6px;
-  }
+  .name-input:focus { border-color: var(--accent); background: #fff; }
+  .err { color: var(--accent2); font-size: 13px; font-weight: 700; min-height: 18px; margin: 0 0 12px 2px; }
+
   .btn {
     display: block;
     width: 100%;
@@ -97,175 +103,66 @@
     padding: 17px;
     border-radius: 16px;
     box-shadow: 0 10px 24px rgba(106, 92, 255, .35);
-    transition: transform .12s ease, box-shadow .12s ease;
+    transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
   }
   .btn:active { transform: translateY(2px) scale(.99); box-shadow: 0 5px 14px rgba(106,92,255,.3); }
-  .btn.ghost {
-    background: var(--soft);
-    color: var(--accent);
-    box-shadow: none;
+  .btn[disabled] { opacity: .55; cursor: default; }
+  .btn.ghost { background: var(--soft); color: var(--accent); box-shadow: none; }
+  .note { text-align: center; color: var(--muted); font-size: 13px; margin-top: 14px; }
+  .link {
+    display:block; text-align:center; margin-top:16px;
+    color:var(--muted); font-size:13px; font-weight:700; text-decoration:none;
   }
-  .note {
-    text-align: center;
-    color: var(--muted);
-    font-size: 13px;
-    margin-top: 14px;
-  }
+  .link:hover { color: var(--accent); }
 
-  /* Progress */
-  .progress-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 18px;
-  }
-  .qcount { font-size: 13px; font-weight: 800; color: var(--muted); }
-  .bar {
-    flex: 1;
-    height: 8px;
-    background: var(--soft);
-    border-radius: 999px;
-    margin-left: 12px;
-    overflow: hidden;
-  }
-  .bar > i {
-    display: block;
-    height: 100%;
-    width: 0;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    border-radius: 999px;
-    transition: width .3s ease;
-  }
-  .q-emoji { font-size: 42px; text-align: center; margin: 10px 0 4px; }
-  .q-text {
-    font-size: 21px;
-    font-weight: 800;
-    text-align: center;
-    margin: 4px 0 24px;
-    letter-spacing: -.5px;
-  }
+  .progress-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .qcount { font-size:13px; font-weight:800; color:var(--muted); }
+  .bar { flex:1; height:8px; background:var(--soft); border-radius:999px; margin-left:12px; overflow:hidden; }
+  .bar > i { display:block; height:100%; width:0; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:999px; transition:width .3s ease; }
+  .q-emoji { font-size:42px; text-align:center; margin:10px 0 4px; }
+  .q-text { font-size:21px; font-weight:800; text-align:center; margin:4px 0 24px; letter-spacing:-.5px; }
   .opt {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    text-align: left;
-    border: 2px solid #ece9ff;
-    background: #fbfaff;
-    border-radius: 16px;
-    padding: 16px 16px;
-    margin-bottom: 12px;
-    font-family: inherit;
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--ink);
-    cursor: pointer;
-    transition: border-color .12s ease, transform .1s ease, background .12s ease;
+    display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+    border:2px solid #ece9ff; background:#fbfaff; border-radius:16px; padding:16px;
+    margin-bottom:12px; font-family:inherit; font-size:16px; font-weight:700; color:var(--ink);
+    cursor:pointer; transition:border-color .12s ease, transform .1s ease, background .12s ease;
   }
   .opt:active { transform: scale(.98); }
-  .opt:hover { border-color: var(--accent); background: #fff; }
-  .opt .ic { font-size: 24px; flex-shrink: 0; }
+  .opt:hover { border-color: var(--accent); background:#fff; }
+  .opt .ic { font-size:24px; flex-shrink:0; }
   .back {
-    display: inline-block;
-    margin-top: 6px;
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    padding: 8px 4px;
+    display:inline-block; margin-top:6px; background:none; border:none; color:var(--muted);
+    font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; padding:8px 4px;
   }
 
-  /* Result */
-  .r-emoji { font-size: 70px; text-align: center; line-height: 1; margin: 4px 0 8px; }
-  .r-code {
-    text-align: center;
-    font-weight: 900;
-    letter-spacing: 3px;
-    color: var(--accent);
-    font-size: 15px;
-    margin-bottom: 2px;
-  }
-  .r-name {
-    text-align: center;
-    font-size: 27px;
-    font-weight: 900;
-    letter-spacing: -1px;
-    margin: 0 0 6px;
-  }
-  .r-tag {
-    text-align: center;
-    color: var(--muted);
-    font-size: 15px;
-    margin: 0 0 20px;
-    font-weight: 600;
-  }
-  .r-desc {
-    background: var(--soft);
-    border-radius: 16px;
-    padding: 16px 18px;
-    font-size: 15px;
-    margin-bottom: 16px;
-  }
-  .sect-title {
-    font-size: 14px;
-    font-weight: 900;
-    color: var(--accent2);
-    margin: 0 0 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  ul.pills { list-style: none; padding: 0; margin: 0 0 18px; }
-  ul.pills li {
-    background: #fff;
-    border: 2px solid #f0eeff;
-    border-radius: 12px;
-    padding: 11px 14px;
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
-  .r-axes {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
-    margin-bottom: 20px;
-  }
-  .axis {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 12.5px;
-    font-weight: 700;
-    color: var(--muted);
-    background: #fafaff;
-    border-radius: 10px;
-    padding: 8px 12px;
-  }
-  .axis b { color: var(--ink); }
-  .axis .pole { flex: 1; text-align: center; }
-  .axis .pole.on { color: var(--accent); font-weight: 900; }
-  .axis .mid { font-size: 10px; opacity: .5; }
-  .match {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  .match > div {
-    flex: 1;
-    border-radius: 14px;
-    padding: 12px;
-    text-align: center;
-    font-size: 13px;
-    font-weight: 700;
-  }
-  .match .good { background: #e9fbef; color: #17a04a; }
-  .match .bad { background: #ffeef0; color: #e0466a; }
-  .match .lbl { display: block; font-size: 11px; opacity: .7; margin-bottom: 3px; font-weight: 800; }
-  .foot-note { text-align: center; color: var(--muted); font-size: 12px; margin-top: 16px; }
+  .done-emoji { font-size:64px; text-align:center; margin:8px 0 6px; }
+  .done-title { text-align:center; font-size:24px; font-weight:900; letter-spacing:-1px; margin:0 0 8px; }
+  .done-sub { text-align:center; color:var(--muted); font-size:15px; margin:0 0 24px; }
+
+  .r-emoji { font-size:70px; text-align:center; line-height:1; margin:4px 0 8px; }
+  .r-hello { text-align:center; font-size:14px; font-weight:800; color:var(--muted); margin-bottom:4px; }
+  .r-code { text-align:center; font-weight:900; letter-spacing:3px; color:var(--accent); font-size:15px; margin-bottom:2px; }
+  .r-name { text-align:center; font-size:27px; font-weight:900; letter-spacing:-1px; margin:0 0 6px; }
+  .r-tag { text-align:center; color:var(--muted); font-size:15px; margin:0 0 20px; font-weight:600; }
+  .r-desc { background:var(--soft); border-radius:16px; padding:16px 18px; font-size:15px; margin-bottom:16px; }
+  .sect-title { font-size:14px; font-weight:900; color:var(--accent2); margin:0 0 8px; display:flex; align-items:center; gap:6px; }
+  ul.pills { list-style:none; padding:0; margin:0 0 18px; }
+  ul.pills li { background:#fff; border:2px solid #f0eeff; border-radius:12px; padding:11px 14px; font-size:14px; font-weight:600; margin-bottom:8px; }
+  .r-axes { display:grid; grid-template-columns:1fr; gap:8px; margin-bottom:20px; }
+  .axis { display:flex; align-items:center; justify-content:space-between; font-size:12.5px; font-weight:700; color:var(--muted); background:#fafaff; border-radius:10px; padding:8px 12px; }
+  .axis .pole { flex:1; text-align:center; }
+  .axis .pole.on { color:var(--accent); font-weight:900; }
+  .axis .mid { font-size:10px; opacity:.5; }
+  .match { display:flex; gap:10px; margin-bottom:20px; }
+  .match > div { flex:1; border-radius:14px; padding:12px; text-align:center; font-size:13px; font-weight:700; }
+  .match .good { background:#e9fbef; color:#17a04a; }
+  .match .bad { background:#ffeef0; color:#e0466a; }
+  .match .lbl { display:block; font-size:11px; opacity:.7; margin-bottom:3px; font-weight:800; }
+  .save-state { text-align:center; font-size:12.5px; font-weight:700; margin:2px 0 14px; min-height:18px; }
+  .save-state.ok { color:#17a04a; }
+  .save-state.err { color:var(--accent2); }
+  .save-state.pending { color:var(--muted); }
+  .foot-note { text-align:center; color:var(--muted); font-size:12px; margin-top:16px; }
   .stack > * + * { margin-top: 10px; }
 </style>
 </head>
@@ -273,14 +170,22 @@
 <div class="wrap">
   <div class="card">
 
-    <!-- INTRO -->
+    <!-- INTRO / LANDING -->
     <section id="intro" class="screen active">
       <span class="badge">🎁 사내 아이스브레이킹용</span>
       <h1>나를 춤추게 하는<br><span class="hl">보상 유형</span>은?</h1>
-      <p class="lead">사람마다 힘이 나는 '보상'은 다릅니다. 12개 질문으로 나의 보상 성향 16유형을 찾아보세요. 팀원들과 결과를 비교해 보면 서로를 이해하는 힌트가 됩니다!</p>
+      <p class="lead">12개 질문으로 나의 보상 성향 16유형을 찾아보세요. 결과는 자동으로 기록되어 팀원들과 비교해 볼 수 있어요!</p>
       <div class="emoji-row">💰 · 🌱 · 🏅 · 🎉</div>
-      <button class="btn" onclick="start()">테스트 시작하기</button>
+
+      <label class="fld" for="nameInput">이름 (또는 닉네임)</label>
+      <input id="nameInput" class="name-input" type="text" maxlength="20"
+             placeholder="예: 김보상" autocomplete="off"
+             onkeydown="if(event.key==='Enter')start()" oninput="clearErr()" />
+      <p class="err" id="nameErr"></p>
+
+      <button class="btn" onclick="start()">시작하기</button>
       <p class="note">약 1분 · 12문항 · 정답은 없어요</p>
+      <a class="link" href="./records.html">📊 전체 기록 보기</a>
     </section>
 
     <!-- QUIZ -->
@@ -295,12 +200,23 @@
       <button class="back" id="backBtn" onclick="goBack()" style="visibility:hidden">← 이전 질문</button>
     </section>
 
+    <!-- DONE -->
+    <section id="done" class="screen">
+      <div class="done-emoji">🎊</div>
+      <div class="done-title" id="doneTitle">다 풀었어요!</div>
+      <p class="done-sub">이제 나의 보상 유형을 확인해 볼까요?</p>
+      <button class="btn" id="revealBtn" onclick="reveal()">결과 보기 🎉</button>
+      <button class="back" onclick="goBack()" style="display:block;margin:12px auto 0;">← 마지막 질문 다시 보기</button>
+    </section>
+
     <!-- RESULT -->
     <section id="result" class="screen">
       <div class="r-emoji" id="rEmoji">🎯</div>
+      <div class="r-hello" id="rHello"></div>
       <div class="r-code" id="rCode"></div>
       <h2 class="r-name" id="rName"></h2>
       <p class="r-tag" id="rTag"></p>
+      <div class="save-state pending" id="saveState"></div>
 
       <div class="r-desc" id="rDesc"></div>
 
@@ -319,17 +235,17 @@
       </div>
 
       <div class="stack">
-        <button class="btn" onclick="restart()">다시 하기 🔁</button>
-        <button class="btn ghost" onclick="shareResult()">결과 문구 복사하기 📋</button>
+        <button class="btn" onclick="shareResult()">공유하기 📤</button>
+        <button class="btn ghost" onclick="restart()">다시 하기 🔁</button>
       </div>
-      <p class="foot-note">결과 화면을 캡처해서 팀 채팅방에 공유해 보세요!</p>
+      <a class="link" href="./records.html">📊 전체 기록 보기</a>
     </section>
 
   </div>
 </div>
 
 <script>
-// ---- 질문 정의 ----
+// ===== 질문 정의 =====
 // axis: 형태 M(실속)/E(가치), 타이밍 I(즉시)/A(축적), 대상 S(개인)/T(팀), 방식 P(공개)/Q(은근)
 const QUESTIONS = [
   { e:"📈", q:"이번 분기 성과가 좋아서 보상을 받는다면?",
@@ -380,7 +296,7 @@ const AXES = [
   { left:{k:"P", label:"스포트라이트형 · 공개"}, right:{k:"Q", label:"은근형 · 조용히"} },
 ];
 
-// ---- 16유형 ----
+// ===== 16유형 =====
 const TYPES = {
   MISP:{e:"🕺",n:"무대 위 인센티브 헌터",tag:"바로 꽂히는 보너스에 스포트라이트까지!",
     desc:"확실한 보상을 지금 당장, 그리고 모두가 보는 앞에서 받을 때 가장 신이 나는 타입. 성과가 나오면 티 나게 인정받고 싶고, 그 에너지가 다음 목표의 연료가 됩니다.",
@@ -464,9 +380,12 @@ const TYPES = {
     good:"MISP 무대 위 인센티브 헌터", bad:"MISP 무대 위 인센티브 헌터"},
 };
 
-// ---- 상태 ----
+// ===== 상태 =====
 let idx = 0;
-let answers = []; // 각 문항의 선택 키 저장
+let answers = [];
+let playerName = "";
+let currentCode = null;
+let savedOnce = false;
 
 const $ = id => document.getElementById(id);
 function show(screen){
@@ -474,13 +393,20 @@ function show(screen){
   $(screen).classList.add('active');
   window.scrollTo(0,0);
 }
+function clearErr(){ $('nameErr').textContent=''; }
 
-function start(){ idx=0; answers=[]; show('quiz'); render(); }
+function start(){
+  const name = $('nameInput').value.trim();
+  if(name.length < 1){ $('nameErr').textContent='이름(또는 닉네임)을 입력해 주세요 🙂'; $('nameInput').focus(); return; }
+  playerName = name;
+  idx=0; answers=[]; currentCode=null; savedOnce=false;
+  show('quiz'); render();
+}
 
 function render(){
   const Q = QUESTIONS[idx];
   $('qnow').textContent = idx+1;
-  $('barfill').style.width = ((idx)/QUESTIONS.length*100) + '%';
+  $('barfill').style.width = (idx/QUESTIONS.length*100) + '%';
   $('qEmoji').textContent = Q.e;
   $('qText').textContent = Q.q;
   const wrap = $('opts');
@@ -498,26 +424,31 @@ function render(){
 function choose(k){
   answers[idx] = k;
   if(idx < QUESTIONS.length-1){ idx++; render(); }
-  else finish();
+  else { $('barfill').style.width='100%'; show('done'); }
 }
 
-function goBack(){ if(idx>0){ idx--; render(); } }
+function goBack(){
+  if($('done').classList.contains('active')){ show('quiz'); render(); return; }
+  if(idx>0){ idx--; render(); }
+}
 
-function finish(){
+function computeCode(){
   const score = {M:0,E:0,I:0,A:0,S:0,T:0,P:0,Q:0};
   answers.forEach(k=> score[k]++);
-  const code =
-    (score.M>=score.E?'M':'E') +
-    (score.I>=score.A?'I':'A') +
-    (score.S>=score.T?'S':'T') +
-    (score.P>=score.Q?'P':'Q');
-  showResult(code, score);
+  return (score.M>=score.E?'M':'E')+(score.I>=score.A?'I':'A')+
+         (score.S>=score.T?'S':'T')+(score.P>=score.Q?'P':'Q');
 }
 
-function showResult(code, score){
+function reveal(){
+  currentCode = computeCode();
+  showResult(currentCode);
+  saveResult();
+}
+
+function showResult(code){
   const t = TYPES[code];
-  $('barfill').style.width = '100%';
   $('rEmoji').textContent = t.e;
+  $('rHello').textContent = `${playerName} 님의 보상 유형은…`;
   $('rCode').textContent = code;
   $('rName').textContent = t.n;
   $('rTag').textContent = '"'+t.tag+'"';
@@ -527,7 +458,6 @@ function showResult(code, score){
   const loves = $('rLoves'); loves.innerHTML='';
   t.loves.forEach(l=>{ const li=document.createElement('li'); li.textContent='• '+l; loves.appendChild(li); });
 
-  // 축 좌표
   const axesBox = $('rAxes'); axesBox.innerHTML='';
   AXES.forEach(ax=>{
     const onLeft = code.includes(ax.left.k);
@@ -542,20 +472,60 @@ function showResult(code, score){
 
   $('rGood').textContent = t.good;
   $('rBad').textContent = t.bad;
-
-  window._resultText =
-    `[보상 MBTI] 나는 "${t.n}" (${code}) ${t.e}\n`+
-    `"${t.tag}"\n`+
-    `💗 이런 보상에 심장이 뜀: ${t.loves[0]} 등\n`+
-    `너의 보상 유형도 알려줘!`;
-
   show('result');
 }
 
-function restart(){ show('intro'); }
+// ===== 기록 저장 (Neon via /api/results) =====
+function setSaveState(cls, msg){
+  const el = $('saveState');
+  el.className = 'save-state ' + cls;
+  el.textContent = msg;
+}
 
-function shareResult(){
-  const text = window._resultText || '';
+async function saveResult(){
+  if(savedOnce) return;
+  const t = TYPES[currentCode];
+  setSaveState('pending', '기록 저장 중…');
+  try{
+    const res = await fetch('/api/results', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        name: playerName,
+        code: currentCode,
+        typeName: t.n,
+        answers: answers.join('')
+      })
+    });
+    if(!res.ok) throw new Error('bad status '+res.status);
+    savedOnce = true;
+    setSaveState('ok', '✅ 결과가 기록되었어요');
+  }catch(e){
+    setSaveState('err', '⚠️ 기록 저장에 실패했어요 (결과 확인엔 문제 없어요)');
+  }
+}
+
+// ===== 공유 =====
+function buildShareText(){
+  const t = TYPES[currentCode];
+  return `[보상 MBTI] ${playerName} 님은 "${t.n}" (${currentCode}) ${t.e}\n`+
+         `"${t.tag}"\n`+
+         `💗 이런 보상에 심장이 뜀: ${t.loves[0]} 등\n`+
+         `너의 보상 유형도 알려줘! 👉 ${location.origin}${location.pathname}`;
+}
+
+async function shareResult(){
+  const text = buildShareText();
+  const shareData = { title:'보상 MBTI', text };
+  try { shareData.url = location.origin + location.pathname; } catch(e){}
+  if(navigator.share){
+    try{ await navigator.share(shareData); return; }
+    catch(e){ if(e && e.name==='AbortError') return; }
+  }
+  copyText(text);
+}
+
+function copyText(text){
   if(navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(text).then(
       ()=>toast('결과 문구가 복사됐어요! 팀 채팅방에 붙여넣기 👍'),
@@ -576,6 +546,11 @@ function toast(msg){
   d.style.cssText='position:fixed;left:50%;bottom:32px;transform:translateX(-50%);background:#23204a;color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;font-weight:700;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.3);max-width:88%;text-align:center';
   document.body.appendChild(d);
   setTimeout(()=>{ d.style.transition='opacity .4s'; d.style.opacity='0'; setTimeout(()=>d.remove(),400); }, 2200);
+}
+
+function restart(){
+  $('nameInput').value = playerName;
+  show('intro');
 }
 </script>
 </body>

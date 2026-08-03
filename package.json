@@ -1,0 +1,9 @@
+{
+  "name": "reward-mbti",
+  "version": "1.0.0",
+  "private": true,
+  "description": "보상 MBTI - 직원 교육 아이스브레이킹용 성향 테스트 (Vercel + Neon)",
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4"
+  }
+}

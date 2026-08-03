@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>보상 MBTI · 전체 기록</title>
+<style>
+  :root{
+    --bg1:#6a5cff; --bg2:#ff6ba6; --card:#fff; --ink:#23204a; --muted:#6b6890;
+    --accent:#6a5cff; --accent2:#ff5c8a; --soft:#f2f1ff; --shadow:0 18px 50px rgba(60,40,120,.25);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+    color:var(--ink); background:linear-gradient(135deg,var(--bg1),var(--bg2));
+    min-height:100vh; padding:24px 16px; line-height:1.6;
+  }
+  .wrap{max-width:720px;margin:0 auto;}
+  .card{background:var(--card);border-radius:24px;box-shadow:var(--shadow);padding:26px 22px;margin-bottom:18px;}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;}
+  h1{font-size:24px;font-weight:900;letter-spacing:-.8px;margin:0;}
+  .sub{color:var(--muted);font-size:14px;margin:2px 0 0;}
+  a.home{color:var(--accent);font-weight:800;font-size:14px;text-decoration:none;background:var(--soft);padding:9px 14px;border-radius:12px;white-space:nowrap;}
+  .stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;}
+  .stat{flex:1;min-width:120px;background:var(--soft);border-radius:16px;padding:14px 16px;}
+  .stat .big{font-size:26px;font-weight:900;color:var(--accent);}
+  .stat .lbl{font-size:12.5px;color:var(--muted);font-weight:700;}
+  .sect-title{font-size:14px;font-weight:900;color:var(--accent2);margin:0 0 12px;}
+  .btn{border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:800;color:var(--accent);background:var(--soft);padding:9px 14px;border-radius:12px;}
+  .dist li{list-style:none;margin-bottom:10px;}
+  .dist ul{padding:0;margin:0;}
+  .dist .bar-line{display:flex;align-items:center;gap:10px;}
+  .dist .nm{width:150px;font-size:13px;font-weight:700;flex-shrink:0;}
+  .dist .track{flex:1;height:16px;background:#f0eeff;border-radius:999px;overflow:hidden;}
+  .dist .fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:999px;}
+  .dist .cnt{width:34px;text-align:right;font-size:13px;font-weight:800;color:var(--muted);}
+  table{width:100%;border-collapse:collapse;font-size:14px;}
+  th,td{text-align:left;padding:10px 8px;border-bottom:1px solid #f0eeff;}
+  th{font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.4px;}
+  td.code{font-weight:900;color:var(--accent);letter-spacing:1px;}
+  td.when{color:var(--muted);font-size:12.5px;white-space:nowrap;}
+  .empty{text-align:center;color:var(--muted);padding:30px 0;font-weight:700;}
+  .tablewrap{overflow-x:auto;}
+  .muted-note{color:var(--muted);font-size:12.5px;margin-top:14px;text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="top">
+      <div>
+        <h1>📊 보상 MBTI 전체 기록</h1>
+        <p class="sub">참가자들의 결과와 유형 분포</p>
+      </div>
+      <a class="home" href="./index.html">← 테스트로</a>
+    </div>
+    <div class="stat-row" id="stats"></div>
+    <p class="muted-note" style="text-align:right;margin-top:12px;">
+      <button class="btn" onclick="load()">↻ 새로고침</button>
+    </p>
+  </div>
+
+  <div class="card dist">
+    <p class="sect-title">🏆 유형 분포</p>
+    <ul id="dist"></ul>
+    <div id="distEmpty" class="empty" style="display:none;">아직 기록이 없어요.</div>
+  </div>
+
+  <div class="card">
+    <p class="sect-title">🧾 참가자 기록</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>#</th><th>이름</th><th>유형</th><th>코드</th><th>시각</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div id="rowsEmpty" class="empty" style="display:none;">아직 참가한 사람이 없어요. 첫 주자가 되어보세요! 🎉</div>
+  </div>
+</div>
+
+<script>
+const TYPE_META = {
+  MISP:["🕺","무대 위 인센티브 헌터"],MISQ:["🤑","조용한 보너스 수집가"],
+  MITP:["🍻","회식비 스폰서"],MITQ:["🎈","몰래 쏘는 팀 서포터"],
+  MASP:["📈","연봉 협상 마스터"],MASQ:["🏦","묵묵한 자산가"],
+  MATP:["🏗️","성과급 설계자"],MATQ:["🛡️","든든한 곳간지기"],
+  EISP:["🎉","리액션 부자"],EISQ:["🍵","소소한 힐링러"],
+  EITP:["🥳","분위기 메이커"],EITQ:["🤗","따뜻한 케어러"],
+  EASP:["🧗","커리어 등반가"],EASQ:["📚","자기계발 장인"],
+  EATP:["🌅","비전 리더"],EATQ:["🌳","성장 멘토"],
+};
+const $ = id => document.getElementById(id);
+
+function fmt(ts){
+  try{
+    const d = new Date(ts);
+    const p = n => String(n).padStart(2,'0');
+    return `${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  }catch(e){ return ts; }
+}
+
+async function load(){
+  try{
+    const res = await fetch('/api/results?limit=1000', {cache:'no-store'});
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.error||'error');
+    render(data);
+  }catch(e){
+    $('stats').innerHTML = `<div class="stat"><div class="lbl" style="color:var(--accent2)">기록을 불러오지 못했어요</div><div class="lbl">Neon(DATABASE_URL) 연결과 배포 상태를 확인해 주세요.</div></div>`;
+  }
+}
+
+function render(data){
+  const results = data.results || [];
+  const counts = data.counts || [];
+  const total = data.total || results.length;
+  const distinctTypes = counts.length;
+  const top = counts[0];
+  const topLabel = top ? `${(TYPE_META[top.code]||['','?'])[0]} ${(TYPE_META[top.code]||['','?'])[1]}` : '—';
+
+  $('stats').innerHTML =
+    `<div class="stat"><div class="big">${total}</div><div class="lbl">총 참가자</div></div>`+
+    `<div class="stat"><div class="big">${distinctTypes}<span style="font-size:15px">/16</span></div><div class="lbl">나온 유형 수</div></div>`+
+    `<div class="stat"><div class="big" style="font-size:18px;line-height:1.4">${topLabel}</div><div class="lbl">가장 많은 유형</div></div>`;
+
+  // 분포
+  const distEl = $('dist');
+  distEl.innerHTML = '';
+  const max = counts.reduce((m,c)=>Math.max(m,c.count),0) || 1;
+  if(counts.length===0){ $('distEmpty').style.display='block'; }
+  else {
+    $('distEmpty').style.display='none';
+    counts.forEach(c=>{
+      const [emoji,name] = TYPE_META[c.code] || ['❓', c.code];
+      const li = document.createElement('li');
+      li.innerHTML =
+        `<div class="bar-line">`+
+          `<span class="nm">${emoji} ${name}</span>`+
+          `<span class="track"><span class="fill" style="width:${(c.count/max*100)}%"></span></span>`+
+          `<span class="cnt">${c.count}</span>`+
+        `</div>`;
+      distEl.appendChild(li);
+    });
+  }
+
+  // 테이블
+  const rowsEl = $('rows');
+  rowsEl.innerHTML = '';
+  if(results.length===0){ $('rowsEmpty').style.display='block'; }
+  else {
+    $('rowsEmpty').style.display='none';
+    results.forEach((r,i)=>{
+      const [emoji,name] = TYPE_META[r.code] || ['❓', r.type_name||''];
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        `<td>${i+1}</td>`+
+        `<td>${escapeHtml(r.name)}</td>`+
+        `<td>${emoji} ${escapeHtml(r.type_name||name)}</td>`+
+        `<td class="code">${escapeHtml(r.code)}</td>`+
+        `<td class="when">${fmt(r.created_at)}</td>`;
+      rowsEl.appendChild(tr);
+    });
+  }
+}
+
+function escapeHtml(s){
+  return String(s==null?'':s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+}
+
+load();
+</script>
+</body>
+</html>
