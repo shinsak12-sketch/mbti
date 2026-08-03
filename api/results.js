@@ -15,7 +15,7 @@ const CONN =
   process.env.DATABASE_URL_UNPOOLED ||
   process.env.POSTGRES_PRISMA_URL;
 
-const VALID_CODE = /^[ME][IA][ST][PQ]$/;
+const VALID_CODE = /^[EI][SN][TF][JP]$/;
 
 let schemaReady = false;
 async function ensureSchema(sql) {
