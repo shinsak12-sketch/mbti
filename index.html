@@ -24,11 +24,11 @@
       radial-gradient(60% 45% at 15% 0%, rgba(15,157,99,.18), transparent 60%),
       radial-gradient(55% 40% at 100% 12%, rgba(56,199,255,.14), transparent 60%),
       radial-gradient(70% 50% at 50% 110%, rgba(15,157,99,.12), transparent 60%);
-    min-height:100dvh; display:flex; align-items:center; justify-content:center;
-    padding:22px 16px calc(34px + env(safe-area-inset-bottom));
+    min-height:100dvh; display:flex; flex-direction:column; align-items:center;
+    padding:18px 14px calc(28px + env(safe-area-inset-bottom));
     line-height:1.65; -webkit-font-smoothing:antialiased;
   }
-  .wrap{width:100%;max-width:480px;}
+  .wrap{width:100%;max-width:480px;margin:auto;}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
     box-shadow:var(--shadow);padding:30px 24px 26px;position:relative;overflow:hidden;}
   .screen{display:none;}
@@ -149,6 +149,17 @@
     background:#132019;color:#fff;font-size:14px;font-weight:700;padding:12px 18px;border-radius:14px;opacity:0;
     pointer-events:none;transition:opacity .3s, transform .3s;z-index:50;max-width:88%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.3);}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* 모바일 최적화 */
+  @media (max-width:400px){
+    .card{padding:24px 18px 22px;border-radius:20px;}
+    h1{font-size:29px;}
+    .q-text{font-size:19px;}
+    .r-name{font-size:26px;}
+    .r-avatar{width:96px;height:96px;font-size:48px;}
+    .cases,.pair{grid-template-columns:1fr;}
+    .bar-line .nm{width:130px;}
+  }
 </style>
 </head>
 <body>
