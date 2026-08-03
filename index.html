@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>보상 MBTI · 나를 춤추게 하는 보상은?</title>
+<style>
+  :root {
+    --bg1: #6a5cff;
+    --bg2: #ff6ba6;
+    --card: #ffffff;
+    --ink: #23204a;
+    --muted: #6b6890;
+    --accent: #6a5cff;
+    --accent2: #ff5c8a;
+    --soft: #f2f1ff;
+    --shadow: 0 18px 50px rgba(60, 40, 120, 0.25);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
+    color: var(--ink);
+    background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    line-height: 1.6;
+  }
+  .wrap {
+    width: 100%;
+    max-width: 480px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 26px;
+    box-shadow: var(--shadow);
+    padding: 30px 26px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .screen { display: none; }
+  .screen.active { display: block; animation: pop .35s ease; }
+  @keyframes pop {
+    from { opacity: 0; transform: translateY(14px) scale(.98); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* Intro */
+  .badge {
+    display: inline-block;
+    background: var(--soft);
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: .5px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-size: 30px;
+    line-height: 1.3;
+    margin: 0 0 12px;
+    font-weight: 900;
+    letter-spacing: -1px;
+  }
+  h1 .hl {
+    background: linear-gradient(120deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .lead {
+    color: var(--muted);
+    font-size: 15px;
+    margin: 0 0 22px;
+  }
+  .emoji-row {
+    font-size: 34px;
+    text-align: center;
+    margin: 6px 0 22px;
+    letter-spacing: 6px;
+  }
+  .btn {
+    display: block;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 800;
+    color: #fff;
+    background: linear-gradient(120deg, var(--accent), var(--accent2));
+    padding: 17px;
+    border-radius: 16px;
+    box-shadow: 0 10px 24px rgba(106, 92, 255, .35);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:active { transform: translateY(2px) scale(.99); box-shadow: 0 5px 14px rgba(106,92,255,.3); }
+  .btn.ghost {
+    background: var(--soft);
+    color: var(--accent);
+    box-shadow: none;
+  }
+  .note {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 14px;
+  }
+
+  /* Progress */
+  .progress-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .qcount { font-size: 13px; font-weight: 800; color: var(--muted); }
+  .bar {
+    flex: 1;
+    height: 8px;
+    background: var(--soft);
+    border-radius: 999px;
+    margin-left: 12px;
+    overflow: hidden;
+  }
+  .bar > i {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 999px;
+    transition: width .3s ease;
+  }
+  .q-emoji { font-size: 42px; text-align: center; margin: 10px 0 4px; }
+  .q-text {
+    font-size: 21px;
+    font-weight: 800;
+    text-align: center;
+    margin: 4px 0 24px;
+    letter-spacing: -.5px;
+  }
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    text-align: left;
+    border: 2px solid #ece9ff;
+    background: #fbfaff;
+    border-radius: 16px;
+    padding: 16px 16px;
+    margin-bottom: 12px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    cursor: pointer;
+    transition: border-color .12s ease, transform .1s ease, background .12s ease;
+  }
+  .opt:active { transform: scale(.98); }
+  .opt:hover { border-color: var(--accent); background: #fff; }
+  .opt .ic { font-size: 24px; flex-shrink: 0; }
+  .back {
+    display: inline-block;
+    margin-top: 6px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 8px 4px;
+  }
+
+  /* Result */
+  .r-emoji { font-size: 70px; text-align: center; line-height: 1; margin: 4px 0 8px; }
+  .r-code {
+    text-align: center;
+    font-weight: 900;
+    letter-spacing: 3px;
+    color: var(--accent);
+    font-size: 15px;
+    margin-bottom: 2px;
+  }
+  .r-name {
+    text-align: center;
+    font-size: 27px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    margin: 0 0 6px;
+  }
+  .r-tag {
+    text-align: center;
+    color: var(--muted);
+    font-size: 15px;
+    margin: 0 0 20px;
+    font-weight: 600;
+  }
+  .r-desc {
+    background: var(--soft);
+    border-radius: 16px;
+    padding: 16px 18px;
+    font-size: 15px;
+    margin-bottom: 16px;
+  }
+  .sect-title {
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--accent2);
+    margin: 0 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  ul.pills { list-style: none; padding: 0; margin: 0 0 18px; }
+  ul.pills li {
+    background: #fff;
+    border: 2px solid #f0eeff;
+    border-radius: 12px;
+    padding: 11px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .r-axes {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .axis {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--muted);
+    background: #fafaff;
+    border-radius: 10px;
+    padding: 8px 12px;
+  }
+  .axis b { color: var(--ink); }
+  .axis .pole { flex: 1; text-align: center; }
+  .axis .pole.on { color: var(--accent); font-weight: 900; }
+  .axis .mid { font-size: 10px; opacity: .5; }
+  .match {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .match > div {
+    flex: 1;
+    border-radius: 14px;
+    padding: 12px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .match .good { background: #e9fbef; color: #17a04a; }
+  .match .bad { background: #ffeef0; color: #e0466a; }
+  .match .lbl { display: block; font-size: 11px; opacity: .7; margin-bottom: 3px; font-weight: 800; }
+  .foot-note { text-align: center; color: var(--muted); font-size: 12px; margin-top: 16px; }
+  .stack > * + * { margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+
+    <!-- INTRO -->
+    <section id="intro" class="screen active">
+      <span class="badge">🎁 사내 아이스브레이킹용</span>
+      <h1>나를 춤추게 하는<br><span class="hl">보상 유형</span>은?</h1>
+      <p class="lead">사람마다 힘이 나는 '보상'은 다릅니다. 12개 질문으로 나의 보상 성향 16유형을 찾아보세요. 팀원들과 결과를 비교해 보면 서로를 이해하는 힌트가 됩니다!</p>
+      <div class="emoji-row">💰 · 🌱 · 🏅 · 🎉</div>
+      <button class="btn" onclick="start()">테스트 시작하기</button>
+      <p class="note">약 1분 · 12문항 · 정답은 없어요</p>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="quiz" class="screen">
+      <div class="progress-top">
+        <span class="qcount"><span id="qnow">1</span>/12</span>
+        <span class="bar"><i id="barfill"></i></span>
+      </div>
+      <div class="q-emoji" id="qEmoji">💭</div>
+      <div class="q-text" id="qText"></div>
+      <div id="opts"></div>
+      <button class="back" id="backBtn" onclick="goBack()" style="visibility:hidden">← 이전 질문</button>
+    </section>
+
+    <!-- RESULT -->
+    <section id="result" class="screen">
+      <div class="r-emoji" id="rEmoji">🎯</div>
+      <div class="r-code" id="rCode"></div>
+      <h2 class="r-name" id="rName"></h2>
+      <p class="r-tag" id="rTag"></p>
+
+      <div class="r-desc" id="rDesc"></div>
+
+      <p class="sect-title">💗 이런 보상에 심장이 뜁니다</p>
+      <ul class="pills" id="rLoves"></ul>
+
+      <p class="sect-title">🧑‍💼 이 사람을 춤추게 하려면 (매니저 팁)</p>
+      <div class="r-desc" id="rTip" style="background:#fff5f9;"></div>
+
+      <p class="sect-title">🧭 나의 보상 좌표</p>
+      <div class="r-axes" id="rAxes"></div>
+
+      <div class="match">
+        <div class="good"><span class="lbl">환상의 짝꿍</span><span id="rGood"></span></div>
+        <div class="bad"><span class="lbl">티키타카 필요</span><span id="rBad"></span></div>
+      </div>
+
+      <div class="stack">
+        <button class="btn" onclick="restart()">다시 하기 🔁</button>
+        <button class="btn ghost" onclick="shareResult()">결과 문구 복사하기 📋</button>
+      </div>
+      <p class="foot-note">결과 화면을 캡처해서 팀 채팅방에 공유해 보세요!</p>
+    </section>
+
+  </div>
+</div>
+
+<script>
+// ---- 질문 정의 ----
+// axis: 형태 M(실속)/E(가치), 타이밍 I(즉시)/A(축적), 대상 S(개인)/T(팀), 방식 P(공개)/Q(은근)
+const QUESTIONS = [
+  { e:"📈", q:"이번 분기 성과가 좋아서 보상을 받는다면?",
+    a:{t:"통장에 꽂히는 두둑한 보너스", ic:"💰", k:"M"},
+    b:{t:"배우고 싶던 강의·워크숍 지원", ic:"🌱", k:"E"} },
+  { e:"🎁", q:"사내 경품 이벤트, 더 끌리는 상품은?",
+    a:{t:"어디서나 쓰는 백화점 상품권", ic:"🧾", k:"M"},
+    b:{t:"특별한 여행·체험 티켓", ic:"✈️", k:"E"} },
+  { e:"✨", q:'"잘했어!"라는 말보다 나에게 더 중요한 건?',
+    a:{t:"눈에 보이는 확실한 보상", ic:"💵", k:"M"},
+    b:{t:"나에게 남는 의미와 경험", ic:"📖", k:"E"} },
+
+  { e:"⏱️", q:"보상은 언제 받아야 제맛인가요?",
+    a:{t:"지금 당장, 바로바로", ic:"⚡", k:"I"},
+    b:{t:"모아뒀다가 크게 한 방", ic:"🎯", k:"A"} },
+  { e:"🎯", q:"포인트 적립 스타일을 고른다면?",
+    a:{t:"쌓이는 족족 바로 쓴다", ic:"🛒", k:"I"},
+    b:{t:"참고 모아서 큰 걸 노린다", ic:"🏆", k:"A"} },
+  { e:"🍗", q:"목표를 이룬 나에게 주는 상은?",
+    a:{t:"그날 저녁 바로 치킨 한 마리", ic:"🍗", k:"I"},
+    b:{t:"1년 뒤 큰 목표 달성 후 명품 하나", ic:"👜", k:"A"} },
+
+  { e:"🚀", q:"프로젝트가 대박! 가장 기쁜 순간은?",
+    a:{t:"내 기여를 콕 집어 인정받을 때", ic:"🙋", k:"S"},
+    b:{t:"우리 팀이 다 같이 축하받을 때", ic:"🙌", k:"T"} },
+  { e:"🏅", q:"보상을 받는다면 어느 쪽?",
+    a:{t:"나 개인에게 오는 상", ic:"🏅", k:"S"},
+    b:{t:"팀 회식·팀 단위 포상", ic:"🎉", k:"T"} },
+  { e:"💸", q:"성과급, 이상적인 배분 방식은?",
+    a:{t:"기여한 만큼 개인별로 차등", ic:"📊", k:"S"},
+    b:{t:"팀이 함께 골고루 나눠서", ic:"🤝", k:"T"} },
+
+  { e:"👏", q:"칭찬받을 때 나는?",
+    a:{t:"전체 회의에서 대놓고 박수받기", ic:"👏", k:"P"},
+    b:{t:"조용히 따로 한마디가 더 좋아", ic:"🤫", k:"Q"} },
+  { e:"📰", q:"사내 게시판에 내 성과가 올라간다면?",
+    a:{t:"좋아! 다들 보라고 해", ic:"📢", k:"P"},
+    b:{t:"음… 좀 부담스러운데", ic:"😳", k:"Q"} },
+  { e:"🎤", q:"상 받는 자리에서 나는?",
+    a:{t:"무대 올라가는 거 신난다", ic:"🎤", k:"P"},
+    b:{t:"자리에서 받는 게 편하다", ic:"💺", k:"Q"} },
+];
+
+const AXES = [
+  { left:{k:"M", label:"실속형 · 돈/물질"}, right:{k:"E", label:"가치형 · 경험/의미"} },
+  { left:{k:"I", label:"즉시형 · 바로바로"}, right:{k:"A", label:"축적형 · 모아서 크게"} },
+  { left:{k:"S", label:"개인형 · 나부터"},   right:{k:"T", label:"팀형 · 함께"} },
+  { left:{k:"P", label:"스포트라이트형 · 공개"}, right:{k:"Q", label:"은근형 · 조용히"} },
+];
+
+// ---- 16유형 ----
+const TYPES = {
+  MISP:{e:"🕺",n:"무대 위 인센티브 헌터",tag:"바로 꽂히는 보너스에 스포트라이트까지!",
+    desc:"확실한 보상을 지금 당장, 그리고 모두가 보는 앞에서 받을 때 가장 신이 나는 타입. 성과가 나오면 티 나게 인정받고 싶고, 그 에너지가 다음 목표의 연료가 됩니다.",
+    loves:["즉시 지급되는 성과 인센티브","전체 회의에서의 이름 호명·시상","이달의 사원 같은 눈에 띄는 타이틀"],
+    tip:"성과가 나오면 '바로 + 공개적으로' 보상하세요. 분기 말까지 미루면 동기가 식습니다. 금액이 작아도 '즉시성'과 '무대'가 핵심.",
+    good:"EITQ 따뜻한 케어러", bad:"MASQ 묵묵한 자산가"},
+  MISQ:{e:"🤑",n:"조용한 보너스 수집가",tag:"티 안 나게, 그러나 확실하게 챙긴다",
+    desc:"확실한 보상을 지금 받되, 요란한 무대는 사양하는 타입. 통장에 딱 들어오면 그걸로 충분하고, 관심의 스포트라이트보다 실속을 택합니다.",
+    loves:["조용히 지급되는 즉시 인센티브","개인적으로 전하는 감사 + 기프티콘","드러나지 않는 실질 혜택(주유·식비 등)"],
+    tip:"공개 시상대에 세우기보다, 1:1로 조용히 '이건 네 몫'이라며 실질 보상을 건네세요. 과한 주목은 오히려 부담.",
+    good:"EITP 분위기 메이커", bad:"EASP 커리어 등반가"},
+  MITP:{e:"🍻",n:"회식비 스폰서",tag:"우리 팀 쏜다! 다 같이 지금 즐기자",
+    desc:"보상은 팀과 함께, 지금 바로, 그리고 왁자지껄하게 즐길 때 최고. 나 혼자보다 다 같이 나눌 때 두 배로 신나는 분위기 메이커형 실속가.",
+    loves:["팀 회식비·팀 인센티브 즉시 지급","다 함께하는 깜짝 포상 파티","팀 이름으로 받는 공개 보상"],
+    tip:"개인 표창보다 '팀 단위 즉시 보상'이 이 사람을 움직입니다. 성과 직후 팀 회식·팀 포인트를 크게, 공개적으로.",
+    good:"MASQ 묵묵한 자산가", bad:"EASQ 자기계발 장인"},
+  MITQ:{e:"🎈",n:"몰래 쏘는 팀 서포터",tag:"생색 없이 팀에 실속을 채워주는 사람",
+    desc:"팀을 위한 실질적 보상을 지금 챙기되, 자기 공을 드러내진 않는 타입. 조용히 팀 곳간을 채우고 뒤에서 흐뭇해하는 든든한 스타일.",
+    loves:["팀에 돌아가는 즉각적 실속 혜택","조용히 마련되는 팀 간식·회식","드러나지 않아도 팀에 남는 실질 보상"],
+    tip:"'네 덕분에 팀이 받았다'는 걸 개인적으로만 짚어주세요. 공개 칭찬보다 팀 전체가 누리는 혜택 그 자체가 보상.",
+    good:"EASP 커리어 등반가", bad:"MISP 무대 위 인센티브 헌터"},
+  MASP:{e:"📈",n:"연봉 협상 마스터",tag:"큰 그림의 보상, 확실하게 인정받고 간다",
+    desc:"당장의 소소함보다 크게 모아 한 방을 노리는 실속파. 대신 그 성취는 확실히 드러나야 합니다. 연봉·승진처럼 축적된 보상을 공개적으로 인정받을 때 만족.",
+    loves:["연봉 인상·승진 같은 굵직한 보상","목표 달성 시 큰 규모의 성과급","공개적으로 확정되는 지위·타이틀"],
+    tip:"작은 즉시 보상보다 '분명한 장기 목표 → 큰 보상' 로드맵을 제시하세요. 그 성취는 반드시 공식적으로 인정.",
+    good:"EITQ 따뜻한 케어러", bad:"EITP 분위기 메이커"},
+  MASQ:{e:"🏦",n:"묵묵한 자산가",tag:"조용히 크게 모으는 실속의 끝판왕",
+    desc:"요란함 없이, 지금 참고 크게 모아 확실한 보상으로 돌려받는 타입. 스포트라이트엔 관심 없고 통장 잔고와 안정이 최고의 인정입니다.",
+    loves:["장기 근속·목표 달성 시 큰 보상","조용히 쌓이는 스톡옵션·연금·복지","드러나지 않는 안정적 처우 개선"],
+    tip:"화려한 이벤트 대신 '장기적으로 확실히 챙겨준다'는 신뢰를 주세요. 예측 가능한 큰 보상이 최고의 동기.",
+    good:"MITP 회식비 스폰서", bad:"EISP 리액션 부자"},
+  MATP:{e:"🏗️",n:"성과급 설계자",tag:"팀 전체의 큰 파이를 키우는 전략가",
+    desc:"팀이 함께 큰 목표를 향해 달려 큰 보상을 나눠 갖는 그림을 즐기는 타입. 그 성과는 공개적으로 인정받아야 제맛인 실속형 리더 기질.",
+    loves:["팀 목표 달성 시 큰 성과급 배분","팀 단위의 공식적 포상·시상","모두가 아는 팀의 성취 스토리"],
+    tip:"팀 공동의 장기 목표와 '달성 시 이만큼'을 명확히 걸어주세요. 성과는 팀 이름으로 크게 알리는 자리 마련.",
+    good:"EISQ 소소한 힐링러", bad:"EISP 리액션 부자"},
+  MATQ:{e:"🛡️",n:"든든한 곳간지기",tag:"티 안 내고 팀의 미래를 채워둔다",
+    desc:"팀을 위해 크게 모으되 생색은 내지 않는 타입. 지금의 화려함보다 팀에 남을 실질적 자산을 조용히 쌓는 걸 보람으로 여깁니다.",
+    loves:["팀에 축적되는 장기 성과·예산","조용히 마련되는 팀 복지·환경 개선","드러나지 않아도 팀에 남는 든든함"],
+    tip:"공개 표창보다 '팀에 실제로 남는 것'을 만들 권한을 주세요. 조용한 신뢰와 장기적 결과가 동력입니다.",
+    good:"EISP 리액션 부자", bad:"MISP 무대 위 인센티브 헌터"},
+  EISP:{e:"🎉",n:"리액션 부자",tag:"지금 이 순간의 즐거움과 환호가 최고!",
+    desc:"돈보다 경험과 재미, 그것도 지금 당장 그리고 사람들의 리액션과 함께일 때 폭발하는 타입. 즉각적인 칭찬과 즐거운 순간이 곧 보상입니다.",
+    loves:["그 자리에서 터지는 칭찬과 환호","즉흥적인 깜짝 이벤트·소소한 재미","경험을 함께 나누고 반응받는 순간"],
+    tip:"성과 즉시, 눈앞에서, 표현력 있게 칭찬하세요. 금액보다 '와~ 대박!' 하는 그 순간의 리액션이 최고의 보상.",
+    good:"MASQ 묵묵한 자산가", bad:"MATQ 든든한 곳간지기"},
+  EISQ:{e:"🍵",n:"소소한 힐링러",tag:"지금 나에게 주는 작지만 다정한 위로",
+    desc:"큰 보상보다 지금 이 순간의 소소한 경험과 여유를 아끼는 타입. 조용히, 나만 아는 작은 힐링으로도 충분히 채워지는 섬세한 스타일.",
+    loves:["조용한 반차·일찍 퇴근 같은 여유","개인적으로 건네는 따뜻한 한마디","소소하지만 즉각적인 취향 저격 선물"],
+    tip:"거창한 무대 대신 '오늘 고생했으니 먼저 들어가요' 같은 즉각적이고 사적인 배려가 크게 와닿습니다.",
+    good:"MATP 성과급 설계자", bad:"MISP 무대 위 인센티브 헌터"},
+  EITP:{e:"🥳",n:"분위기 메이커",tag:"다 같이, 지금, 신나게 즐기자!",
+    desc:"팀과 함께 지금 이 순간을 즐겁게 나누는 데서 힘을 얻는 타입. 경험과 재미를 공유하고 다 같이 왁자지껄할 때 가장 빛나는 무드 리더.",
+    loves:["팀 단합 이벤트·즉흥 회식","다 함께 즐기는 경험형 보상","팀 전체가 웃는 공개적인 순간"],
+    tip:"팀 전체가 함께 즐길 즉각적 경험(깜짝 나들이, 팀 게임 등)을 열어주세요. 개인 포상보다 '같이'가 핵심.",
+    good:"MASQ 묵묵한 자산가", bad:"MASP 연봉 협상 마스터"},
+  EITQ:{e:"🤗",n:"따뜻한 케어러",tag:"티 안 나게 팀을 챙기는 다정한 사람",
+    desc:"팀원들과 지금의 경험을 나누되, 앞에 나서기보단 뒤에서 챙기는 타입. 함께 웃는 순간 자체가 보상이고, 생색은 필요 없습니다.",
+    loves:["팀원과 나누는 소소한 경험·정","조용히 챙겨주는 분위기와 배려","드러나지 않아도 팀이 편안한 순간"],
+    tip:"큰 무대보다 '팀 분위기를 좋게 만드는 사람'이라고 사적으로 인정해 주세요. 함께하는 따뜻한 경험이 동기.",
+    good:"MISP 무대 위 인센티브 헌터", bad:"MASP 연봉 협상 마스터"},
+  EASP:{e:"🧗",n:"커리어 등반가",tag:"성장이라는 보상을, 인정과 함께",
+    desc:"눈앞의 이익보다 길게 보고 성장하는 경험을 택하는 타입. 대신 그 성장의 여정은 인정받고 싶어 합니다. 도전 기회와 공개적 인정이 최고의 보상.",
+    loves:["큰 프로젝트·도전 기회 부여","성장의 이정표를 공식적으로 인정","리더십·전문성을 드러낼 무대"],
+    tip:"단기 보상보다 '이 경험이 너를 어디까지 데려갈지'를 그려주세요. 성장의 순간마다 공개적으로 인정.",
+    good:"MITQ 몰래 쏘는 팀 서포터", bad:"MISQ 조용한 보너스 수집가"},
+  EASQ:{e:"📚",n:"자기계발 장인",tag:"묵묵히 나를 갈고닦는 성장 덕후",
+    desc:"장기적인 성장과 배움 그 자체가 보상인 타입. 남들이 알아주지 않아도 조용히 실력을 쌓는 데서 깊은 만족을 얻는 내공파.",
+    loves:["교육·자격증·학습 기회 지원","스스로 몰입할 시간과 자율성","조용히 인정받는 전문성의 깊이"],
+    tip:"떠들썩한 상보다 '배우고 성장할 기회'와 자율을 주세요. 성장에 필요한 자원을 조용히 지원하는 게 최고의 보상.",
+    good:"MITP 회식비 스폰서", bad:"MITP 회식비 스폰서"},
+  EATP:{e:"🌅",n:"비전 리더",tag:"팀과 함께 멀리, 그리고 당당하게",
+    desc:"팀이 함께 장기적 성장과 의미를 향해 나아가는 그림을 그리는 타입. 그 여정과 성취는 공개적으로 공유될 때 더 큰 힘을 냅니다.",
+    loves:["팀의 장기 비전·성장 스토리","함께 이룬 성취의 공개적 공유","팀을 대표해 발표·인정받는 자리"],
+    tip:"팀의 '왜'와 장기 비전을 함께 그리게 하고, 이정표마다 팀의 성장을 공개적으로 축하해 주세요.",
+    good:"MISQ 조용한 보너스 수집가", bad:"MISQ 조용한 보너스 수집가"},
+  EATQ:{e:"🌳",n:"성장 멘토",tag:"묵묵히 팀을 키워내는 든든한 뿌리",
+    desc:"팀의 장기적 성장을 위해 헌신하되 앞에 나서지 않는 타입. 후배와 팀이 자라는 걸 보는 것 자체가 보상인 조용한 큰그릇 스타일.",
+    loves:["팀·후배의 성장을 돕는 역할","길게 보는 팀의 발전과 안정","드러나지 않아도 남는 성장의 결실"],
+    tip:"멘토·코치 역할과 팀을 키울 권한을 주세요. 화려한 인정보다 '팀이 성장했다'는 결과가 가장 큰 보상.",
+    good:"MISP 무대 위 인센티브 헌터", bad:"MISP 무대 위 인센티브 헌터"},
+};
+
+// ---- 상태 ----
+let idx = 0;
+let answers = []; // 각 문항의 선택 키 저장
+
+const $ = id => document.getElementById(id);
+function show(screen){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(screen).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function start(){ idx=0; answers=[]; show('quiz'); render(); }
+
+function render(){
+  const Q = QUESTIONS[idx];
+  $('qnow').textContent = idx+1;
+  $('barfill').style.width = ((idx)/QUESTIONS.length*100) + '%';
+  $('qEmoji').textContent = Q.e;
+  $('qText').textContent = Q.q;
+  const wrap = $('opts');
+  wrap.innerHTML = '';
+  [Q.a, Q.b].forEach(opt=>{
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.innerHTML = `<span class="ic">${opt.ic}</span><span>${opt.t}</span>`;
+    b.onclick = ()=>choose(opt.k);
+    wrap.appendChild(b);
+  });
+  $('backBtn').style.visibility = idx>0 ? 'visible' : 'hidden';
+}
+
+function choose(k){
+  answers[idx] = k;
+  if(idx < QUESTIONS.length-1){ idx++; render(); }
+  else finish();
+}
+
+function goBack(){ if(idx>0){ idx--; render(); } }
+
+function finish(){
+  const score = {M:0,E:0,I:0,A:0,S:0,T:0,P:0,Q:0};
+  answers.forEach(k=> score[k]++);
+  const code =
+    (score.M>=score.E?'M':'E') +
+    (score.I>=score.A?'I':'A') +
+    (score.S>=score.T?'S':'T') +
+    (score.P>=score.Q?'P':'Q');
+  showResult(code, score);
+}
+
+function showResult(code, score){
+  const t = TYPES[code];
+  $('barfill').style.width = '100%';
+  $('rEmoji').textContent = t.e;
+  $('rCode').textContent = code;
+  $('rName').textContent = t.n;
+  $('rTag').textContent = '"'+t.tag+'"';
+  $('rDesc').textContent = t.desc;
+  $('rTip').textContent = t.tip;
+
+  const loves = $('rLoves'); loves.innerHTML='';
+  t.loves.forEach(l=>{ const li=document.createElement('li'); li.textContent='• '+l; loves.appendChild(li); });
+
+  // 축 좌표
+  const axesBox = $('rAxes'); axesBox.innerHTML='';
+  AXES.forEach(ax=>{
+    const onLeft = code.includes(ax.left.k);
+    const div = document.createElement('div');
+    div.className='axis';
+    div.innerHTML =
+      `<span class="pole ${onLeft?'on':''}">${ax.left.label}</span>`+
+      `<span class="mid">↔</span>`+
+      `<span class="pole ${!onLeft?'on':''}">${ax.right.label}</span>`;
+    axesBox.appendChild(div);
+  });
+
+  $('rGood').textContent = t.good;
+  $('rBad').textContent = t.bad;
+
+  window._resultText =
+    `[보상 MBTI] 나는 "${t.n}" (${code}) ${t.e}\n`+
+    `"${t.tag}"\n`+
+    `💗 이런 보상에 심장이 뜀: ${t.loves[0]} 등\n`+
+    `너의 보상 유형도 알려줘!`;
+
+  show('result');
+}
+
+function restart(){ show('intro'); }
+
+function shareResult(){
+  const text = window._resultText || '';
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(
+      ()=>toast('결과 문구가 복사됐어요! 팀 채팅방에 붙여넣기 👍'),
+      ()=>fallbackCopy(text)
+    );
+  } else { fallbackCopy(text); }
+}
+function fallbackCopy(text){
+  const ta=document.createElement('textarea');
+  ta.value=text; document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); toast('결과 문구가 복사됐어요! 👍'); }
+  catch(e){ toast('복사가 안 되면 화면을 캡처해 주세요 📸'); }
+  document.body.removeChild(ta);
+}
+function toast(msg){
+  const d=document.createElement('div');
+  d.textContent=msg;
+  d.style.cssText='position:fixed;left:50%;bottom:32px;transform:translateX(-50%);background:#23204a;color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;font-weight:700;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.3);max-width:88%;text-align:center';
+  document.body.appendChild(d);
+  setTimeout(()=>{ d.style.transition='opacity .4s'; d.style.opacity='0'; setTimeout(()=>d.remove(),400); }, 2200);
+}
+</script>
+</body>
+</html>
