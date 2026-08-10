@@ -52,6 +52,13 @@
   .help.mode b{color:var(--merged)}
 
   .wrap{max-width:1200px;margin:20px auto 0;padding:0 16px}
+  .stats{display:inline-flex;flex-direction:column;gap:7px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:16px;max-width:100%}
+  .stats .t{font-size:11px;color:var(--muted);font-weight:800;letter-spacing:.3px}
+  .stats .row{display:flex;flex-wrap:wrap;gap:6px}
+  .stats .cell{font-size:12px;font-weight:700;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:4px 10px;white-space:nowrap}
+  .stats .cell .v{color:var(--accent);margin-left:3px}
+  .stats .up{color:var(--new);margin-left:3px;font-size:11px}
+  .stats .dn{color:var(--closed);margin-left:3px;font-size:11px}
 
   .ceo-area{display:flex;align-items:center;justify-content:center;flex-wrap:nowrap}
   .ceo{background:linear-gradient(135deg,var(--ceo1),var(--ceo2));border:1px solid var(--ceo-bd);color:#fff;padding:14px 40px;border-radius:14px;font-size:18px;font-weight:800;box-shadow:0 10px 30px rgba(0,0,0,.35);text-align:center;flex:none}
@@ -192,6 +199,7 @@
 </div>
 
 <div class="wrap">
+  <div id="stats" class="stats"></div>
   <div id="canvas"></div>
   <div class="legend">
     <span><i style="background:var(--tft)"></i>TFT(부서·센터 사이)</span>
@@ -354,7 +362,25 @@ function render(){
   document.getElementById('canvas').innerHTML=h;
   if(selectedId&&idMap[selectedId]){ var el=document.querySelector('[data-id="'+selectedId+'"]'); if(el) el.classList.add('sel'); }
   if(pending) highlightTargets();
-  saveData(); updateTabs();
+  renderStats(); saveData(); updateTabs();
+}
+function computeStats(root){
+  var s={hq:0,unit:0,tft:0,center:0,team:0,support:0};
+  (function w(n){ (n.children||[]).forEach(function(c){
+    if(c.change==='closed') return;
+    if(c.kind==='hq') s.hq++;
+    else if(c.kind==='tft') s.tft++;
+    else if(c.kind==='unit'){ if(c.flags&&c.flags.indexOf('support')>=0) s.support++; else s.unit++; }
+    else if(c.kind==='leaf'){ if(c.flags&&c.flags.indexOf('team')>=0) s.team++; else s.center++; }
+    w(c);
+  }); })(root);
+  return s;
+}
+function renderStats(){
+  var a=computeStats(tree), o=computeStats(INITIAL);
+  function cell(label,cur,orig){ var d=cur-orig; var dd=d?' <span class="'+(d>0?'up':'dn')+'">('+(d>0?'+':'')+d+')</span>':''; return '<span class="cell">'+label+'<span class="v">'+cur+'</span>'+dd+'</span>'; }
+  document.getElementById('stats').innerHTML='<div class="t">개편 후 조직 수 · '+VERS[cur]+'</div><div class="row">'
+    +cell('본부',a.hq,o.hq)+cell('부서',a.unit,o.unit)+cell('TFT',a.tft,o.tft)+cell('센터',a.center,o.center)+cell('팀',a.team,o.team)+'</div>';
 }
 function highlightTargets(){
   var src=idMap[pending.srcId]; if(!src) return;
