@@ -112,6 +112,14 @@
   .tft{
     border-style:dashed;color:var(--muted);background:#fff;
   }
+  .part.tftdept{background:#f7f5ff;border-color:#d7cef0}
+  .part.tftdept .ph{background:#efeafb;border-bottom:none;color:#5b4a9c}
+  .part.tftdept .dot{background:#7c66c4}
+  .lvl{
+    font-size:10px;font-weight:700;color:#7a869a;background:#fff;
+    border:1px solid var(--line);border-radius:20px;padding:1px 7px;margin-left:6px;
+  }
+  .team .lvl{font-size:9.5px;padding:0 5px}
 
   /* 차량보상부 (부 + 센터들) */
   .bu{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
@@ -196,9 +204,11 @@
             <span class="team">QI팀</span>
           </div>
         </div>
+        <div class="part tftdept">
+          <div class="ph"><span class="dot"></span>네트워크운영TFT <span class="lvl">부서레벨</span></div>
+        </div>
         <div class="teams" style="padding:0">
-          <span class="team tft">네트워크운영TFT</span>
-          <span class="team tft">업무TFT</span>
+          <span class="team tft">업무TFT <span class="lvl">부서급 아님</span></span>
         </div>
       </div>
     </section>
@@ -257,9 +267,9 @@
         <div class="bu">
           <div class="buh"><span class="dot"></span>수도권SMART차량보상부<span class="cnt">5센터</span></div>
           <div class="centers">
-            <span class="c-chip smart">smart강북</span><span class="c-chip smart">smart강남</span>
-            <span class="c-chip smart">smart동서울</span><span class="c-chip smart">smart인천</span>
-            <span class="c-chip smart">smart경기</span>
+            <span class="c-chip smart">SMART강북</span><span class="c-chip smart">SMART강남</span>
+            <span class="c-chip smart">SMART동서울</span><span class="c-chip smart">SMART인천</span>
+            <span class="c-chip smart">SMART경기</span>
           </div>
         </div>
       </div>
@@ -310,8 +320,8 @@
         <div class="bu">
           <div class="buh"><span class="dot"></span>지방SMART차량보상부<span class="cnt">4센터</span></div>
           <div class="centers">
-            <span class="c-chip smart">smart부산</span><span class="c-chip smart">smart대구</span>
-            <span class="c-chip smart">smart충청</span><span class="c-chip smart">smart호남</span>
+            <span class="c-chip smart">SMART부산</span><span class="c-chip smart">SMART대구</span>
+            <span class="c-chip smart">SMART충청</span><span class="c-chip smart">SMART호남</span>
           </div>
         </div>
       </div>
