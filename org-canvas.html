@@ -134,7 +134,7 @@
   .bdg.demoted{background:var(--demoted);color:#3a2708}
   .bdg.mtgt{background:var(--merged);color:#06241f}
   .bdg.combined{background:var(--combined);color:#06241f}
-  .chg-combined{border-color:var(--combined)!important;box-shadow:0 0 0 2px rgba(26,188,156,.2)}
+  .has-merge{border-color:var(--combined)!important;border-width:3px!important;box-shadow:0 0 0 2px rgba(26,188,156,.2)}
   .mtarget{border-color:var(--merged)!important;border-width:3px!important;box-shadow:0 0 0 2px rgba(26,188,156,.18)}
   .hq.mtarget{box-shadow:inset 4px 0 0 var(--merged)}
   .old{color:var(--muted);text-decoration:line-through;font-weight:500;font-size:11px;margin-left:6px}
@@ -286,7 +286,7 @@ function init(){
   var d=loadData();
   data = d && d.versions && d.versions.length===4 ? {versions:d.versions} : {versions:[mkWs(),mkWs(),mkWs(),mkWs()]};
   cur = d && typeof d.cur==='number' ? d.cur : 0;
-  idSeq=0; data.versions.forEach(function(ws){ (function w(n){ if(n.id){ var m=/^n(\d+)$/.exec(n.id); if(m) idSeq=Math.max(idSeq,+m[1]); } (n.children||[]).forEach(w); })(ws.tree); });
+  idSeq=0; data.versions.forEach(function(ws){ (function w(n){ if(n.id){ var m=/^n(\d+)$/.exec(n.id); if(m) idSeq=Math.max(idSeq,+m[1]); } if(n.change==='combined'||n.change==='merged') n.change=null; (n.children||[]).forEach(w); })(ws.tree); });
   applyTheme(localStorage.getItem(TKEY)||'dark');
   activate(cur);
 }
@@ -307,12 +307,10 @@ function canParent(childKind, parentNode){ if(!parentNode) return false; var ok=
 
 /* ═══════ 렌더 ═══════ */
 function chgClass(n){ return n.change?' chg-'+n.change:''; }
-function chgBadge(n){ if(!n.change) return '';
-  if(n.change==='combined') return ' <span class="bdg combined">통합: '+esc((n.mergedParts||[]).join(' · '))+'</span>';
-  var m={new:'신설',closed:'폐쇄',moved:'이동',renamed:'명칭변경',promoted:'승격',demoted:'강등',merged:'통합'}; var ex=(n.change==='merged'&&n.mergedInto)?'→'+n.mergedInto:''; return ' <span class="bdg '+n.change+'">'+m[n.change]+ex+'</span>'; }
+function chgBadge(n){ if(!n.change) return ''; var m={new:'신설',closed:'폐쇄',moved:'이동',renamed:'명칭변경',promoted:'승격',demoted:'강등'}; if(!m[n.change]) return ''; return ' <span class="bdg '+n.change+'">'+m[n.change]+'</span>'; }
 function specBadge(n){ return n.special?' <span class="spec">'+esc(n.special)+'</span>':''; }
-function mtClass(n){ return (n.mergedFrom&&n.mergedFrom.length)?' mtarget':''; }
-function mfBadge(n){ return (n.mergedFrom&&n.mergedFrom.length)?' <span class="bdg mtgt">통합←'+esc(n.mergedFrom.join('·'))+'</span>':''; }
+function mtClass(n){ return (n.mergedParts&&n.mergedParts.length)?' has-merge':''; }
+function mfBadge(n){ return (n.mergedParts&&n.mergedParts.length)?' <span class="bdg combined">통합: '+esc(n.mergedParts.join(' · '))+'</span>':''; }
 function oldName(n){ return n.oldName?'<span class="old">'+esc(n.oldName)+'</span>':''; }
 function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
 
@@ -552,7 +550,7 @@ function completePending(id){
       var parts = (s.mergedParts&&s.mergedParts.length) ? s.mergedParts.slice() : [s.name];
       parts.push(tt.name);
       removeFromParent(tt);          // 흡수된 조직은 화면에서 제거
-      s.mergedParts=parts; s.change='combined';
+      s.mergedParts=parts;           // 통합 정보는 change와 별개로 유지(이동해도 안 사라짐)
       if(nm && nm!==s.name) s.name=nm;
       ensureIds(); selectedId=s.id; render(); openSheet(s.id); toast('통합되었습니다: '+parts.join(' + '));
     });
@@ -579,7 +577,7 @@ document.querySelector('.toolbar').addEventListener('click', function(e){
 function updateTabs(){
   document.querySelectorAll('.vtab').forEach(function(b){
     var i=+b.getAttribute('data-v'); var t=data.versions[i].tree;
-    var c=0;(function w(n){ if(n.change)c++; (n.children||[]).forEach(w); })(t);
+    var c=0;(function w(n){ if(n.change||(n.mergedParts&&n.mergedParts.length))c++; (n.children||[]).forEach(w); })(t);
     b.classList.toggle('on', i===cur);
     b.innerHTML='v'+(i+1)+(c?' <span class="vc">'+c+'</span>':'');
   });
@@ -592,16 +590,19 @@ function toggleTheme(){ var light=document.body.classList.contains('light'); var
 /* ═══════ 요약 ═══════ */
 function collectChanges(){ var out=[]; (function w(n){ if(n.change) out.push({node:n,path:pathNames(n.id)}); (n.children||[]).forEach(w); })(tree); return out; }
 function collectSpecial(){ var out=[]; (function w(n){ if(n.special) out.push({node:n,path:pathNames(n.id)}); (n.children||[]).forEach(w); })(tree); return out; }
+function collectMerges(){ var out=[]; (function w(n){ if(n.mergedParts&&n.mergedParts.length) out.push({node:n,path:pathNames(n.id)}); (n.children||[]).forEach(w); })(tree); return out; }
 function showSummary(){
-  var ch=collectChanges(), sp=collectSpecial(), counts={}, lbl={new:'신설',closed:'폐쇄',combined:'통합',moved:'이동',renamed:'명칭변경',promoted:'승격',demoted:'강등'};
+  var ch=collectChanges(), mg=collectMerges(), sp=collectSpecial(), counts={}, lbl={new:'신설',closed:'폐쇄',moved:'이동',renamed:'명칭변경',promoted:'승격',demoted:'강등'};
   ch.forEach(function(c){ counts[c.node.change]=(counts[c.node.change]||0)+1; });
   var h='<span class="close" onclick="closeModal()">✕</span><h2>📋 '+VERS[cur]+' 변경 요약</h2><div class="sumgrid">';
   Object.keys(lbl).forEach(function(k){ h+='<span class="k" style="border-color:var(--'+k+')">'+lbl[k]+' '+(counts[k]||0)+'</span>'; });
+  h+='<span class="k" style="border-color:var(--combined)">통합 '+mg.length+'</span>';
   h+='<span class="k" style="border-color:var(--auto)">특화 '+sp.length+'</span></div>';
-  if(!ch.length&&!sp.length) h+='<div class="empty">아직 변경 사항이 없습니다.</div>';
+  if(!ch.length&&!mg.length&&!sp.length) h+='<div class="empty">아직 변경 사항이 없습니다.</div>';
   else{
     h+='<div class="sumlist">';
-    ch.forEach(function(c){ var n=c.node, ex=''; if(n.change==='renamed'&&n.oldName) ex=' <span class="old">'+esc(n.oldName)+'</span> → '+esc(n.name); else if(n.change==='combined') ex=' : '+esc((n.mergedParts||[]).join(' + '))+' 통합'; else if((n.change==='promoted'||n.change==='demoted')&&n.oldKind) ex=' : '+KIND_LABEL[n.oldKind]+' → '+KIND_LABEL[n.kind]; h+='<div class="sumrow"><span class="bdg '+n.change+'">'+lbl[n.change]+'</span><span><b>'+esc(n.name)+'</b>'+ex+'<div class="path">'+(c.path.join(' › ')||'최상위')+'</div></span></div>'; });
+    ch.forEach(function(c){ var n=c.node, ex=''; if(n.change==='renamed'&&n.oldName) ex=' <span class="old">'+esc(n.oldName)+'</span> → '+esc(n.name); else if((n.change==='promoted'||n.change==='demoted')&&n.oldKind) ex=' : '+KIND_LABEL[n.oldKind]+' → '+KIND_LABEL[n.kind]; h+='<div class="sumrow"><span class="bdg '+n.change+'">'+lbl[n.change]+'</span><span><b>'+esc(n.name)+'</b>'+ex+'<div class="path">'+(c.path.join(' › ')||'최상위')+'</div></span></div>'; });
+    mg.forEach(function(c){ h+='<div class="sumrow"><span class="bdg combined">통합</span><span><b>'+esc(c.node.name)+'</b> : '+esc(c.node.mergedParts.join(' + '))+'<div class="path">'+(c.path.join(' › ')||'')+'</div></span></div>'; });
     sp.forEach(function(c){ h+='<div class="sumrow"><span class="spec">특화</span><span><b>'+esc(c.node.name)+'</b> : '+esc(c.node.special)+'<div class="path">'+(c.path.join(' › ')||'')+'</div></span></div>'; });
     h+='</div>';
   }
@@ -630,9 +631,11 @@ function treeText(node, skipClosed){
   return lines.join('\n');
 }
 function changesText(){
-  var ch=collectChanges(); if(!ch.length) return '(구조 변경 없음)';
-  var lbl={new:'신설',closed:'폐쇄',combined:'통합',moved:'이동',renamed:'명칭변경',promoted:'승격',demoted:'강등'};
-  return ch.map(function(c){ var n=c.node, ex=''; if(n.change==='renamed'&&n.oldName) ex=' : '+n.oldName+' → '+n.name; else if(n.change==='combined') ex=' : '+(n.mergedParts||[]).join(' + ')+' 통합'; else if((n.change==='promoted'||n.change==='demoted')&&n.oldKind) ex=' : '+KIND_LABEL[n.oldKind]+' → '+KIND_LABEL[n.kind]; var p=c.path.length?'  ('+c.path.join(' › ')+')':''; return '- ['+lbl[n.change]+'] '+n.name+ex+p; }).join('\n');
+  var ch=collectChanges(); if(!ch.length && !collectMerges().length) return '(구조 변경 없음)';
+  var lbl={new:'신설',closed:'폐쇄',moved:'이동',renamed:'명칭변경',promoted:'승격',demoted:'강등'};
+  var lines=ch.map(function(c){ var n=c.node, ex=''; if(n.change==='renamed'&&n.oldName) ex=' : '+n.oldName+' → '+n.name; else if((n.change==='promoted'||n.change==='demoted')&&n.oldKind) ex=' : '+KIND_LABEL[n.oldKind]+' → '+KIND_LABEL[n.kind]; var p=c.path.length?'  ('+c.path.join(' › ')+')':''; return '- ['+lbl[n.change]+'] '+n.name+ex+p; });
+  collectMerges().forEach(function(c){ var p=c.path.length?'  ('+c.path.join(' › ')+')':''; lines.push('- [통합] '+c.node.name+' : '+c.node.mergedParts.join(' + ')+' 통합'+p); });
+  return lines.join('\n');
 }
 function specialText(){ var sp=collectSpecial(); if(!sp.length) return '(없음)'; return sp.map(function(c){ return '- '+c.node.name+' : '+c.node.special+'  ('+c.path.join(' › ')+')'; }).join('\n'); }
 function savePrompt(){
