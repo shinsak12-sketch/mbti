@@ -33,7 +33,7 @@
     background:var(--bg);color:var(--ink);line-height:1.45;-webkit-font-smoothing:antialiased;padding:0 0 130px;transition:background .2s,color .2s}
 
   .toolbar{position:sticky;top:0;z-index:30;background:var(--bg);border-bottom:1px solid var(--line);padding:9px 14px}
-  .toolbar .row{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .toolbar .row{max-width:1440px;margin:0 auto;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
   .toolbar .row+.row{margin-top:8px}
   .brand{font-size:14px;font-weight:800;margin-right:6px;white-space:nowrap}
   .vtab{border:1px solid var(--line);background:var(--panel);color:var(--muted);padding:8px 16px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer}
@@ -46,12 +46,16 @@
   .btn.pri{background:var(--new);border-color:var(--new);color:#08301c}
   .btn.accent{background:var(--accent);border-color:var(--accent);color:#fff}
   .spacer{flex:1}
-  .help{max-width:1200px;margin:8px auto 0;font-size:12.5px;color:var(--muted)}
+  .help{max-width:1440px;margin:8px auto 0;font-size:12.5px;color:var(--muted)}
   .help b{color:var(--gold)}
   .help.mode{color:var(--merged);font-weight:700}
   .help.mode b{color:var(--merged)}
 
-  .wrap{max-width:1200px;margin:20px auto 0;padding:0 16px}
+  .wrap{max-width:1440px;margin:20px auto 0;padding:0 16px}
+  .hqcol{display:flex;flex-direction:column}
+  @media(min-width:900px){
+    .hqcols{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  }
   .stats{display:inline-flex;flex-direction:column;gap:7px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:16px;max-width:100%}
   .stats .t{font-size:11px;color:var(--muted);font-weight:800;letter-spacing:.3px}
   .stats .row{display:flex;flex-wrap:wrap;gap:6px}
@@ -361,7 +365,10 @@ function render(){
   var h='<div class="ceo-area"><div class="ceo'+chgClass(tree)+'" data-id="'+tree.id+'" data-kind="ceo">'+esc(tree.name)+oldName(tree)+chgBadge(tree)+'<small>CEO</small></div></div>';
   h+='<div class="rail"></div>';
   if(auditHtml) h+='<div class="staff"><div class="staff-left">'+auditHtml+'<span class="hconn"></span></div></div>';
-  h+=hqs.map(renderHQ).join('');
+  var half=Math.ceil(hqs.length/2);
+  var leftCol=hqs.slice(0,half).map(renderHQ).join('');
+  var rightCol=hqs.slice(half).map(renderHQ).join('');
+  h+='<div class="hqcols"><div class="hqcol">'+leftCol+'</div><div class="hqcol">'+rightCol+'</div></div>';
   if(other.length) h+=other.map(renderUnitLike).join('');
   document.getElementById('canvas').innerHTML=h;
   if(selectedId&&idMap[selectedId]){ var el=document.querySelector('[data-id="'+selectedId+'"]'); if(el) el.classList.add('sel'); }
