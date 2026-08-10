@@ -488,7 +488,7 @@ function startPending(type, sel){
   var help=document.getElementById('help'); help.className='help mode';
   help.innerHTML = type==='move'
     ? '<b>이동</b> — "'+esc(sel.name)+'" 을 옮길 상위 조직을 탭 (초록 표시 / 취소: 빈 곳 탭)'
-    : '<b>통합</b> — "'+esc(sel.name)+'" 을 합칠 같은 종류 대상을 탭 (초록 표시 / 취소: 빈 곳 탭)';
+    : '<b>통합</b> — "'+esc(sel.name)+'"(으)로 <b>흡수할</b> 조직을 탭하세요. 탭한 조직이 "'+esc(sel.name)+'"에 합쳐지며 빗금 처리됩니다. (취소: 빈 곳 탭)';
   render();
 }
 function completePending(id){
@@ -503,8 +503,9 @@ function completePending(id){
   } else {
     if(t.kind!==src.kind){ toast('같은 종류끼리만 통합할 수 있습니다.'); return; }
     pushHistory();
-    (src.children||[]).forEach(function(c){ if(c.change!=='closed'){ if(c.change!=='new') c.change='moved'; t.children.push(c); } });
-    src.children=[]; src.change='merged'; src.mergedInto=t.name; selectedId=t.id; endPending(); toast('통합되었습니다');
+    // 탭한 t 를 선택 조직 src 로 흡수 → t 가 통합되어 빗금 처리
+    (t.children||[]).forEach(function(c){ if(c.change!=='closed'){ if(c.change!=='new') c.change='moved'; src.children.push(c); } });
+    t.children=[]; t.change='merged'; t.mergedInto=src.name; selectedId=src.id; endPending(); toast('"'+t.name+'" 을(를) "'+src.name+'"에 통합했습니다');
   }
 }
 function endPending(){ pending=null; resetHelp(); render(); }
