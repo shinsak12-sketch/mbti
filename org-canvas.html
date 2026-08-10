@@ -121,6 +121,9 @@
   .bdg.moved{background:var(--moved);color:#fff} .bdg.renamed{background:var(--renamed);color:#3a2708}
   .bdg.promoted{background:var(--promoted);color:#1a123a} .bdg.merged{background:var(--merged);color:#06241f}
   .bdg.demoted{background:var(--demoted);color:#3a2708}
+  .bdg.mtgt{background:var(--merged);color:#06241f}
+  .mtarget{border-color:var(--merged)!important;border-width:3px!important;box-shadow:0 0 0 2px rgba(26,188,156,.18)}
+  .hq.mtarget{box-shadow:inset 4px 0 0 var(--merged)}
   .old{color:var(--muted);text-decoration:line-through;font-weight:500;font-size:11px;margin-left:6px}
 
   .legend{display:flex;gap:13px;justify-content:center;flex-wrap:wrap;margin:20px 0 4px;font-size:12px;color:var(--muted)}
@@ -292,14 +295,16 @@ function canParent(childKind, parentNode){ if(!parentNode) return false; var ok=
 function chgClass(n){ return n.change?' chg-'+n.change:''; }
 function chgBadge(n){ if(!n.change) return ''; var m={new:'신설',closed:'폐쇄',moved:'이동',renamed:'명칭변경',promoted:'승격',demoted:'강등',merged:'통합'}; var ex=(n.change==='merged'&&n.mergedInto)?'→'+n.mergedInto:''; return ' <span class="bdg '+n.change+'">'+m[n.change]+ex+'</span>'; }
 function specBadge(n){ return n.special?' <span class="spec">'+esc(n.special)+'</span>':''; }
+function mtClass(n){ return (n.mergedFrom&&n.mergedFrom.length)?' mtarget':''; }
+function mfBadge(n){ return (n.mergedFrom&&n.mergedFrom.length)?' <span class="bdg mtgt">통합←'+esc(n.mergedFrom.join('·'))+'</span>':''; }
 function oldName(n){ return n.oldName?'<span class="old">'+esc(n.oldName)+'</span>':''; }
 function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
 
 function renderLeaf(n){
-  var cls='leaf'+(n.flags.indexOf('team')>=0?' team':'')+(n.flags.indexOf('import')>=0?' import':'')+(n.flags.indexOf('smart')>=0?' smart':'')+(n.special?' has-spec':'')+chgClass(n);
-  return '<span class="'+cls+'" data-id="'+n.id+'" data-kind="leaf"><span class="lname">'+esc(n.name)+'</span>'+oldName(n)+specBadge(n)+chgBadge(n)+'</span>';
+  var cls='leaf'+(n.flags.indexOf('team')>=0?' team':'')+(n.flags.indexOf('import')>=0?' import':'')+(n.flags.indexOf('smart')>=0?' smart':'')+(n.special?' has-spec':'')+mtClass(n)+chgClass(n);
+  return '<span class="'+cls+'" data-id="'+n.id+'" data-kind="leaf"><span class="lname">'+esc(n.name)+'</span>'+oldName(n)+specBadge(n)+chgBadge(n)+mfBadge(n)+'</span>';
 }
-function supportHtml(n){ return '<div class="support'+(n.special?' has-spec':'')+chgClass(n)+'" data-id="'+n.id+'" data-kind="unit"><span class="u-name">'+esc(n.name)+'</span>'+oldName(n)+specBadge(n)+chgBadge(n)+'</div>'; }
+function supportHtml(n){ return '<div class="support'+(n.special?' has-spec':'')+mtClass(n)+chgClass(n)+'" data-id="'+n.id+'" data-kind="unit"><span class="u-name">'+esc(n.name)+'</span>'+oldName(n)+specBadge(n)+chgBadge(n)+mfBadge(n)+'</div>'; }
 function renderUnitLike(n){
   if(n.kind==='unit'&&n.flags.indexOf('support')>=0) return supportHtml(n);
   var kids=n.children||[];
@@ -307,9 +312,9 @@ function renderUnitLike(n){
   var subs=kids.filter(function(c){return c.kind==='unit'||c.kind==='tft';});
   var cnt=leaves.filter(function(c){return c.change!=='closed';}).length;
   var cntHtml=cnt>0?'<span class="cnt">'+cnt+'</span>':'';
-  var box='unit'+(n.kind==='tft'?' tftbox':'')+(n.special?' has-spec':'')+chgClass(n);
+  var box='unit'+(n.kind==='tft'?' tftbox':'')+(n.special?' has-spec':'')+mtClass(n)+chgClass(n);
   var h='<div class="branch"><div class="'+box+'" data-id="'+n.id+'" data-kind="'+n.kind+'">'
-    +'<div class="unit-head"><span class="ic"></span><span class="u-name">'+esc(n.name)+'</span>'+oldName(n)+specBadge(n)+chgBadge(n)+cntHtml+'</div>';
+    +'<div class="unit-head"><span class="ic"></span><span class="u-name">'+esc(n.name)+'</span>'+oldName(n)+specBadge(n)+chgBadge(n)+mfBadge(n)+cntHtml+'</div>';
   if(leaves.length) h+='<div class="leaves">'+leaves.map(renderLeaf).join('')+'</div>';
   h+='</div>';
   if(subs.length) h+='<div style="margin-left:6px">'+subs.map(renderUnitLike).join('')+'</div>';
@@ -326,8 +331,8 @@ function renderHQ(n){
   var cc=0;(function co(nd){(nd.children||[]).forEach(function(c){ if(c.kind==='leaf'&&c.flags.indexOf('team')<0&&c.change!=='closed')cc++; co(c);});})(n);
   var tp=[]; if(uc)tp.push('부서 '+uc); if(tc)tp.push('TFT '+tc); if(cc)tp.push('센터 '+cc);
   var tag=tp.join(' · ');
-  var h='<section class="hq '+(n.color||'c1')+'"><div class="hq-head" data-id="'+n.id+'" data-kind="hq">'
-    +'<span class="name u-name">'+esc(n.name)+'</span>'+oldName(n)+specBadge(n)+chgBadge(n)+(tag?'<span class="tag">'+tag+'</span>':'')+'</div><div class="hq-body">';
+  var h='<section class="hq '+(n.color||'c1')+mtClass(n)+'"><div class="hq-head" data-id="'+n.id+'" data-kind="hq">'
+    +'<span class="name u-name">'+esc(n.name)+'</span>'+oldName(n)+specBadge(n)+chgBadge(n)+mfBadge(n)+(tag?'<span class="tag">'+tag+'</span>':'')+'</div><div class="hq-body">';
   h+=sup.map(supportHtml).join('')+org.map(renderUnitLike).join('');
   if(leaves.length) h+='<div class="leaves">'+leaves.map(renderLeaf).join('')+'</div>';
   h+='</div></section>';
@@ -503,9 +508,11 @@ function completePending(id){
   } else {
     if(t.kind!==src.kind){ toast('같은 종류끼리만 통합할 수 있습니다.'); return; }
     pushHistory();
-    // 탭한 t 를 선택 조직 src 로 흡수 → t 가 통합되어 빗금 처리
+    // 탭한 t 를 선택 조직 src 로 흡수 → t 가 통합되어 빗금 처리, src 에도 통합 기록 표시
     (t.children||[]).forEach(function(c){ if(c.change!=='closed'){ if(c.change!=='new') c.change='moved'; src.children.push(c); } });
-    t.children=[]; t.change='merged'; t.mergedInto=src.name; selectedId=src.id; endPending(); toast('"'+t.name+'" 을(를) "'+src.name+'"에 통합했습니다');
+    t.children=[]; t.change='merged'; t.mergedInto=src.name;
+    src.mergedFrom=src.mergedFrom||[]; src.mergedFrom.push(t.name);
+    selectedId=src.id; endPending(); toast('"'+t.name+'" 을(를) "'+src.name+'"에 통합했습니다');
   }
 }
 function endPending(){ pending=null; resetHelp(); render(); }
@@ -558,7 +565,7 @@ function showSummary(){
 }
 
 /* ═══════ 저장 (JSON / 프롬프트) ═══════ */
-function stripIds(n){ var o={name:n.name,kind:n.kind,flags:n.flags||[]}; if(n.color)o.color=n.color; if(n.change)o.change=n.change; if(n.oldName)o.oldName=n.oldName; if(n.oldKind)o.oldKind=n.oldKind; if(n.mergedInto)o.mergedInto=n.mergedInto; if(n.special)o.special=n.special; o.children=(n.children||[]).map(stripIds); return o; }
+function stripIds(n){ var o={name:n.name,kind:n.kind,flags:n.flags||[]}; if(n.color)o.color=n.color; if(n.change)o.change=n.change; if(n.oldName)o.oldName=n.oldName; if(n.oldKind)o.oldKind=n.oldKind; if(n.mergedInto)o.mergedInto=n.mergedInto; if(n.mergedFrom)o.mergedFrom=n.mergedFrom; if(n.special)o.special=n.special; o.children=(n.children||[]).map(stripIds); return o; }
 function downloadFile(fname, content, mime){
   try{ var blob=new Blob([content],{type:mime}); var url=URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download=fname; document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); },100); toast('저장: '+fname); }
   catch(e){ openModal('<span class="close" onclick="closeModal()">✕</span><h2>'+esc(fname)+' (복사해서 사용)</h2><textarea class="txtin" style="height:320px">'+esc(content)+'</textarea>'); }
@@ -571,7 +578,7 @@ function treeText(node, skipClosed){
   var lines=[];
   (function w(n,d){
     if(skipClosed && (n.change==='closed'||n.change==='merged')) return;
-    var tags=[]; if(n.flags&&n.flags.indexOf('import')>=0)tags.push('외제'); if(n.flags&&n.flags.indexOf('smart')>=0)tags.push('SMART'); if(n.special)tags.push('특화:'+n.special);
+    var tags=[]; if(n.flags&&n.flags.indexOf('import')>=0)tags.push('외제'); if(n.flags&&n.flags.indexOf('smart')>=0)tags.push('SMART'); if(n.special)tags.push('특화:'+n.special); if(n.mergedFrom&&n.mergedFrom.length)tags.push('통합수용:'+n.mergedFrom.join('·'));
     var lv=KIND_LABEL[n.kind]; var t=tags.length?' ['+tags.join(', ')+']':'';
     lines.push(Array(d+1).join('  ')+'- '+n.name+' ('+lv+')'+t);
     (n.children||[]).forEach(function(c){ w(c,d+1); });
