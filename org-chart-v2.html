@@ -122,9 +122,15 @@
   .leaf.tft{border-style:dashed;color:var(--muted)}
   .leaf.import{border-color:#5a4526;color:#e6b878;background:rgba(224,150,60,.07)}
   .leaf.smart{border-color:#274a72;color:#8fc0ff;background:rgba(79,140,255,.08)}
-  .unit.tftdept{border-color:#3d356a;background:#1e1b33}
-  .unit.tftdept .unit-head{color:var(--violet)}
-  .unit.tftdept .ic{background:var(--violet)}
+  .unit.amb{border-color:#6a4a3d;background:#2a1f1b}
+  .unit.amb .unit-head{color:#e6b878}
+  .unit.amb .ic{background:#e6b878}
+  .unit.amb .lvl{border-color:#e6b878;color:#e6b878;background:rgba(224,150,60,.08)}
+  .leaf.auto{border-color:#c0392b;box-shadow:0 0 0 2px rgba(192,57,43,.18);position:relative}
+  .leaf.auto .ab{
+    display:block;font-size:9px;font-weight:800;color:#fff;background:#c0392b;
+    border-radius:4px;padding:1px 5px;margin-top:3px;letter-spacing:.2px;
+  }
 
   /* support team pill */
   .support{
@@ -171,7 +177,7 @@
     <section class="hq c1">
       <div class="hq-head">
         <div class="name">경영지원본부</div>
-        <div class="tag">파트 2 · 부서레벨 TFT 1</div>
+        <div class="tag">파트 2 · 네트워크운영TFT · 업무TFT</div>
       </div>
       <div class="hq-body">
         <div class="branch">
@@ -194,10 +200,15 @@
           </div>
         </div>
         <div class="branch">
-          <div class="unit tftdept">
-            <div class="unit-head"><span class="ic"></span>네트워크운영TFT<span class="lvl">부서레벨</span></div>
+          <div class="unit">
+            <div class="unit-head"><span class="ic"></span>네트워크운영TFT</div>
+          </div>
+        </div>
+        <div class="branch">
+          <div class="unit amb">
+            <div class="unit-head"><span class="ic"></span>업무TFT<span class="lvl">애매 조직</span></div>
             <div class="leaves">
-              <span class="leaf tft">업무TFT<span class="lvl" style="border-color:#4a5568;color:#93a0b8;background:none">부서급 아님</span></span>
+              <span class="leaf tft">외부파견자 소속 · 본부 직속</span>
             </div>
           </div>
         </div>
@@ -267,7 +278,8 @@
           <div class="unit">
             <div class="unit-head"><span class="ic"></span>수도권SMART차량보상부<span class="cnt">5센터</span></div>
             <div class="leaves">
-              <span class="leaf smart">SMART강북</span><span class="leaf smart">SMART강남</span>
+              <span class="leaf smart">SMART강북</span>
+              <span class="leaf smart auto">SMART강남<span class="ab">자동화전담 전원 소속</span></span>
               <span class="leaf smart">SMART동서울</span><span class="leaf smart">SMART인천</span>
               <span class="leaf smart">SMART경기</span>
             </div>
@@ -343,9 +355,9 @@
     <span><i style="background:var(--c1)"></i>경영지원본부</span>
     <span><i style="background:var(--c2)"></i>수도권보상본부</span>
     <span><i style="background:var(--c3)"></i>지방보상본부</span>
-    <span><i style="background:var(--violet)"></i>부서레벨 TFT</span>
     <span><i style="background:#e6b878"></i>외제 센터</span>
     <span><i style="background:#8fc0ff"></i>SMART 센터</span>
+    <span><i style="background:#c0392b"></i>자동화전담 소속</span>
   </div>
 
   <footer>인사회의 조직개편 검토용 · 현재 조직도(초안) · 작성일 2026-08-10</footer>

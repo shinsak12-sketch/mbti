@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>현재 조직도 (클래식형)</title>
+<style>
+  :root{
+    --ink:#17324e;
+    --muted:#5f7590;
+    --wire:#9cbbdb;
+    --box:#eaf2fb;
+    --box-bd:#7aa8d8;
+    --hq:#d7e6f7;
+    --hq-bd:#5b90c6;
+    --support:#f1f7fd;
+    --import:#fff4e6;
+    --import-bd:#e6c088;
+    --import-ink:#8a5a1f;
+    --smart:#e9f2ff;
+    --smart-bd:#a9c6e4;
+    --smart-ink:#255ea8;
+    --amb:#fbeaea;
+    --amb-bd:#d99a9a;
+    --amb-ink:#a23b3b;
+    --auto:#c0392b;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
+    background:#f6f9fc;color:var(--ink);line-height:1.35;
+    padding:26px 16px 60px;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1500px;margin:0 auto}
+  header.top{text-align:center;margin-bottom:18px}
+  header.top h1{font-size:24px;margin:0 0 6px;letter-spacing:-.5px}
+  header.top .sub{color:var(--muted);font-size:13px}
+  .legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:12px;font-size:12px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .legend i{width:12px;height:12px;border-radius:3px;display:inline-block;border:1px solid rgba(0,0,0,.12)}
+
+  .chartwrap{overflow-x:auto;padding:8px 4px 16px}
+  .chart{display:inline-block;min-width:100%}
+  .chart ul{list-style:none;margin:0;padding:0}
+  .chart > ul{padding-top:6px}
+
+  /* connector tree */
+  .chart ul{position:relative;text-align:center;white-space:nowrap;padding-top:22px}
+  .chart li{display:inline-block;vertical-align:top;position:relative;padding:22px 5px 0}
+  .chart li::before,.chart li::after{
+    content:'';position:absolute;top:0;right:50%;
+    border-top:2px solid var(--wire);width:50%;height:22px;
+  }
+  .chart li::after{right:auto;left:50%;border-left:2px solid var(--wire)}
+  .chart li:only-child::before,.chart li:only-child::after{display:none}
+  .chart li:only-child{padding-top:0}
+  .chart li:first-child::before,.chart li:last-child::after{border:0 none}
+  .chart li:last-child::before{border-right:2px solid var(--wire);border-radius:0 7px 0 0}
+  .chart li:first-child::after{border-radius:7px 0 0 0}
+  .chart ul ul::before{
+    content:'';position:absolute;top:0;left:50%;
+    border-left:2px solid var(--wire);width:0;height:22px;
+  }
+
+  /* boxes */
+  .node{
+    display:inline-block;border:1.6px solid var(--box-bd);background:var(--box);
+    border-radius:9px;padding:9px 14px;font-size:13.5px;font-weight:700;color:var(--ink);
+    box-shadow:0 1px 2px rgba(30,60,90,.08);min-width:76px;
+  }
+  .node.ceo{
+    background:linear-gradient(180deg,#2a4a6e,#1d3557);
+    color:#fff;border-color:#1d3557;font-size:17px;padding:13px 34px;border-radius:12px;
+    box-shadow:0 6px 16px rgba(29,53,87,.3);
+  }
+  .node.ceo small{display:block;font-size:10px;font-weight:600;opacity:.8;letter-spacing:2px;margin-top:2px}
+  .node.hq{background:var(--hq);border-color:var(--hq-bd);font-size:15px;padding:11px 18px}
+  .node.support{background:var(--support);font-weight:600;font-size:12.5px;color:#3d5a78}
+  .node.amb{background:var(--amb);border:1.6px dashed var(--amb-bd);color:var(--amb-ink)}
+  .node.amb .note{display:block;font-size:10px;font-weight:600;color:#b06a6a;margin-top:3px;white-space:normal;max-width:150px}
+  .node .cnt{margin-left:6px;font-size:10.5px;font-weight:700;color:#3d6a99;background:#fff;
+    border:1px solid var(--box-bd);border-radius:20px;padding:0 7px;vertical-align:middle}
+
+  /* stacked leaves (teams / centers) under a node, no connector nodes */
+  .stack{position:relative;margin-top:14px;display:flex;flex-direction:column;gap:5px;align-items:center}
+  .stack::before{content:'';position:absolute;top:-14px;left:50%;width:2px;height:14px;background:var(--wire)}
+  .leaf{
+    border:1.3px solid var(--box-bd);background:#fff;border-radius:7px;
+    padding:5px 9px;font-size:11.5px;font-weight:600;color:#25446a;min-width:82px;white-space:nowrap;
+  }
+  .leaf.team{background:#f4f9ff;font-weight:700}
+  .leaf.import{background:var(--import);border-color:var(--import-bd);color:var(--import-ink)}
+  .leaf.smart{background:var(--smart);border-color:var(--smart-bd);color:var(--smart-ink)}
+  .leaf.auto{border-color:var(--auto);box-shadow:0 0 0 2px rgba(192,57,43,.12)}
+  .leaf .abadge{
+    display:block;font-size:9px;font-weight:800;color:#fff;background:var(--auto);
+    border-radius:4px;padding:1px 4px;margin-top:3px;letter-spacing:.2px;
+  }
+
+  /* 감사파트 side box */
+  .rootbox{position:relative;display:inline-block}
+  .audit{
+    position:absolute;top:12px;left:calc(100% + 26px);
+    border:1.5px dashed #b8912f;background:#fdf7e8;color:#8a6d1f;
+    border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;white-space:nowrap;
+  }
+  .audit::before{content:'';position:absolute;left:-26px;top:50%;width:26px;height:2px;background:var(--wire)}
+  .audit small{display:block;font-size:9.5px;font-weight:600;color:#a98a3f;margin-top:1px}
+
+  footer{margin-top:26px;text-align:center;color:var(--muted);font-size:12px}
+  .note-foot{max-width:900px;margin:14px auto 0;font-size:11.5px;color:var(--muted);text-align:center;line-height:1.6}
+
+  @media print{body{background:#fff}.node{box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>현재 조직도</h1>
+    <div class="sub">인사회의 · 조직개편 검토 자료 &nbsp;|&nbsp; 총 센터 79개 (수도권 44 · 지방 35)</div>
+    <div class="legend">
+      <span><i style="background:var(--hq)"></i>본부</span>
+      <span><i style="background:var(--box)"></i>파트 / 부</span>
+      <span><i style="background:var(--import)"></i>외제 센터</span>
+      <span><i style="background:var(--smart)"></i>SMART 센터</span>
+      <span><i style="background:var(--amb)"></i>애매 조직(외부파견)</span>
+      <span><i style="background:var(--auto)"></i>자동화전담 소속</span>
+    </div>
+  </header>
+
+  <div class="chartwrap">
+    <div class="chart">
+      <ul>
+        <li>
+          <div class="rootbox">
+            <div class="node ceo">대표이사<small>CEO</small></div>
+            <div class="audit">감사파트<small>대표이사 직속</small></div>
+          </div>
+
+          <ul>
+            <!-- ───────── 경영지원본부 ───────── -->
+            <li>
+              <div class="node hq">경영지원본부</div>
+              <ul>
+                <li>
+                  <div class="node">손사지원파트</div>
+                  <div class="stack">
+                    <div class="leaf team">인사교육팀</div>
+                    <div class="leaf team">총무경리팀</div>
+                  </div>
+                </li>
+                <li>
+                  <div class="node">손사전략파트</div>
+                  <div class="stack">
+                    <div class="leaf team">업무지원팀</div>
+                    <div class="leaf team">기회통계팀</div>
+                    <div class="leaf team">QI팀</div>
+                  </div>
+                </li>
+                <li>
+                  <div class="node">네트워크운영TFT</div>
+                </li>
+                <li>
+                  <div class="node amb">업무TFT<span class="note">외부파견자 소속 · 본부 직속 (애매 조직)</span></div>
+                </li>
+              </ul>
+            </li>
+
+            <!-- ───────── 수도권보상본부 ───────── -->
+            <li>
+              <div class="node hq">수도권보상본부</div>
+              <ul>
+                <li><div class="node support">수도본부지원팀</div></li>
+                <li>
+                  <div class="node">강북차량보상부<span class="cnt">8</span></div>
+                  <div class="stack">
+                    <div class="leaf">의정부</div><div class="leaf">노원</div><div class="leaf">성동</div>
+                    <div class="leaf">동대문</div><div class="leaf">서대문</div><div class="leaf">일산</div>
+                    <div class="leaf import">외제일산</div><div class="leaf import">외제강북</div>
+                  </div>
+                </li>
+                <li>
+                  <div class="node">강남차량보상부<span class="cnt">7</span></div>
+                  <div class="stack">
+                    <div class="leaf">강남</div><div class="leaf">강서</div><div class="leaf">영등포</div>
+                    <div class="leaf">구로</div><div class="leaf">제주</div>
+                    <div class="leaf import">외제강남</div><div class="leaf import">외제강서</div>
+                  </div>
+                </li>
+                <li>
+                  <div class="node">동서울차량보상부<span class="cnt">8</span></div>
+                  <div class="stack">
+                    <div class="leaf">구리</div><div class="leaf">강동</div><div class="leaf">성남</div>
+                    <div class="leaf">춘천</div><div class="leaf">원주</div><div class="leaf">이천</div>
+                    <div class="leaf">강릉</div><div class="leaf import">외제강동</div>
+                  </div>
+                </li>
+                <li>
+                  <div class="node">인천차량보상부<span class="cnt">8</span></div>
+                  <div class="stack">
+                    <div class="leaf">서인천</div><div class="leaf">동인천</div><div class="leaf">남인천</div>
+                    <div class="leaf">부천</div><div class="leaf">부평</div><div class="leaf">김포</div>
+                    <div class="leaf">시흥</div><div class="leaf import">외제인천</div>
+                  </div>
+                </li>
+                <li>
+                  <div class="node">경기차량보상부<span class="cnt">8</span></div>
+                  <div class="stack">
+                    <div class="leaf">동수원</div><div class="leaf">서수원</div><div class="leaf">안산</div>
+                    <div class="leaf">안양</div><div class="leaf">용인</div><div class="leaf">오산</div>
+                    <div class="leaf">평택</div><div class="leaf import">외제경기</div>
+                  </div>
+                </li>
+                <li>
+                  <div class="node">수도권SMART차량보상부<span class="cnt">5</span></div>
+                  <div class="stack">
+                    <div class="leaf smart">SMART강북</div>
+                    <div class="leaf smart auto">SMART강남<span class="abadge">자동화전담 전원 소속</span></div>
+                    <div class="leaf smart">SMART동서울</div>
+                    <div class="leaf smart">SMART인천</div>
+                    <div class="leaf smart">SMART경기</div>
+                  </div>
+                </li>
+              </ul>
+            </li>
+
+            <!-- ───────── 지방보상본부 ───────── -->
+            <li>
+              <div class="node hq">지방보상본부</div>
+              <ul>
+                <li><div class="node support">지방본부지원팀</div></li>
+                <li>
+                  <div class="node">부산차량보상부<span class="cnt">8</span></div>
+                  <div class="stack">
+                    <div class="leaf">서부산</div><div class="leaf">동부산</div><div class="leaf">사상</div>
+                    <div class="leaf">창원</div><div class="leaf">울산</div><div class="leaf">김해</div>
+                    <div class="leaf">진주</div><div class="leaf import">외제부산</div>
+                  </div>
+                </li>
+                <li>
+                  <div class="node">대구차량보상부<span class="cnt">8</span></div>
+                  <div class="stack">
+                    <div class="leaf">남대구</div><div class="leaf">동대구</div><div class="leaf">서대구</div>
+                    <div class="leaf">북대구</div><div class="leaf">포항</div><div class="leaf">구미</div>
+                    <div class="leaf">안동</div><div class="leaf import">외제대구</div>
+                  </div>
+                </li>
+                <li>
+                  <div class="node">충청차량보상부<span class="cnt">8</span></div>
+                  <div class="stack">
+                    <div class="leaf">동대전</div><div class="leaf">서대전</div><div class="leaf">세종</div>
+                    <div class="leaf">충주</div><div class="leaf">청주</div><div class="leaf">천안</div>
+                    <div class="leaf">홍성</div><div class="leaf import">외제충청</div>
+                  </div>
+                </li>
+                <li>
+                  <div class="node">호남차량보상부<span class="cnt">7</span></div>
+                  <div class="stack">
+                    <div class="leaf">동광주</div><div class="leaf">서광주</div><div class="leaf">전주</div>
+                    <div class="leaf">군산</div><div class="leaf">순천</div><div class="leaf">목포</div>
+                    <div class="leaf import">외제호남</div>
+                  </div>
+                </li>
+                <li>
+                  <div class="node">지방SMART차량보상부<span class="cnt">4</span></div>
+                  <div class="stack">
+                    <div class="leaf smart">SMART부산</div><div class="leaf smart">SMART대구</div>
+                    <div class="leaf smart">SMART충청</div><div class="leaf smart">SMART호남</div>
+                  </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note-foot">
+    ※ 네트워크운영TFT는 손사지원파트·손사전략파트와 동일 레벨(파트급)입니다. &nbsp;|&nbsp;
+    업무TFT는 외부파견자를 모아둔 경영지원본부 직속의 애매 조직입니다. &nbsp;|&nbsp;
+    자동화전담 직원은 전원 SMART강남 소속입니다.
+  </div>
+  <footer>인사회의 조직개편 검토용 · 현재 조직도(초안) · 작성일 2026-08-10</footer>
+</div>
+</body>
+</html>

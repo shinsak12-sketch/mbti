@@ -112,9 +112,9 @@
   .tft{
     border-style:dashed;color:var(--muted);background:#fff;
   }
-  .part.tftdept{background:#f7f5ff;border-color:#d7cef0}
-  .part.tftdept .ph{background:#efeafb;border-bottom:none;color:#5b4a9c}
-  .part.tftdept .dot{background:#7c66c4}
+  .part.amb{background:#fdf1f1;border-color:#e6bcbc}
+  .part.amb .ph{background:#fae3e3;color:#a23b3b}
+  .part.amb .dot{background:#c0392b}
   .lvl{
     font-size:10px;font-weight:700;color:#7a869a;background:#fff;
     border:1px solid var(--line);border-radius:20px;padding:1px 7px;margin-left:6px;
@@ -139,6 +139,9 @@
   }
   .c-chip.import{background:var(--chip-import);border-color:#f3dcc0;color:#8a5a1f}
   .c-chip.smart{background:var(--chip-smart);border-color:#cfe2fb;color:#255ea8}
+  .c-chip.auto{border-color:#c0392b;box-shadow:0 0 0 2px rgba(192,57,43,.12)}
+  .c-chip .ab{display:block;font-size:8.5px;font-weight:800;color:#fff;background:#c0392b;
+    border-radius:4px;padding:1px 4px;margin-top:2px;letter-spacing:.2px}
 
   .support{
     align-self:flex-start;background:#fff;border:1px solid var(--line);
@@ -168,6 +171,7 @@
       <span><i style="background:var(--hq3)"></i>지방보상본부</span>
       <span><i style="background:#f3dcc0"></i>외제 센터</span>
       <span><i style="background:#cfe2fb"></i>SMART 센터</span>
+      <span><i style="background:#c0392b"></i>자동화전담 소속</span>
     </div>
   </header>
 
@@ -204,11 +208,12 @@
             <span class="team">QI팀</span>
           </div>
         </div>
-        <div class="part tftdept">
-          <div class="ph"><span class="dot"></span>네트워크운영TFT <span class="lvl">부서레벨</span></div>
+        <div class="part">
+          <div class="ph"><span class="dot"></span>네트워크운영TFT</div>
         </div>
-        <div class="teams" style="padding:0">
-          <span class="team tft">업무TFT <span class="lvl">부서급 아님</span></span>
+        <div class="part amb">
+          <div class="ph"><span class="dot"></span>업무TFT <span class="lvl">애매 조직</span></div>
+          <div class="teams"><span class="team tft">외부파견자 소속 · 본부 직속</span></div>
         </div>
       </div>
     </section>
@@ -267,7 +272,8 @@
         <div class="bu">
           <div class="buh"><span class="dot"></span>수도권SMART차량보상부<span class="cnt">5센터</span></div>
           <div class="centers">
-            <span class="c-chip smart">SMART강북</span><span class="c-chip smart">SMART강남</span>
+            <span class="c-chip smart">SMART강북</span>
+            <span class="c-chip smart auto">SMART강남<span class="ab">자동화전담 전원 소속</span></span>
             <span class="c-chip smart">SMART동서울</span><span class="c-chip smart">SMART인천</span>
             <span class="c-chip smart">SMART경기</span>
           </div>
