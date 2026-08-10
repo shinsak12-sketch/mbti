@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>현재 조직도 (트리형)</title>
+<title>조직개편 초안 (트리형)</title>
 <style>
   :root{
     --bg:#0f1420;
@@ -132,6 +132,27 @@
     border-radius:4px;padding:1px 5px;margin-top:3px;letter-spacing:.2px;
   }
 
+  /* ── 개편 하이라이트 ── */
+  .unit.chg{border-color:#2ecc71;background:#132a20;box-shadow:0 0 0 2px rgba(46,204,113,.18)}
+  .unit.chg .unit-head{color:#7ee7ad}
+  .unit.chg .ic{background:#2ecc71}
+  .leaf.new{border-color:#2ecc71;border-style:dashed;color:#a9f0c6;background:rgba(46,204,113,.08)}
+  .badge{
+    display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.3px;
+    color:#0d2a1a;background:#2ecc71;border-radius:5px;padding:1px 6px;margin-left:6px;vertical-align:middle;
+  }
+  .badge.new{background:#f0b429;color:#3a2708}
+  .strike{color:#7a8aa0;text-decoration:line-through;font-weight:500;margin-left:7px;font-size:11px}
+
+  /* 개편 배너 */
+  .plan-banner{
+    max-width:760px;margin:0 auto 6px;background:linear-gradient(180deg,#132a20,#10241b);
+    border:1px solid #235c3f;border-radius:12px;padding:12px 18px;color:#cfeeda;font-size:12.5px;line-height:1.6;
+  }
+  .plan-banner b{color:#7ee7ad}
+  .plan-banner .n{display:inline-block;width:18px;height:18px;line-height:18px;text-align:center;
+    background:#2ecc71;color:#0d2a1a;border-radius:50%;font-weight:800;font-size:11px;margin-right:6px}
+
   /* support team pill */
   .support{
     display:inline-flex;align-items:center;gap:7px;margin:12px 0 0 10px;
@@ -160,10 +181,14 @@
 <div class="wrap">
 
   <header class="top">
-    <div class="ey">HR Organization</div>
-    <h1>현재 조직도</h1>
-    <div class="sub">인사회의 · 조직개편 검토 자료 &nbsp;|&nbsp; 총 센터 79개 (수도권 44 · 지방 35)</div>
+    <div class="ey">HR Organization · Restructuring Draft</div>
+    <h1>조직개편 초안</h1>
+    <div class="sub">인사회의 · 개편(안) 반영 &nbsp;|&nbsp; 총 센터 79개 (수도권 44 · 지방 35)</div>
   </header>
+
+  <div class="plan-banner">
+    <div><span class="n">1</span><b>네트워크운영TFT → 네트워크운영파트 승격</b> · 하위 3팀(영상상담팀 · 네트워크관리팀 · 분쟁대응팀) 신설</div>
+  </div>
 
   <div class="node-ceo">
     <div class="ceo">대표이사<small>CEO</small></div>
@@ -177,7 +202,7 @@
     <section class="hq c1">
       <div class="hq-head">
         <div class="name">경영지원본부</div>
-        <div class="tag">파트 2 · 네트워크운영TFT · 업무TFT</div>
+        <div class="tag">파트 3 · 업무TFT</div>
       </div>
       <div class="hq-body">
         <div class="branch">
@@ -200,8 +225,13 @@
           </div>
         </div>
         <div class="branch">
-          <div class="unit">
-            <div class="unit-head"><span class="ic"></span>네트워크운영TFT</div>
+          <div class="unit chg">
+            <div class="unit-head"><span class="ic"></span>네트워크운영파트<span class="badge">승격</span><span class="strike">네트워크운영TFT</span></div>
+            <div class="leaves">
+              <span class="leaf new">영상상담팀<span class="badge new">신설</span></span>
+              <span class="leaf new">네트워크관리팀<span class="badge new">신설</span></span>
+              <span class="leaf new">분쟁대응팀<span class="badge new">신설</span></span>
+            </div>
           </div>
         </div>
         <div class="branch">
@@ -355,9 +385,10 @@
     <span><i style="background:#e6b878"></i>외제 센터</span>
     <span><i style="background:#8fc0ff"></i>SMART 센터</span>
     <span><i style="background:#c0392b"></i>자동화전담 소속</span>
+    <span><i style="background:#2ecc71"></i>개편 대상(승격·신설)</span>
   </div>
 
-  <footer>인사회의 조직개편 검토용 · 현재 조직도(초안) · 작성일 2026-08-10</footer>
+  <footer>인사회의 조직개편 검토용 · 개편 초안 · 작성일 2026-08-10</footer>
 </div>
 </body>
 </html>
