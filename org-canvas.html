@@ -222,10 +222,10 @@ var INITIAL={ name:'대표이사', kind:'ceo', flags:[], children:[
 
 /* ═══════ 상태 ═══════ */
 var KEY='orgCanvasState_v4c';
-var tree, selectedId=null, pending=null, history=[], idMap={}, parentMap={}, idSeq=0;
+var tree, selectedId=null, pending=null, undoStack=[], idMap={}, parentMap={}, idSeq=0;
 
 function clone(o){ return JSON.parse(JSON.stringify(o)); }
-function pushHistory(){ history.push(clone(tree)); if(history.length>60) history.shift(); }
+function pushHistory(){ undoStack.push(clone(tree)); if(undoStack.length>60) undoStack.shift(); }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(tree)); }catch(e){} }
 function load(){ try{ var s=localStorage.getItem(KEY); if(s) return JSON.parse(s); }catch(e){} return null; }
 function ensureIds(){ idMap={}; parentMap={}; (function w(n,pid){ if(!n.id) n.id='n'+(++idSeq); idMap[n.id]=n; parentMap[n.id]=pid; (n.children||[]).forEach(function(c){ w(c,n.id); }); })(tree,null); }
@@ -393,7 +393,7 @@ function actPromote(sel){
 }
 function actClose(sel, close){
   pushHistory();
-  if(close){ if(sel.change==='merged'){ history.pop(); toast('통합된 조직입니다.'); return; } sel._prev=sel.change||null; sel.change='closed'; toast('폐쇄 표시되었습니다'); }
+  if(close){ if(sel.change==='merged'){ undoStack.pop(); toast('통합된 조직입니다.'); return; } sel._prev=sel.change||null; sel.change='closed'; toast('폐쇄 표시되었습니다'); }
   else { sel.change=sel._prev||null; delete sel._prev; toast('폐쇄가 취소되었습니다'); }
   render();
 }
@@ -431,8 +431,8 @@ function resetHelp(){ var help=document.getElementById('help'); help.className='
 document.querySelector('.toolbar').addEventListener('click', function(e){
   var b=e.target.closest('[data-act]'); if(!b) return;
   var a=b.getAttribute('data-act');
-  if(a==='undo'){ if(!history.length){ toast('되돌릴 작업이 없습니다.'); return; } tree=history.pop(); ensureIds(); selectedId=null; pending=null; resetHelp(); hideSheet(); render(); toast('실행취소'); return; }
-  if(a==='reset'){ askConfirm('모든 변경을 지우고 현재(원본) 조직으로 초기화할까요?', function(){ history=[]; tree=clone(INITIAL); idSeq=0; ensureIds(); selectedId=null; pending=null; resetHelp(); hideSheet(); render(); toast('초기화되었습니다'); }); return; }
+  if(a==='undo'){ if(!undoStack.length){ toast('되돌릴 작업이 없습니다.'); return; } tree=undoStack.pop(); ensureIds(); selectedId=null; pending=null; resetHelp(); hideSheet(); render(); toast('실행취소'); return; }
+  if(a==='reset'){ askConfirm('모든 변경을 지우고 현재(원본) 조직으로 초기화할까요?', function(){ undoStack=[]; tree=clone(INITIAL); idSeq=0; ensureIds(); selectedId=null; pending=null; resetHelp(); hideSheet(); render(); toast('초기화되었습니다'); }); return; }
   if(a==='summary') return showSummary();
   if(a==='export') return doExport();
   if(a==='print') return window.print();
