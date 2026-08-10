@@ -65,12 +65,13 @@
   .ceo small{display:block;font-size:10px;font-weight:600;color:#c9d3e6;letter-spacing:2px;margin-top:2px}
   .rail{width:2px;height:22px;background:var(--line);margin:10px auto 0}
   /* 감사파트: CEO 아래 중앙선에서 좌측으로 가지 치는 하위 조직 */
-  .staff{position:relative;height:66px;margin:2px 0 4px}
-  .staff::before{content:"";position:absolute;left:50%;top:0;height:44px;width:2px;background:var(--line);transform:translateX(-1px)}
-  .audit{position:absolute;top:22px;right:calc(50% + 36px);display:flex;flex-direction:column;align-items:center;gap:1px;border:1.5px dashed var(--gold);color:var(--gold);border-radius:12px;padding:8px 12px;font-size:12px;font-weight:800;background:rgba(217,178,90,.07);white-space:nowrap}
-  .audit::after{content:"";position:absolute;left:100%;top:50%;width:36px;height:2px;background:var(--line)}
-  .audit::before{content:"";position:absolute;left:100%;top:50%;transform:translateY(-50%);width:0;height:0;border:6px solid transparent;border-right-color:var(--line)}
+  .staff{position:relative;padding:6px 0 8px}
+  .staff::before{content:"";position:absolute;left:50%;top:0;height:100%;width:2px;background:var(--line);transform:translateX(-1px)}
+  .staff-left{width:50%;display:flex;justify-content:flex-end;align-items:center}
+  .audit{display:flex;flex-direction:column;align-items:center;gap:1px;border:1.5px dashed var(--gold);color:var(--gold);border-radius:12px;padding:8px 12px;font-size:12px;font-weight:800;background:rgba(217,178,90,.07);white-space:nowrap}
   .audit small{font-size:9px;color:var(--muted);font-weight:600}
+  .hconn{position:relative;width:24px;height:2px;background:var(--line);flex:none}
+  .hconn::before{content:"";position:absolute;left:-1px;top:50%;transform:translateY(-50%);width:0;height:0;border:5px solid transparent;border-right-color:var(--line)}
 
   .hq{background:var(--panel);border:1px solid var(--line);border-radius:16px;margin-bottom:14px;overflow:hidden}
   .hq-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-left:5px solid var(--accent)}
@@ -361,7 +362,7 @@ function render(){
   var auditHtml=audit.map(function(a){ return '<div class="audit'+chgClass(a)+'" data-id="'+a.id+'" data-kind="audit"><b class="u-name">'+esc(a.name)+'</b><small>대표이사 직속</small>'+oldName(a)+specBadge(a)+chgBadge(a)+'</div>'; }).join('');
   var h='<div class="ceo-area"><div class="ceo'+chgClass(tree)+'" data-id="'+tree.id+'" data-kind="ceo">'+esc(tree.name)+oldName(tree)+chgBadge(tree)+'<small>CEO</small></div></div>';
   h+='<div class="rail"></div>';
-  if(auditHtml) h+='<div class="staff">'+auditHtml+'</div>';
+  if(auditHtml) h+='<div class="staff"><div class="staff-left">'+auditHtml+'<span class="hconn"></span></div></div>';
   h+=hqs.map(renderHQ).join('');
   if(other.length) h+=other.map(renderUnitLike).join('');
   document.getElementById('canvas').innerHTML=h;
