@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>현재 조직도</title>
+<style>
+  :root{
+    --bg:#f4f6fb;
+    --ink:#1f2733;
+    --muted:#6b7688;
+    --line:#c3ccdb;
+    --card:#ffffff;
+
+    --ceo:#1f2a44;
+    --audit:#8a6d3b;
+    --hq1:#2f6db0;   /* 경영지원본부 */
+    --hq2:#2e8b6f;   /* 수도권보상본부 */
+    --hq3:#a4553f;   /* 지방보상본부 */
+
+    --chip:#eef2f8;
+    --chip-import:#fff4e8;   /* 외제 */
+    --chip-smart:#eaf3ff;    /* smart */
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.4;
+    -webkit-font-smoothing:antialiased;
+    padding:28px 20px 60px;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+
+  header.top{
+    text-align:center;
+    margin-bottom:26px;
+  }
+  header.top h1{
+    font-size:26px;margin:0 0 6px;letter-spacing:-.5px;
+  }
+  header.top .sub{color:var(--muted);font-size:13px}
+  .legend{
+    display:flex;gap:14px;justify-content:center;flex-wrap:wrap;
+    margin-top:14px;font-size:12px;color:var(--muted);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+  /* ── CEO row ── */
+  .ceo-row{display:flex;justify-content:center;position:relative;margin-bottom:8px}
+  .box{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    box-shadow:0 1px 2px rgba(20,30,50,.05);
+  }
+  .ceo{
+    background:var(--ceo);color:#fff;border:none;
+    padding:14px 40px;border-radius:12px;font-size:18px;font-weight:700;
+    box-shadow:0 4px 14px rgba(31,42,68,.28);
+  }
+
+  /* connector under CEO */
+  .stem{width:2px;height:22px;background:var(--line);margin:0 auto}
+
+  /* audit staff, hangs to the side of the stem */
+  .audit-line{display:flex;justify-content:center;margin:0 0 4px}
+  .audit-line .inner{position:relative;width:100%;max-width:520px}
+  .audit{
+    position:absolute;right:calc(50% + 60px);top:-2px;
+    background:#fff;border:1px dashed var(--audit);color:var(--audit);
+    padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;white-space:nowrap;
+  }
+  .audit::after{
+    content:"";position:absolute;right:-24px;top:50%;width:24px;height:2px;background:var(--line);
+  }
+
+  /* ── HQ columns ── */
+  .hq-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:10px;
+  }
+  .hq{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    overflow:hidden;box-shadow:0 2px 8px rgba(20,30,50,.06);display:flex;flex-direction:column;
+  }
+  .hq > h2{
+    margin:0;color:#fff;font-size:16px;font-weight:700;
+    padding:13px 16px;text-align:center;letter-spacing:-.3px;
+  }
+  .hq.a > h2{background:var(--hq1)}
+  .hq.b > h2{background:var(--hq2)}
+  .hq.c > h2{background:var(--hq3)}
+  .hq-body{padding:14px;display:flex;flex-direction:column;gap:12px}
+
+  /* part / group blocks */
+  .part{
+    border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fbfcfe;
+  }
+  .part > .ph{
+    padding:8px 12px;font-weight:700;font-size:13.5px;
+    background:#eef2f8;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:7px;
+  }
+  .dot{width:8px;height:8px;border-radius:50%;flex:none}
+  .a .dot{background:var(--hq1)} .b .dot{background:var(--hq2)} .c .dot{background:var(--hq3)}
+  .teams{padding:9px 12px;display:flex;flex-wrap:wrap;gap:6px}
+  .team{
+    background:#fff;border:1px solid var(--line);border-radius:7px;
+    padding:5px 10px;font-size:12.5px;font-weight:600;color:var(--ink);
+  }
+  .tft{
+    border-style:dashed;color:var(--muted);background:#fff;
+  }
+
+  /* 차량보상부 (부 + 센터들) */
+  .bu{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+  .bu > .buh{
+    padding:8px 12px;font-weight:700;font-size:13.5px;
+    display:flex;align-items:center;gap:7px;
+    border-bottom:1px solid #eef1f6;
+  }
+  .b .bu > .buh{background:#f0f8f4}
+  .c .bu > .buh{background:#fbf1ee}
+  .buh .cnt{margin-left:auto;font-weight:600;font-size:11px;color:var(--muted);
+    background:#fff;border:1px solid var(--line);border-radius:20px;padding:1px 8px}
+  .centers{padding:8px 10px;display:flex;flex-wrap:wrap;gap:5px}
+  .c-chip{
+    background:var(--chip);border:1px solid #e1e7f0;border-radius:6px;
+    padding:3px 8px;font-size:11.5px;color:#3a4658;font-weight:500;white-space:nowrap;
+  }
+  .c-chip.import{background:var(--chip-import);border-color:#f3dcc0;color:#8a5a1f}
+  .c-chip.smart{background:var(--chip-smart);border-color:#cfe2fb;color:#255ea8}
+
+  .support{
+    align-self:flex-start;background:#fff;border:1px solid var(--line);
+    border-radius:7px;padding:6px 12px;font-size:12.5px;font-weight:700;
+  }
+
+  footer{margin-top:34px;text-align:center;color:var(--muted);font-size:12px}
+
+  @media print{
+    body{background:#fff;padding:10px}
+    .hq,.box,.part,.bu{box-shadow:none}
+  }
+  @media (max-width:900px){
+    .hq-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>현재 조직도</h1>
+    <div class="sub">인사회의 · 조직개편 검토 자료 &nbsp;|&nbsp; 총 센터 79개 (수도권 44 · 지방 35)</div>
+    <div class="legend">
+      <span><i style="background:var(--hq1)"></i>경영지원본부</span>
+      <span><i style="background:var(--hq2)"></i>수도권보상본부</span>
+      <span><i style="background:var(--hq3)"></i>지방보상본부</span>
+      <span><i style="background:#f3dcc0"></i>외제 센터</span>
+      <span><i style="background:#cfe2fb"></i>SMART 센터</span>
+    </div>
+  </header>
+
+  <!-- CEO -->
+  <div class="ceo-row"><div class="box ceo">대표이사</div></div>
+
+  <!-- 감사파트 (직속) -->
+  <div class="audit-line">
+    <div class="inner">
+      <div class="audit">감사파트 (직속)</div>
+    </div>
+  </div>
+  <div class="stem"></div>
+
+  <!-- 본부 -->
+  <div class="hq-grid">
+
+    <!-- 경영지원본부 -->
+    <section class="hq a">
+      <h2>경영지원본부</h2>
+      <div class="hq-body">
+        <div class="part">
+          <div class="ph"><span class="dot"></span>손사지원파트</div>
+          <div class="teams">
+            <span class="team">인사교육팀</span>
+            <span class="team">총무경리팀</span>
+          </div>
+        </div>
+        <div class="part">
+          <div class="ph"><span class="dot"></span>손사전략파트</div>
+          <div class="teams">
+            <span class="team">업무지원팀</span>
+            <span class="team">기회통계팀</span>
+            <span class="team">QI팀</span>
+          </div>
+        </div>
+        <div class="teams" style="padding:0">
+          <span class="team tft">네트워크운영TFT</span>
+          <span class="team tft">업무TFT</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 수도권보상본부 -->
+    <section class="hq b">
+      <h2>수도권보상본부</h2>
+      <div class="hq-body">
+        <div class="support">수도본부지원팀</div>
+
+        <div class="bu">
+          <div class="buh"><span class="dot"></span>강북차량보상부<span class="cnt">8센터</span></div>
+          <div class="centers">
+            <span class="c-chip">의정부</span><span class="c-chip">노원</span><span class="c-chip">성동</span>
+            <span class="c-chip">동대문</span><span class="c-chip">서대문</span><span class="c-chip">일산</span>
+            <span class="c-chip import">외제일산</span><span class="c-chip import">외제강북</span>
+          </div>
+        </div>
+
+        <div class="bu">
+          <div class="buh"><span class="dot"></span>강남차량보상부<span class="cnt">7센터</span></div>
+          <div class="centers">
+            <span class="c-chip">강남</span><span class="c-chip">강서</span><span class="c-chip">영등포</span>
+            <span class="c-chip">구로</span><span class="c-chip">제주</span>
+            <span class="c-chip import">외제강남</span><span class="c-chip import">외제강서</span>
+          </div>
+        </div>
+
+        <div class="bu">
+          <div class="buh"><span class="dot"></span>동서울차량보상부<span class="cnt">8센터</span></div>
+          <div class="centers">
+            <span class="c-chip">구리</span><span class="c-chip">강동</span><span class="c-chip">성남</span>
+            <span class="c-chip">춘천</span><span class="c-chip">원주</span><span class="c-chip">이천</span>
+            <span class="c-chip">강릉</span><span class="c-chip import">외제강동</span>
+          </div>
+        </div>
+
+        <div class="bu">
+          <div class="buh"><span class="dot"></span>인천차량보상부<span class="cnt">8센터</span></div>
+          <div class="centers">
+            <span class="c-chip">서인천</span><span class="c-chip">동인천</span><span class="c-chip">남인천</span>
+            <span class="c-chip">부천</span><span class="c-chip">부평</span><span class="c-chip">김포</span>
+            <span class="c-chip">시흥</span><span class="c-chip import">외제인천</span>
+          </div>
+        </div>
+
+        <div class="bu">
+          <div class="buh"><span class="dot"></span>경기차량보상부<span class="cnt">8센터</span></div>
+          <div class="centers">
+            <span class="c-chip">동수원</span><span class="c-chip">서수원</span><span class="c-chip">안산</span>
+            <span class="c-chip">안양</span><span class="c-chip">용인</span><span class="c-chip">오산</span>
+            <span class="c-chip">평택</span><span class="c-chip import">외제경기</span>
+          </div>
+        </div>
+
+        <div class="bu">
+          <div class="buh"><span class="dot"></span>수도권SMART차량보상부<span class="cnt">5센터</span></div>
+          <div class="centers">
+            <span class="c-chip smart">smart강북</span><span class="c-chip smart">smart강남</span>
+            <span class="c-chip smart">smart동서울</span><span class="c-chip smart">smart인천</span>
+            <span class="c-chip smart">smart경기</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 지방보상본부 -->
+    <section class="hq c">
+      <h2>지방보상본부</h2>
+      <div class="hq-body">
+        <div class="support">지방본부지원팀</div>
+
+        <div class="bu">
+          <div class="buh"><span class="dot"></span>부산차량보상부<span class="cnt">8센터</span></div>
+          <div class="centers">
+            <span class="c-chip">서부산</span><span class="c-chip">동부산</span><span class="c-chip">사상</span>
+            <span class="c-chip">창원</span><span class="c-chip">울산</span><span class="c-chip">김해</span>
+            <span class="c-chip">진주</span><span class="c-chip import">외제부산</span>
+          </div>
+        </div>
+
+        <div class="bu">
+          <div class="buh"><span class="dot"></span>대구차량보상부<span class="cnt">8센터</span></div>
+          <div class="centers">
+            <span class="c-chip">남대구</span><span class="c-chip">동대구</span><span class="c-chip">서대구</span>
+            <span class="c-chip">북대구</span><span class="c-chip">포항</span><span class="c-chip">구미</span>
+            <span class="c-chip">안동</span><span class="c-chip import">외제대구</span>
+          </div>
+        </div>
+
+        <div class="bu">
+          <div class="buh"><span class="dot"></span>충청차량보상부<span class="cnt">8센터</span></div>
+          <div class="centers">
+            <span class="c-chip">동대전</span><span class="c-chip">서대전</span><span class="c-chip">세종</span>
+            <span class="c-chip">충주</span><span class="c-chip">청주</span><span class="c-chip">천안</span>
+            <span class="c-chip">홍성</span><span class="c-chip import">외제충청</span>
+          </div>
+        </div>
+
+        <div class="bu">
+          <div class="buh"><span class="dot"></span>호남차량보상부<span class="cnt">7센터</span></div>
+          <div class="centers">
+            <span class="c-chip">동광주</span><span class="c-chip">서광주</span><span class="c-chip">전주</span>
+            <span class="c-chip">군산</span><span class="c-chip">순천</span><span class="c-chip">목포</span>
+            <span class="c-chip import">외제호남</span>
+          </div>
+        </div>
+
+        <div class="bu">
+          <div class="buh"><span class="dot"></span>지방SMART차량보상부<span class="cnt">4센터</span></div>
+          <div class="centers">
+            <span class="c-chip smart">smart부산</span><span class="c-chip smart">smart대구</span>
+            <span class="c-chip smart">smart충청</span><span class="c-chip smart">smart호남</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>인사회의 조직개편 검토용 · 현재 조직도(초안) · 작성일 2026-08-10</footer>
+</div>
+</body>
+</html>
