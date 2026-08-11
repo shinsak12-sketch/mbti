@@ -201,6 +201,44 @@
   .chg-moved{border-color:var(--moved)!important;box-shadow:0 0 0 2px rgba(37,99,235,.14)}
   .unit.chg-rp{border-color:var(--promoted)!important;box-shadow:0 0 0 2px rgba(124,58,237,.16)}
   .old{color:var(--muted);text-decoration:line-through;font-size:10.5px;margin-left:5px}
+  /* ══ 모션 & 입체감(음각·양각) ══ */
+  .card,.theme,.loadcard,.dir,.cat{transition:transform .22s cubic-bezier(.2,.7,.3,1),box-shadow .22s ease}
+  .card:hover,.loadcard:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(30,50,90,.13)}
+  .theme:hover,.cat:hover{transform:translateY(-3px);box-shadow:0 16px 34px rgba(30,50,90,.15)}
+  .dir:hover{transform:translateY(-4px);box-shadow:0 12px 26px rgba(30,50,90,.16)}
+  body.dark .card:hover,body.dark .theme:hover,body.dark .loadcard:hover,body.dark .dir:hover,body.dark .cat:hover{box-shadow:0 16px 34px rgba(0,0,0,.5)}
+  /* 스탯 타일: 음각 배경 + 양각 숫자, hover 부상 */
+  .stat{transition:transform .18s ease,box-shadow .18s ease;box-shadow:inset 0 2px 6px rgba(30,50,90,.09),inset 0 -1px 0 rgba(255,255,255,.6)}
+  .stat:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 10px 22px rgba(30,50,90,.16)}
+  .stat .n{text-shadow:0 1px 0 rgba(255,255,255,.7)}
+  body.dark .stat{box-shadow:inset 0 2px 6px rgba(0,0,0,.35),inset 0 -1px 0 rgba(255,255,255,.04)}
+  body.dark .stat .n{text-shadow:0 1px 2px rgba(0,0,0,.5)}
+  /* 배지: 양각(상단 하이라이트 + 드롭섀도) + hover 반응 */
+  .bdg,.lbdg,.spec,.tg,.hqchip,.lx,.vc{box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 1px 2px rgba(0,0,0,.25)}
+  .bdg,.spec{transition:transform .15s ease,filter .15s ease}
+  .theme:hover .bdg,.theme:hover .spec{transform:translateY(-1px);filter:brightness(1.06)}
+  /* 칩·박스: 살짝 부상 */
+  .babox,.leaf,.rchip,.dir{will-change:transform}
+  .leaf,.babox,.rchip{transition:transform .15s ease,box-shadow .15s ease}
+  .leaf:hover,.babox:hover,.rchip:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(30,50,90,.12)}
+  /* 아이콘 배지 양각 */
+  .dir .dn,.keylist .ico,.lm-ar{box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 2px 6px rgba(0,0,0,.22)}
+  /* 탭·버튼 모션 */
+  .tab,.tbtn{transition:transform .15s ease,box-shadow .15s ease,background .15s,color .15s}
+  .tab:hover,.tbtn:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(30,50,90,.16)}
+  .tab:active,.tbtn:active{transform:translateY(0)}
+  .tab.on{box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 5px 14px rgba(47,111,219,.4)}
+  /* 큰 지표 숫자 음영 */
+  .lm-v,.cover h1{text-shadow:0 1px 2px rgba(0,0,0,.12)}
+  body.dark .lm-v,body.dark .cover h1{text-shadow:0 1px 3px rgba(0,0,0,.4)}
+  /* 진입 팝(주제 배지) */
+  @keyframes pop{0%{transform:scale(.55);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+  @keyframes riseIn{0%{transform:translateY(14px);opacity:0}100%{transform:translateY(0);opacity:1}}
+  .panel.on .theme{animation:riseIn .4s cubic-bezier(.2,.7,.3,1) both}
+  .panel.on .theme:nth-child(3){animation-delay:.05s}.panel.on .theme:nth-child(4){animation-delay:.1s}.panel.on .theme:nth-child(5){animation-delay:.15s}.panel.on .theme:nth-child(6){animation-delay:.2s}.panel.on .theme:nth-child(7){animation-delay:.25s}
+  .panel.on .stat{animation:pop .38s cubic-bezier(.2,.9,.3,1.3) both}
+  .panel.on .stat:nth-child(2){animation-delay:.05s}.panel.on .stat:nth-child(3){animation-delay:.1s}.panel.on .stat:nth-child(4){animation-delay:.15s}.panel.on .stat:nth-child(5){animation-delay:.2s}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px}
   @media print{ .topbar{position:static} .tabs,.tbtn{display:none} .panel{display:block!important;page-break-after:always} body{background:#fff} }
 </style>
@@ -408,25 +446,22 @@ function chartLegend(withChg){
 }
 
 /* 페이지 */
+var ORGCOUNT=[{l:'본부',a:3,b:3},{l:'파트',a:4,b:3},{l:'부서',a:10,b:11},{l:'TFT',a:1,b:2},{l:'센터',a:74,b:79}];
 function renderStatsCards(){
-  var b=stats(BEFORE), a=stats(AFTER);
-  function d(cur,orig){ var x=cur-orig; return x?'<div class="d '+(x>0?'up':'dn')+'">'+(x>0?'+':'')+x+'</div>':'<div class="d" style="color:var(--muted)">-</div>'; }
+  function d(cur,orig){ var x=cur-orig; return x?'<div class="d '+(x>0?'up':'dn')+'">'+(x>0?'+':'')+x+'</div>':'<div class="d" style="color:var(--muted)">±0</div>'; }
+  var tiles=ORGCOUNT.map(function(o){ return '<div class="stat"><div class="n">'+o.a+'</div><div class="l">'+o.l+'</div>'+d(o.a,o.b)+'</div>'; }).join('');
   var order=['renamed','moved','closed','merged','new','promoted'];
   var maxc=Math.max.apply(null,order.map(function(k){return CHGCOUNT[k]||0;}));
   var bars=order.map(function(k){ var v=CHGCOUNT[k]||0; return '<div class="cbar"><span class="tg" style="background:var(--'+k+')">'+CHG_META[k].l+'</span><span class="bar" style="width:'+(v/maxc*150+10)+'px;background:var(--'+k+')"></span><span class="c">'+v+'건</span></div>'; }).join('');
   return '<div class="grid2" style="margin-top:20px">'
-    +'<div class="card"><h3><span class="dot" style="background:var(--accent)"></span>조직 수 변화 (개편 전 → 후)</h3><div class="statrow">'
-      +'<div class="stat"><div class="n">'+a.hq+'</div><div class="l">본부</div>'+d(a.hq,b.hq)+'</div>'
-      +'<div class="stat"><div class="n">'+a.unit+'</div><div class="l">부서</div>'+d(a.unit,b.unit)+'</div>'
-      +'<div class="stat"><div class="n">'+a.tft+'</div><div class="l">TFT</div>'+d(a.tft,b.tft)+'</div>'
-      +'<div class="stat"><div class="n">'+a.center+'</div><div class="l">센터</div>'+d(a.center,b.center)+'</div>'
-    +'</div><p style="color:var(--muted);font-size:12px;margin:12px 0 0">※ 부서 수 동일(강남부 폐쇄 −1, 네트워크운영 승격 +1). 센터 '+(b.center-a.center)+'개 순감 — 현장 보상센터 6개 감소, 본점 디지털업무지원센터 1개 신설.</p></div>'
+    +'<div class="card"><h3><span class="dot" style="background:var(--accent)"></span>조직 수 변화 (개편 전 → 후)</h3><div class="statrow">'+tiles+'</div>'
+    +'<p style="color:var(--muted);font-size:12px;margin:12px 0 0">※ 파트 +1(네트워크운영 정규화), 부서 −1(강남부 폐쇄), TFT −1(승격). 센터 −5 — 현장 보상센터 6개 감소, 본점 디지털업무지원센터 1개 신설. (팀 제외)</p></div>'
     +'<div class="card"><h3><span class="dot" style="background:var(--merged)"></span>개편 유형별 건수</h3><div class="chgbars">'+bars+'</div></div>'
     +'</div>';
 }
 function renderOverview(){
   var html=''
-    +'<div class="cover"><div class="ey">HR Reorganization Plan · v2</div><h1>네트워크 관리 강화 및<br>수도권 권역 재편(안)</h1><p>네트워크운영 정규화 · 강남차량보상부 폐쇄 · 배당량 균형화 · 품질/디지털 기반 정비</p></div>'
+    +'<div class="cover"><div class="ey">HR Reorganization Plan · v2</div><h1>수도권 권역 재편 및<br>네트워크 관리 강화(안)</h1><p>강남차량보상부 폐쇄 · 배당량 균형화 · 네트워크운영 정규화 · 품질/디지털 기반 정비</p></div>'
     +'<div class="card"><h3><span class="dot" style="background:var(--accent)"></span>개편 목적과 방향</h3>'
       +'<p style="margin:-4px 0 16px;font-size:13.5px;line-height:1.6">본 개편은 <b>① 네트워크 관리 기능을 강화</b>하고 <b>② 수도권 권역을 재편</b>하는 것을 두 축으로, 부서 간 업무 부하를 <b>균형화</b>하고 품질·디지털 기반을 정비해 <b>현장 대응력과 관리 효율을 함께 높이는 것</b>을 목표로 합니다.</p>'
       +'<div class="dirs">'
