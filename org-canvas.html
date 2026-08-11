@@ -253,10 +253,9 @@ function bu(n,arr){ return {name:n, kind:'unit', flags:[], children:centers(arr)
 var INITIAL={ name:'대표이사', kind:'ceo', flags:[], children:[
   {name:'감사파트', kind:'audit', flags:[], children:[]},
   {name:'경영지원본부', kind:'hq', color:'c1', flags:[], children:[
-    part('손사지원파트',['인사교육팀','총무경리팀']),
+    part('손사지원파트',['인사교육팀','총무경리팀','업무TFT']),
     part('손사전략파트',['업무지원팀','기회통계팀','QI팀']),
-    tftOrg('네트워크운영TFT'),
-    tftOrg('업무TFT')
+    tftOrg('네트워크운영TFT')
   ]},
   {name:'수도권보상본부', kind:'hq', color:'c2', flags:[], children:[
     support('수도본부지원팀'),

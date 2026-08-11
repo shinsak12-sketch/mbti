@@ -277,9 +277,9 @@ var CHG_META={new:{l:'신설'},closed:{l:'폐쇄'},moved:{l:'이동'},merged:{l:
 var BEFORE={name:'대표이사',kind:'ceo',children:[
   {name:'감사파트',kind:'audit'},
   {name:'경영지원본부',kind:'hq',color:1,children:[
-    part('손사지원파트',['인사교육팀','총무경리팀']),
+    part('손사지원파트',['인사교육팀','총무경리팀','업무TFT']),
     part('손사전략파트',['업무지원팀','기회통계팀','QI팀']),
-    {name:'네트워크운영TFT',kind:'tft'},{name:'업무TFT',kind:'tft'}
+    {name:'네트워크운영TFT',kind:'tft'}
   ]},
   {name:'수도권보상본부',kind:'hq',color:2,children:[
     support('수도본부지원팀'),
@@ -303,10 +303,9 @@ var BEFORE={name:'대표이사',kind:'ceo',children:[
 var AFTER={name:'대표이사',kind:'ceo',children:[
   {name:'감사파트(QI)',kind:'audit'},
   {name:'경영지원본부',kind:'hq',color:1,children:[
-    part('손사지원파트',['인사교육팀','총무경리팀']),
+    part('손사지원파트',['인사교육팀','총무경리팀','업무TFT']),
     {name:'손사전략파트',kind:'unit',children:[team('업무지원팀'),team('기회통계팀'),{name:'디지털업무지원센터',kind:'leaf',chg:['new']}]},
-    {name:'네트워크운영파트',kind:'unit',chg:['renamed','promoted'],old:'네트워크운영TFT'},
-    {name:'업무TFT',kind:'tft'}
+    {name:'네트워크운영파트',kind:'unit',chg:['renamed','promoted'],old:'네트워크운영TFT'}
   ]},
   {name:'수도권보상본부',kind:'hq',color:2,children:[
     support('수도본부지원팀'),
@@ -446,7 +445,7 @@ function chartLegend(withChg){
 }
 
 /* 페이지 */
-var ORGCOUNT=[{l:'본부',a:3,b:3},{l:'파트',a:4,b:3},{l:'부서',a:10,b:11},{l:'TFT',a:1,b:2},{l:'센터',a:74,b:79}];
+var ORGCOUNT=[{l:'본부',a:3,b:3},{l:'파트',a:4,b:3},{l:'부서',a:10,b:11},{l:'센터',a:74,b:79}];
 function renderStatsCards(){
   function d(cur,orig){ var x=cur-orig; return x?'<div class="d '+(x>0?'up':'dn')+'">'+(x>0?'+':'')+x+'</div>':'<div class="d" style="color:var(--muted)">±0</div>'; }
   var tiles=ORGCOUNT.map(function(o){ return '<div class="stat"><div class="n">'+o.a+'</div><div class="l">'+o.l+'</div>'+d(o.a,o.b)+'</div>'; }).join('');
@@ -455,7 +454,7 @@ function renderStatsCards(){
   var bars=order.map(function(k){ var v=CHGCOUNT[k]||0; return '<div class="cbar"><span class="tg" style="background:var(--'+k+')">'+CHG_META[k].l+'</span><span class="bar" style="width:'+(v/maxc*150+10)+'px;background:var(--'+k+')"></span><span class="c">'+v+'건</span></div>'; }).join('');
   return '<div class="grid2" style="margin-top:20px">'
     +'<div class="card"><h3><span class="dot" style="background:var(--accent)"></span>조직 수 변화 (개편 전 → 후)</h3><div class="statrow">'+tiles+'</div>'
-    +'<p style="color:var(--muted);font-size:12px;margin:12px 0 0">※ 파트 +1(네트워크운영 정규화), 부서 −1(강남부 폐쇄), TFT −1(승격). 센터 −5 — 현장 보상센터 6개 감소, 본점 디지털업무지원센터 1개 신설. (팀 제외)</p></div>'
+    +'<p style="color:var(--muted);font-size:12px;margin:12px 0 0">※ 파트 +1(네트워크운영 정규화), 부서 −1(강남부 폐쇄). 센터 −5 — 현장 보상센터 6개 감소, 본점 디지털업무지원센터 1개 신설. (팀·TFT 제외)</p></div>'
     +'<div class="card"><h3><span class="dot" style="background:var(--merged)"></span>개편 유형별 건수</h3><div class="chgbars">'+bars+'</div></div>'
     +'</div>';
 }
@@ -538,7 +537,7 @@ function renderChartPage(id,title,ey,desc,root,withChg){
 }
 
 renderOverview();
-renderChartPage('p1','현재 조직도','As-Is','개편 전 · 본부 3 / 부서 15 / TFT 2 / 센터 79',BEFORE,false);
+renderChartPage('p1','현재 조직도','As-Is','개편 전 · 본부 3 · 파트 3 · 부서 11 · 센터 79',BEFORE,false);
 renderThemes();
 renderChartPage('p3','개편 후 조직도','To-Be','변경점 색상 강조 · 폐쇄·통합된 조직은 제외',AFTER,true);
 document.getElementById('p3').innerHTML += renderStatsCards();
