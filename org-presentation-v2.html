@@ -95,6 +95,38 @@
   .wh.bg{background:var(--muted)} .wh.eff{background:var(--new)}
   .wt{font-size:13px;line-height:1.5}
   .wt b{font-weight:800}
+  /* 강남부 재배치 다이어그램 */
+  .rsrc{flex:none;background:var(--panel);border:2px solid var(--closed);color:var(--closed);border-radius:12px;padding:11px 13px;font-weight:900;font-size:13.5px;text-align:center;text-decoration:line-through}
+  .rsrc span{display:block;font-size:10px;color:var(--closed);font-weight:700;margin-top:3px;text-decoration:none}
+  .rrows{flex:1;display:flex;flex-direction:column;gap:7px;min-width:190px}
+  .rrow{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .rdest{background:var(--panel);border:1.5px solid var(--moved);color:var(--moved);border-radius:8px;padding:4px 10px;font-weight:800;font-size:12px;white-space:nowrap}
+  .rdest.cl{border-color:var(--closed);color:var(--closed)}
+  .rchips{display:flex;gap:4px;flex-wrap:wrap}
+  .rchip{background:var(--leaf-bg);border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;color:var(--leaf-ink)}
+  .rchip.cl{border-color:var(--closed);color:var(--closed);text-decoration:line-through;opacity:.7}
+  /* 배당량 재분배 카드 */
+  .loadcard{background:var(--panel);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:16px;padding:20px 22px;margin-bottom:18px}
+  .lc-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  .lc-head h3{margin:0;font-size:16px}
+  .lc-sub{color:var(--muted);font-size:12px}
+  .lc-legend{display:flex;gap:16px;font-size:11.5px;color:var(--muted);margin-bottom:12px}
+  .lc-legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:middle}
+  .lc-legend i.before{background:var(--muted);opacity:.6} .lc-legend i.after{background:var(--accent)}
+  .ltable{display:flex;flex-direction:column;gap:8px}
+  .lrow{display:grid;grid-template-columns:82px 1fr 66px;align-items:center;gap:12px}
+  .lrow.lclosed .lname{color:var(--closed)}
+  .lname{font-weight:800;font-size:13px}
+  .lx{font-size:9px;font-weight:900;color:#fff;background:var(--closed);border-radius:4px;padding:1px 5px;margin-left:2px}
+  .lbars{display:flex;flex-direction:column;gap:3px}
+  .lb{position:relative;display:flex;align-items:center;height:15px}
+  .lbfill{height:100%;border-radius:4px;min-width:2px}
+  .lbfill.before{background:var(--muted);opacity:.5}
+  .lbfill.after{background:var(--accent)}
+  .lbv{font-size:10.5px;font-weight:700;margin-left:6px;color:var(--muted);white-space:nowrap}
+  .ldelta{text-align:right;font-weight:800;font-size:12.5px;color:var(--muted)}
+  .ldelta.up{color:var(--new)} .ldelta.dn{color:var(--closed)}
+  .lc-note{margin-top:14px;font-size:12.5px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 13px;line-height:1.55}
 
   .bdg{display:inline-block;font-size:9px;font-weight:900;border-radius:5px;padding:2px 7px;color:#fff}
   .bdg.new{background:var(--new)} .bdg.merged{background:var(--merged)} .bdg.moved{background:var(--moved)}
@@ -222,11 +254,11 @@ var AFTER={name:'대표이사',kind:'ceo',children:[
   ]},
   {name:'수도권보상본부',kind:'hq',color:2,children:[
     support('수도본부지원팀'),
-    bu('서부차량보상부',C(['노원',['성동',{merged:'성동+동대문'}],'서대문','일산','외제일산','외제강북','외제강남',['강남',{chg:['moved']}]]),{chg:['renamed'],old:'강북차량보상부'}),
-    bu('동부차량보상부',C(['구리','강동','성남',['원주',{merged:'원주+춘천'}],'이천','강릉','외제강동',['의정부',{chg:['moved']}]]),{chg:['renamed'],old:'동서울차량보상부'}),
+    bu('강북차량보상부',C(['노원',['성동',{merged:'성동+동대문'}],'서대문','일산','외제일산','외제강북','외제강남',['강남',{chg:['moved']}]])),
+    bu('동서울차량보상부',C(['구리','강동','성남',['원주',{merged:'원주+춘천'}],'이천','강릉','외제강동',['의정부',{chg:['moved']}]])),
     bu('인천차량보상부',C(['서인천','동인천','남인천','부천','부평','김포','외제인천',['영등포',{chg:['moved']}],['구로',{chg:['moved']}]])),
     bu('경기차량보상부',C(['동수원','서수원','안산','안양','용인','오산','평택','외제경기',['시흥',{chg:['moved']}]])),
-    bu('수도권SMART차량보상부',C([['SMART서부',{renamed:1}],['SMART동부',{renamed:1}],'SMART인천','SMART경기']))
+    bu('수도권SMART차량보상부',C(['SMART강북','SMART동서울','SMART인천','SMART경기']))
   ]},
   {name:'지방보상본부',kind:'hq',color:3,children:[
     support('지방본부지원팀'),
@@ -237,10 +269,20 @@ var AFTER={name:'대표이사',kind:'ceo',children:[
     bu('지방SMART차량보상부',C(['SMART부산','SMART대구','SMART충청','SMART호남']))
   ]}
 ]};
-// SMART 명칭변경 표시용
-(function(){ AFTER.children[2].children.forEach(function(u){ if(u.name==='수도권SMART차량보상부'){ u.children.forEach(function(c){ if(c.renamed){ c.chg=['renamed']; } }); } }); })();
+var CHGCOUNT={renamed:2, moved:8, closed:5, merged:3, new:1, promoted:1};
 
-var CHGCOUNT={renamed:6, moved:8, closed:5, merged:3, new:1, promoted:1};
+/* 개편 전후 배당량 (26년 2분기 월평균) */
+var LOAD=[
+  {n:'강남부', b:7724, a:0},
+  {n:'강북부', b:9811, a:11017},
+  {n:'경기부', b:10292, a:11673},
+  {n:'대구부', b:9524, a:11078},
+  {n:'동서울부', b:9810, a:11488},
+  {n:'부산부', b:12298, a:10744},
+  {n:'인천부', b:9033, a:11220},
+  {n:'충청부', b:11553, a:11553},
+  {n:'호남부', b:9164, a:10436}
+];
 
 /* 개편 내역 주제 */
 var THEMES=[
@@ -270,15 +312,17 @@ var THEMES=[
      {h:'목적',t:'SMART강남의 자동화전담 기능을 <b>손사전략파트 산하 디지털업무지원센터로 격상·이관</b>.'},
      {h:'기대효과',cls:'eff',t:'자동화·디지털 업무지원을 전사 표준으로 확산, 손사 지원 역량 강화.'}
    ]},
-  {hq:2, key:true, title:'강남차량보상부 폐쇄 & 서부·동부 권역 재편 (수도권 핵심)', tags:['closed','renamed','moved'],
-   before:[{name:'강북차량보상부'},{name:'강남차량보상부',sub:'폐쇄 대상 · 7개 센터',hl:'closed'},{name:'동서울차량보상부'}],
-   after:[{name:'서부차량보상부',sub:'← 강북 명칭변경',hl:'renamed'},{name:'동부차량보상부',sub:'← 동서울 명칭변경',hl:'renamed'}],
-   note:'강남차량보상부 폐쇄',
+  {hq:2, key:true, title:'강남차량보상부 폐쇄 & 하위 센터 재배치 (수도권 핵심)', tags:['closed','moved'],
+   redist:{source:'강남차량보상부', count:7, rows:[
+     {dest:'강북차량보상부', type:'move', centers:['강남','외제강남']},
+     {dest:'인천차량보상부', type:'move', centers:['영등포','구로']},
+     {dest:'호남차량보상부', type:'move', centers:['제주']},
+     {dest:'폐쇄', type:'closed', centers:['강서','외제강서']}
+   ]},
    why:[
-     {h:'배경',cls:'bg',t:'강남권역 물량·관할 조정 필요, 인접 권역 간 관할 중복 해소.'},
-     {h:'센터처리',t:'폐쇄되는 강남부 <b>7개 센터 재배치</b> — ① 강남·외제강남 → <b>서부</b> ② 영등포·구로 → <b>인천</b> ③ 강서·외제강서 → <b>폐쇄</b> ④ 제주 → <b>호남</b>(센터 이동 참조).'},
-     {h:'명칭',t:'권역 명확화를 위해 강북→<b>서부</b>, 동서울→<b>동부</b> (SMART강북→SMART서부, SMART동서울→SMART동부).'},
-     {h:'기대효과',cls:'eff',t:'권역 경계·관할 명확화, 인접 중복 해소로 관리 효율 제고.'}
+     {h:'배경',cls:'bg',t:'강남권역 배당량 감소·관할 조정 필요, 인접 권역 간 관할 중복 해소.'},
+     {h:'조치',t:'<b>강남차량보상부 폐쇄</b>. 하위 7개 센터를 인접 권역으로 재배치하고, 중복 외제센터(강서·외제강서)는 정리.'},
+     {h:'기대효과',cls:'eff',t:'권역 관할 명확화, 인접 중복 해소, 강남부 배당량(7,724)을 타 권역으로 분산.'}
    ]},
   {hq:2, title:'인접·소규모 센터 통합', tags:['merged'],
    before:[{name:'성동 + 동대문',sub:'서부'},{name:'원주 + 춘천',sub:'동부'},{name:'동대구 + 서대구',sub:'지방·대구'}],
@@ -289,11 +333,11 @@ var THEMES=[
      {h:'기대효과',cls:'eff',t:'거점 집중으로 인력·비용 효율화, 관할 단순화.'}
    ]},
   {hq:0, title:'센터 이동 (관할 조정)', tags:['moved'],
-   before:[{name:'의정부',sub:'강북(→서부)'},{name:'시흥',sub:'인천'},{name:'울산',sub:'부산'},{name:'제주',sub:'강남부'}],
-   after:[{name:'의정부 → 동부',hl:'moved'},{name:'시흥 → 경기',hl:'moved'},{name:'울산 → 대구',hl:'moved'},{name:'제주 → 호남',hl:'moved'}],
+   before:[{name:'의정부',sub:'강북차량보상부'},{name:'시흥',sub:'인천차량보상부'},{name:'울산',sub:'부산차량보상부'}],
+   after:[{name:'의정부 → 동서울',hl:'moved'},{name:'시흥 → 경기',hl:'moved'},{name:'울산 → 대구',hl:'moved'}],
    why:[
      {h:'배경',cls:'bg',t:'지리적 접근성·업무량을 고려한 <b>관할 합리화</b> 필요.'},
-     {h:'조치',t:'의정부→<b>동부</b>, 시흥→<b>경기</b>, 울산→<b>대구</b>, 제주→<b>호남</b>으로 관할 이관.'},
+     {h:'조치',t:'의정부→<b>동서울</b>, 시흥→<b>경기</b>, 울산→<b>대구</b>로 관할 이관 (제주→호남은 강남부 재배치 포함).'},
      {h:'기대효과',cls:'eff',t:'이동거리·현장 대응성 개선, 권역 간 업무량 균형.'}
    ]}
 ];
@@ -353,7 +397,7 @@ function renderOverview(){
   var maxc=Math.max.apply(null,order.map(function(k){return CHGCOUNT[k]||0;}));
   var bars=order.map(function(k){ var v=CHGCOUNT[k]||0; return '<div class="cbar"><span class="tg" style="background:var(--'+k+')">'+CHG_META[k].l+'</span><span class="bar" style="width:'+(v/maxc*150+10)+'px;background:var(--'+k+')"></span><span class="c">'+v+'건</span></div>'; }).join('');
   var html=''
-    +'<div class="cover"><div class="ey">HR Reorganization Plan · v2</div><h1>수도권 권역 재편 및<br>손사 지원·품질 체계 정비(안)</h1><p>강남차량보상부 폐쇄 · 서부/동부 권역 정비 · 네트워크운영 정규화 · QI 감사 이관</p></div>'
+    +'<div class="cover"><div class="ey">HR Reorganization Plan · v2</div><h1>수도권 권역 재편 및<br>손사 지원·품질 체계 정비(안)</h1><p>강남차량보상부 폐쇄 · 배당량 재분배 · 네트워크운영 정규화 · QI 감사 이관</p></div>'
     +'<div class="grid2">'
     +'<div class="card"><h3><span class="dot" style="background:var(--accent)"></span>조직 수 변화 (개편 전 → 후)</h3><div class="statrow">'
       +'<div class="stat"><div class="n">'+a.hq+'</div><div class="l">본부</div>'+d(a.hq,b.hq)+'</div>'
@@ -364,7 +408,7 @@ function renderOverview(){
     +'<div class="card"><h3><span class="dot" style="background:var(--merged)"></span>개편 유형별 건수</h3><div class="chgbars">'+bars+'</div></div>'
     +'</div>'
     +'<div class="card" style="margin-top:16px"><h3><span class="dot" style="background:var(--promoted)"></span>핵심 개편 사항</h3><ul class="keylist">'
-      +'<li><span class="ico" style="background:var(--closed)">✕</span><div><b>수도권 — 강남차량보상부 폐쇄 & 서부·동부 권역 재편</b><span class="sub">강남부 폐쇄 후 센터 재배치(서부·인천), 강북→서부·동서울→동부 명칭 정비</span></div></li>'
+      +'<li><span class="ico" style="background:var(--closed)">✕</span><div><b>수도권 — 강남차량보상부 폐쇄 & 하위 센터 재배치</b><span class="sub">강남부 7센터를 강북·인천·호남으로 재배치, 배당량 7,724을 타 권역으로 분산</span></div></li>'
       +'<li><span class="ico" style="background:var(--promoted)">↑</span><div><b>네트워크운영TFT → 네트워크운영파트 승격</b><span class="sub">임시조직을 정규 부서로 전환, 네트워크 관리 기능 상시화</span></div></li>'
       +'<li><span class="ico" style="background:var(--new)">＋</span><div><b>디지털업무지원센터 신설 (SMART강남 자동화전담 격상·이관)</b><span class="sub">현장에 있던 자동화전담 기능을 본사 손사전략파트로 이관해 전사 표준화</span></div></li>'
       +'<li><span class="ico" style="background:var(--renamed)">◎</span><div><b>품질관리(QI) 감사 이관 · 센터 관할 조정</b><span class="sub">QI팀 폐쇄→감사파트(QI) 통합, 의정부·시흥·울산·제주 이동, 인접센터 통합</span></div></li>'
@@ -372,18 +416,44 @@ function renderOverview(){
   document.getElementById('p0').innerHTML=html;
 }
 function baBox(it){ return '<div class="babox'+(it.hl?' hl-'+it.hl:'')+'">'+esc(it.name)+(it.sub?'<span>'+esc(it.sub)+'</span>':'')+'</div>'; }
+function redistHtml(rd){
+  var rows=rd.rows.map(function(r){
+    var chips=r.centers.map(function(c){ return '<span class="rchip'+(r.type==='closed'?' cl':'')+'">'+esc(c)+'</span>'; }).join('');
+    return '<div class="rrow"><span class="rdest'+(r.type==='closed'?' cl':'')+'">'+(r.type==='closed'?'⛔ 폐쇄':'→ '+esc(r.dest))+'</span><span class="rchips">'+chips+'</span></div>';
+  }).join('');
+  return '<div class="rsrc">'+esc(rd.source)+'<span>폐쇄 · '+rd.count+'센터</span></div><div class="ba-ar">→</div><div class="rrows">'+rows+'</div>';
+}
 function themeHtml(th){
   var tags=(th.tags||[]).map(function(t){return '<span class="bdg '+t+'">'+CHG_META[t].l+'</span>';}).join('');
-  var before=(th.before||[]).map(baBox).join('');
-  var after=(th.after||[]).map(baBox).join('');
   var why=(th.why||[]).map(function(w){ return '<div class="wrow"><span class="wh '+(w.cls||'')+'">'+esc(w.h)+'</span><span class="wt">'+w.t+'</span></div>'; }).join('');
   var note=th.note?'<div class="tnote">⚠ '+esc(th.note)+'</div>':'';
+  var baInner = th.redist ? redistHtml(th.redist)
+    : '<div class="ba-col"><div class="ba-lbl">개편 전</div><div class="ba-items">'+(th.before||[]).map(baBox).join('')+'</div></div><div class="ba-ar">→</div><div class="ba-col"><div class="ba-lbl">개편 후</div><div class="ba-items">'+(th.after||[]).map(baBox).join('')+'</div></div>';
   return '<div class="theme'+(th.key?' key':'')+'"><div class="theme-head"><span class="hqchip c'+th.hq+'">'+HQN[th.hq]+'</span><h3>'+esc(th.title)+'</h3><span class="ttags">'+tags+'</span></div>'
-    +'<div class="theme-grid"><div class="ba"><div class="ba-col"><div class="ba-lbl">개편 전</div><div class="ba-items">'+before+'</div></div><div class="ba-ar">→</div><div class="ba-col"><div class="ba-lbl">개편 후</div><div class="ba-items">'+after+'</div></div>'+note+'</div>'
+    +'<div class="theme-grid"><div class="ba">'+baInner+note+'</div>'
     +'<div class="why">'+why+'</div></div></div>';
 }
+function nf(x){ return String(x).replace(/\B(?=(\d{3})+(?!\d))/g,','); }
+function renderLoad(){
+  var maxv=Math.max.apply(null, LOAD.map(function(x){return Math.max(x.b,x.a);}));
+  var rows=LOAD.map(function(x){
+    var d=x.a-x.b, closed=x.a===0;
+    var dtxt=d===0?'±0':(d>0?'+'+nf(d):'-'+nf(-d));
+    var dcls=d>0?'up':(d<0?'dn':'');
+    return '<div class="lrow'+(closed?' lclosed':'')+'"><span class="lname">'+x.n+(closed?' <span class="lx">폐쇄</span>':'')+'</span>'
+      +'<span class="lbars">'
+        +'<span class="lb"><span class="lbfill before" style="width:'+(x.b/maxv*100)+'%"></span><span class="lbv">'+nf(x.b)+'</span></span>'
+        +'<span class="lb"><span class="lbfill after" style="width:'+(x.a/maxv*100)+'%"></span><span class="lbv">'+nf(x.a)+'</span></span>'
+      +'</span>'
+      +'<span class="ldelta '+dcls+'">'+dtxt+'</span></div>';
+  }).join('');
+  return '<div class="loadcard"><div class="lc-head"><h3>📊 개편 전후 부서별 배당량 재분배</h3><span class="lc-sub">26년 2분기 월평균 · 단위 건 · <b>전체 89,208 동일(총량 유지)</b></span></div>'
+    +'<div class="lc-legend"><span><i class="before"></i>개편 전</span><span><i class="after"></i>개편 후</span><span style="margin-left:auto">우측 = 증감</span></div>'
+    +'<div class="ltable">'+rows+'</div>'
+    +'<div class="lc-note">강남부 배당(7,724)은 <b>0으로 폐쇄</b>되어 강북·인천·호남 등으로 분산되고, 부산부는 울산 이관으로 <b>과다 물량이 완화(−1,554)</b>됩니다. 총 배당량은 유지한 채 권역 간 <b>부하를 균형화</b>합니다.</div></div>';
+}
 function renderThemes(){
-  var html='<div class="phead"><div class="ey">Rationale</div><h1>개편 내역 · 배경</h1><p>주요 개편을 주제별로 — 무엇을(전→후), 왜(배경·목적·효과)</p></div>'+THEMES.map(themeHtml).join('');
+  var html='<div class="phead"><div class="ey">Rationale</div><h1>개편 내역 · 배경</h1><p>주요 개편을 주제별로 — 무엇을(전→후), 왜(배경·목적·효과)</p></div>'+renderLoad()+THEMES.map(themeHtml).join('');
   document.getElementById('p2').innerHTML=html;
 }
 function renderChartPage(id,title,ey,desc,root,withChg){
