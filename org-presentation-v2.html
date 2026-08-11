@@ -266,7 +266,7 @@ var AFTER={name:'대표이사',kind:'ceo',children:[
   {name:'감사파트(QI)',kind:'audit'},
   {name:'경영지원본부',kind:'hq',color:1,children:[
     part('손사지원파트',['인사교육팀','총무경리팀']),
-    {name:'손사전략파트',kind:'unit',children:[team('업무지원팀'),team('기회통계팀'),{name:'디지털업무지원센터',kind:'leaf',team:true,chg:['new']}]},
+    {name:'손사전략파트',kind:'unit',children:[team('업무지원팀'),team('기회통계팀'),{name:'디지털업무지원센터',kind:'leaf',chg:['new']}]},
     {name:'네트워크운영파트',kind:'unit',chg:['renamed','promoted'],old:'네트워크운영TFT'},
     {name:'업무TFT',kind:'tft'}
   ]},
@@ -420,7 +420,7 @@ function renderStatsCards(){
       +'<div class="stat"><div class="n">'+a.unit+'</div><div class="l">부서</div>'+d(a.unit,b.unit)+'</div>'
       +'<div class="stat"><div class="n">'+a.tft+'</div><div class="l">TFT</div>'+d(a.tft,b.tft)+'</div>'
       +'<div class="stat"><div class="n">'+a.center+'</div><div class="l">센터</div>'+d(a.center,b.center)+'</div>'
-    +'</div><p style="color:var(--muted);font-size:12px;margin:12px 0 0">※ 강남차량보상부 폐쇄로 부서 1↓, 네트워크운영 승격으로 TFT 1↓·부서 1↑ (부서 수 동일). 센터 '+(b.center-a.center)+'개 순감.</p></div>'
+    +'</div><p style="color:var(--muted);font-size:12px;margin:12px 0 0">※ 부서 수 동일(강남부 폐쇄 −1, 네트워크운영 승격 +1). 센터 '+(b.center-a.center)+'개 순감 — 현장 보상센터 6개 감소, 본점 디지털업무지원센터 1개 신설.</p></div>'
     +'<div class="card"><h3><span class="dot" style="background:var(--merged)"></span>개편 유형별 건수</h3><div class="chgbars">'+bars+'</div></div>'
     +'</div>';
 }
