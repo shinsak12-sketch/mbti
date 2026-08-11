@@ -71,7 +71,7 @@
   .theme-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
   .theme-head h3{margin:0;font-size:16px;letter-spacing:-.3px}
   .hqchip{font-size:11px;font-weight:900;color:#fff;border-radius:20px;padding:3px 11px;white-space:nowrap}
-  .hqchip.c1{background:var(--c1)} .hqchip.c2{background:var(--c2)} .hqchip.c3{background:var(--c3)}
+  .hqchip.c0{background:var(--muted)} .hqchip.c1{background:var(--c1)} .hqchip.c2{background:var(--c2)} .hqchip.c3{background:var(--c3)}
   .ttags{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
   .theme-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:0}
   @media(max-width:820px){.theme-grid{grid-template-columns:1fr}}
@@ -183,7 +183,7 @@ function support(n){ return {name:n,kind:'unit',support:true}; }
 function ct(n,o){ o=o||{}; if(n.indexOf('외제')===0)o.imp=true; if(/^SMART/.test(n))o.smart=true; return Object.assign({name:n,kind:'leaf'},o); }
 function bu(n,arr,o){ return Object.assign({name:n,kind:'unit',children:arr},o||{}); }
 function C(list){ return list.map(function(x){ return typeof x==='string'?ct(x):ct(x[0],x[1]); }); }
-var HQN={1:'경영지원',2:'수도권',3:'지방'};
+var HQN={0:'수도권·지방',1:'경영지원',2:'수도권',3:'지방'};
 var CHG_META={new:{l:'신설'},closed:{l:'폐쇄'},moved:{l:'이동'},merged:{l:'통합'},renamed:{l:'명칭변경'},promoted:{l:'승격'}};
 
 var BEFORE={name:'대표이사',kind:'ceo',children:[
@@ -244,13 +244,13 @@ var CHGCOUNT={renamed:6, moved:8, closed:5, merged:3, new:1, promoted:1};
 
 /* 개편 내역 주제 */
 var THEMES=[
-  {hq:1, title:'네트워크 관리 기능 정규화 (TFT → 정규 부서)', tags:['promoted','renamed'],
+  {hq:1, title:'네트워크운영 기능 정규화 (TFT → 정규 부서)', tags:['promoted','renamed'],
    before:[{name:'네트워크운영TFT',sub:'TFT · 임시조직'}],
    after:[{name:'네트워크운영파트',sub:'부서 · 정규조직',hl:'promoted'}],
    why:[
-     {h:'배경',cls:'bg',t:'협력·정비 네트워크 관리 수요가 지속 증가하나, 임시조직(TFT) 체계로는 상시·전문 대응에 한계.'},
-     {h:'목적',t:'네트워크 관리 기능을 <b>정규 부서로 승격</b>해 책임·권한을 명확히 하고 관리 체계를 상시화.'},
-     {h:'기대효과',cls:'eff',t:'네트워크 품질·비용 관리의 전문성과 연속성 강화.'}
+     {h:'배경',cls:'bg',t:'협력 정비망 관리와 함께 <b>분쟁 거래처(정비공장·협력업체) 대응</b> 수요가 지속 증가하나, 임시조직(TFT) 체계로는 상시·전문 대응에 한계.'},
+     {h:'목적',t:'네트워크 관리 기능을 <b>정규 부서로 승격</b>해, 협력 네트워크 운영과 <b>분쟁 거래처 대응</b>을 상시 전담하고 책임·권한을 명확화.'},
+     {h:'기대효과',cls:'eff',t:'거래처 분쟁 대응력·협상력 강화, 네트워크 품질·비용 관리의 전문성과 연속성 확보.'}
    ]},
   {hq:1, title:'품질관리(QI) 기능 감사파트로 이관', tags:['renamed','closed'],
    before:[{name:'QI팀',sub:'손사전략파트 하위'},{name:'감사파트',sub:'대표이사 직속'}],
@@ -261,21 +261,22 @@ var THEMES=[
      {h:'목적',t:'QI 기능을 대표이사 직속 감사 기능과 결합(<b>감사파트(QI)</b>)해 독립 점검 체계로 전환.'},
      {h:'기대효과',cls:'eff',t:'손사 품질에 대한 견제·감사 기능 강화, 실무-감사 분리.'}
    ]},
-  {hq:1, title:'디지털업무지원센터 신설', tags:['new'],
-   before:[{name:'—',sub:'해당 조직 없음'}],
-   after:[{name:'디지털업무지원센터',sub:'손사전략파트 신설',hl:'new'}],
+  {hq:1, title:'디지털업무지원센터 신설 (SMART강남 자동화전담 기능 격상·이관)', tags:['new','closed'],
+   before:[{name:'SMART강남',sub:'자동화전담 · 수도권SMART 하위',hl:'closed'}],
+   after:[{name:'디지털업무지원센터',sub:'손사전략파트 정규 센터',hl:'new'}],
+   note:'SMART강남 폐쇄 → 자동화전담 기능을 본사로 이관',
    why:[
-     {h:'배경',cls:'bg',t:'손사 업무의 디지털 전환 가속, 시스템·데이터 기반 지원 수요 확대.'},
-     {h:'목적',t:'디지털 기반 업무지원을 전담할 조직 신설.'},
-     {h:'기대효과',cls:'eff',t:'데이터·자동화 기반 손사 지원 역량 강화.'}
+     {h:'배경',cls:'bg',t:'현장 센터(SMART강남)에만 있던 <b>자동화전담</b> 기능을 전사 차원으로 확대·표준화할 필요.'},
+     {h:'목적',t:'SMART강남의 자동화전담 기능을 <b>손사전략파트 산하 디지털업무지원센터로 격상·이관</b>.'},
+     {h:'기대효과',cls:'eff',t:'자동화·디지털 업무지원을 전사 표준으로 확산, 손사 지원 역량 강화.'}
    ]},
   {hq:2, key:true, title:'강남차량보상부 폐쇄 & 서부·동부 권역 재편 (수도권 핵심)', tags:['closed','renamed','moved'],
-   before:[{name:'강북차량보상부'},{name:'강남차량보상부',sub:'폐쇄 대상',hl:'closed'},{name:'동서울차량보상부'}],
+   before:[{name:'강북차량보상부'},{name:'강남차량보상부',sub:'폐쇄 대상 · 7개 센터',hl:'closed'},{name:'동서울차량보상부'}],
    after:[{name:'서부차량보상부',sub:'← 강북 명칭변경',hl:'renamed'},{name:'동부차량보상부',sub:'← 동서울 명칭변경',hl:'renamed'}],
-   note:'강남차량보상부 폐쇄 · SMART강남 폐쇄(자동화전담 재배치 검토 필요)',
+   note:'강남차량보상부 폐쇄',
    why:[
      {h:'배경',cls:'bg',t:'강남권역 물량·관할 조정 필요, 인접 권역 간 관할 중복 해소.'},
-     {h:'조치',t:'<b>강남차량보상부 폐쇄</b> → ① 강남·외제강남 센터는 <b>서부</b>로 이관 ② 영등포·구로는 <b>인천</b>으로 이관 ③ 강서·외제강서는 정리(폐쇄).'},
+     {h:'센터처리',t:'폐쇄되는 강남부 <b>7개 센터 재배치</b> — ① 강남·외제강남 → <b>서부</b> ② 영등포·구로 → <b>인천</b> ③ 강서·외제강서 → <b>폐쇄</b> ④ 제주 → <b>호남</b>(센터 이동 참조).'},
      {h:'명칭',t:'권역 명확화를 위해 강북→<b>서부</b>, 동서울→<b>동부</b> (SMART강북→SMART서부, SMART동서울→SMART동부).'},
      {h:'기대효과',cls:'eff',t:'권역 경계·관할 명확화, 인접 중복 해소로 관리 효율 제고.'}
    ]},
@@ -287,13 +288,13 @@ var THEMES=[
      {h:'목적',t:'인접 센터를 통합해 관리 단위를 최적화.'},
      {h:'기대효과',cls:'eff',t:'거점 집중으로 인력·비용 효율화, 관할 단순화.'}
    ]},
-  {hq:3, title:'지방 관할 조정 (울산·제주 이관)', tags:['moved'],
-   before:[{name:'울산',sub:'부산차량보상부'},{name:'제주',sub:'강남차량보상부'}],
-   after:[{name:'울산 → 대구',sub:'접근성 기준 재배치',hl:'moved'},{name:'제주 → 호남',sub:'권역 편입',hl:'moved'}],
+  {hq:0, title:'센터 이동 (관할 조정)', tags:['moved'],
+   before:[{name:'의정부',sub:'강북(→서부)'},{name:'시흥',sub:'인천'},{name:'울산',sub:'부산'},{name:'제주',sub:'강남부'}],
+   after:[{name:'의정부 → 동부',hl:'moved'},{name:'시흥 → 경기',hl:'moved'},{name:'울산 → 대구',hl:'moved'},{name:'제주 → 호남',hl:'moved'}],
    why:[
-     {h:'배경',cls:'bg',t:'지리적 접근성·관할 합리화 필요.'},
-     {h:'조치',t:'울산을 <b>대구 관할</b>로, 제주를 <b>호남 관할</b>로 이관.'},
-     {h:'기대효과',cls:'eff',t:'이동거리·현장 대응성 개선, 권역 정합성 제고.'}
+     {h:'배경',cls:'bg',t:'지리적 접근성·업무량을 고려한 <b>관할 합리화</b> 필요.'},
+     {h:'조치',t:'의정부→<b>동부</b>, 시흥→<b>경기</b>, 울산→<b>대구</b>, 제주→<b>호남</b>으로 관할 이관.'},
+     {h:'기대효과',cls:'eff',t:'이동거리·현장 대응성 개선, 권역 간 업무량 균형.'}
    ]}
 ];
 
@@ -365,8 +366,8 @@ function renderOverview(){
     +'<div class="card" style="margin-top:16px"><h3><span class="dot" style="background:var(--promoted)"></span>핵심 개편 사항</h3><ul class="keylist">'
       +'<li><span class="ico" style="background:var(--closed)">✕</span><div><b>수도권 — 강남차량보상부 폐쇄 & 서부·동부 권역 재편</b><span class="sub">강남부 폐쇄 후 센터 재배치(서부·인천), 강북→서부·동서울→동부 명칭 정비</span></div></li>'
       +'<li><span class="ico" style="background:var(--promoted)">↑</span><div><b>네트워크운영TFT → 네트워크운영파트 승격</b><span class="sub">임시조직을 정규 부서로 전환, 네트워크 관리 기능 상시화</span></div></li>'
-      +'<li><span class="ico" style="background:var(--renamed)">◎</span><div><b>품질관리(QI) 기능 감사파트로 이관</b><span class="sub">QI팀 폐쇄 → 대표이사 직속 감사파트(QI)로 통합, 독립 점검 체계</span></div></li>'
-      +'<li><span class="ico" style="background:var(--new)">＋</span><div><b>디지털업무지원센터 신설 · 지방 관할 조정</b><span class="sub">디지털 지원 전담 신설, 울산→대구·제주→호남 이관, 인접센터 통합</span></div></li>'
+      +'<li><span class="ico" style="background:var(--new)">＋</span><div><b>디지털업무지원센터 신설 (SMART강남 자동화전담 격상·이관)</b><span class="sub">현장에 있던 자동화전담 기능을 본사 손사전략파트로 이관해 전사 표준화</span></div></li>'
+      +'<li><span class="ico" style="background:var(--renamed)">◎</span><div><b>품질관리(QI) 감사 이관 · 센터 관할 조정</b><span class="sub">QI팀 폐쇄→감사파트(QI) 통합, 의정부·시흥·울산·제주 이동, 인접센터 통합</span></div></li>'
     +'</ul></div>';
   document.getElementById('p0').innerHTML=html;
 }
