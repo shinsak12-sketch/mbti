@@ -64,6 +64,12 @@
   .keylist li{display:flex;gap:11px;align-items:flex-start;font-size:13.5px}
   .keylist .ico{width:26px;height:26px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;font-weight:900}
   .keylist .sub{color:var(--muted);font-size:12px;display:block;margin-top:1px}
+  .dirs{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:13px}
+  .dir{background:var(--panel2);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:12px;padding:15px 16px}
+  .dir .dn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;background:var(--accent);color:#fff;font-weight:900;font-size:12.5px;margin-bottom:9px}
+  .dir h4{margin:0 0 6px;font-size:14px}
+  .dir p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.55}
+  .dir p b{color:var(--ink)}
 
   /* 개편 내역 (주제 카드) */
   .theme{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:0;margin-bottom:16px;overflow:hidden}
@@ -402,15 +408,13 @@ function chartLegend(withChg){
 }
 
 /* 페이지 */
-function renderOverview(){
+function renderStatsCards(){
   var b=stats(BEFORE), a=stats(AFTER);
   function d(cur,orig){ var x=cur-orig; return x?'<div class="d '+(x>0?'up':'dn')+'">'+(x>0?'+':'')+x+'</div>':'<div class="d" style="color:var(--muted)">-</div>'; }
   var order=['renamed','moved','closed','merged','new','promoted'];
   var maxc=Math.max.apply(null,order.map(function(k){return CHGCOUNT[k]||0;}));
   var bars=order.map(function(k){ var v=CHGCOUNT[k]||0; return '<div class="cbar"><span class="tg" style="background:var(--'+k+')">'+CHG_META[k].l+'</span><span class="bar" style="width:'+(v/maxc*150+10)+'px;background:var(--'+k+')"></span><span class="c">'+v+'건</span></div>'; }).join('');
-  var html=''
-    +'<div class="cover"><div class="ey">HR Reorganization Plan · v2</div><h1>수도권 권역 재편 및<br>손사 지원·품질 체계 정비(안)</h1><p>강남차량보상부 폐쇄 · 배당량 재분배 · 네트워크운영 정규화 · QI 감사 이관</p></div>'
-    +'<div class="grid2">'
+  return '<div class="grid2" style="margin-top:20px">'
     +'<div class="card"><h3><span class="dot" style="background:var(--accent)"></span>조직 수 변화 (개편 전 → 후)</h3><div class="statrow">'
       +'<div class="stat"><div class="n">'+a.hq+'</div><div class="l">본부</div>'+d(a.hq,b.hq)+'</div>'
       +'<div class="stat"><div class="n">'+a.unit+'</div><div class="l">부서</div>'+d(a.unit,b.unit)+'</div>'
@@ -418,11 +422,23 @@ function renderOverview(){
       +'<div class="stat"><div class="n">'+a.center+'</div><div class="l">센터</div>'+d(a.center,b.center)+'</div>'
     +'</div><p style="color:var(--muted);font-size:12px;margin:12px 0 0">※ 강남차량보상부 폐쇄로 부서 1↓, 네트워크운영 승격으로 TFT 1↓·부서 1↑ (부서 수 동일). 센터 '+(b.center-a.center)+'개 순감.</p></div>'
     +'<div class="card"><h3><span class="dot" style="background:var(--merged)"></span>개편 유형별 건수</h3><div class="chgbars">'+bars+'</div></div>'
-    +'</div>'
+    +'</div>';
+}
+function renderOverview(){
+  var html=''
+    +'<div class="cover"><div class="ey">HR Reorganization Plan · v2</div><h1>네트워크 관리 강화 및<br>수도권 권역 재편(안)</h1><p>네트워크운영 정규화 · 강남차량보상부 폐쇄 · 배당량 균형화 · 품질/디지털 기반 정비</p></div>'
+    +'<div class="card"><h3><span class="dot" style="background:var(--accent)"></span>개편 목적과 방향</h3>'
+      +'<p style="margin:-4px 0 16px;font-size:13.5px;line-height:1.6">본 개편은 <b>① 네트워크 관리 기능을 강화</b>하고 <b>② 수도권 권역을 재편</b>하는 것을 두 축으로, 부서 간 업무 부하를 <b>균형화</b>하고 품질·디지털 기반을 정비해 <b>현장 대응력과 관리 효율을 함께 높이는 것</b>을 목표로 합니다.</p>'
+      +'<div class="dirs">'
+        +'<div class="dir" style="border-top-color:var(--promoted)"><span class="dn" style="background:var(--promoted)">1</span><h4>네트워크 관리 강화</h4><p>협력 정비망·거래처 관리와 <b>분쟁 거래처 대응</b>을 임시조직(TFT)에서 정규 부서(네트워크운영파트)로 전환해 상시·전문 대응 체계를 구축합니다.</p></div>'
+        +'<div class="dir" style="border-top-color:var(--closed)"><span class="dn" style="background:var(--closed)">2</span><h4>수도권 권역 재편 · 배당 균형</h4><p>강남차량보상부를 폐쇄하고 하위 센터를 인접 권역으로 재배치해 <b>권역 간 배당량 편차를 축소</b>(4,574→1,237)하고 관할을 명확히 합니다.</p></div>'
+        +'<div class="dir" style="border-top-color:var(--new)"><span class="dn" style="background:var(--new)">3</span><h4>품질·디지털 기반 정비</h4><p>품질관리(QI)를 감사와 결합해 <b>독립 점검 체계</b>로 전환하고, 현장 자동화전담 기능을 디지털업무지원센터로 격상해 <b>전사 표준화</b>합니다.</p></div>'
+        +'<div class="dir" style="border-top-color:var(--moved)"><span class="dn" style="background:var(--moved)">4</span><h4>센터 관할 합리화</h4><p>접근성·업무량 기준으로 센터 관할을 조정(울산→대구, 제주→호남 등)하고 인접 소규모 센터를 통합해 운영 효율을 높입니다.</p></div>'
+      +'</div></div>'
     +'<div class="card" style="margin-top:16px"><h3><span class="dot" style="background:var(--promoted)"></span>핵심 개편 사항</h3><ul class="keylist">'
+      +'<li><span class="ico" style="background:var(--promoted)">↑</span><div><b>네트워크운영TFT → 네트워크운영파트 승격</b><span class="sub">임시조직을 정규 부서로 전환, 협력망 관리·분쟁 거래처 대응 상시화</span></div></li>'
       +'<li><span class="ico" style="background:var(--closed)">✕</span><div><b>수도권 — 강남차량보상부 폐쇄 & 하위 센터 재배치</b><span class="sub">강남부 7센터를 강북·인천·호남으로 재배치, 배당량 7,724을 타 권역으로 분산</span></div></li>'
-      +'<li><span class="ico" style="background:var(--promoted)">↑</span><div><b>네트워크운영TFT → 네트워크운영파트 승격</b><span class="sub">임시조직을 정규 부서로 전환, 네트워크 관리 기능 상시화</span></div></li>'
-      +'<li><span class="ico" style="background:var(--new)">＋</span><div><b>디지털업무지원센터 신설 (SMART강남 자동화전담 격상·이관)</b><span class="sub">현장에 있던 자동화전담 기능을 본사 손사전략파트로 이관해 전사 표준화</span></div></li>'
+      +'<li><span class="ico" style="background:var(--new)">＋</span><div><b>디지털업무지원센터 신설 (SMART강남 자동화전담 격상·이관)</b><span class="sub">현장에 있던 자동화전담 기능을 본사로 이관해 전사 표준화</span></div></li>'
       +'<li><span class="ico" style="background:var(--renamed)">◎</span><div><b>품질관리(QI) 감사 이관 · 센터 관할 조정</b><span class="sub">QI팀 폐쇄→감사파트(QI) 통합, 의정부·시흥·울산·제주 이동, 인접센터 통합</span></div></li>'
     +'</ul></div>';
   document.getElementById('p0').innerHTML=html;
@@ -490,6 +506,7 @@ renderOverview();
 renderChartPage('p1','현재 조직도','As-Is','개편 전 · 본부 3 / 부서 15 / TFT 2 / 센터 79',BEFORE,false);
 renderThemes();
 renderChartPage('p3','개편 후 조직도','To-Be','변경점 색상 강조 · 폐쇄·통합된 조직은 제외',AFTER,true);
+document.getElementById('p3').innerHTML += renderStatsCards();
 
 document.querySelector('.tabs').addEventListener('click',function(e){
   var t=e.target.closest('.tab'); if(!t) return;
