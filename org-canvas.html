@@ -160,6 +160,7 @@
   .sheet .sb:active{transform:translateY(1px)}
   .sheet .sb .e{font-size:18px;line-height:1}
   .sheet .sb.danger{color:#e06a6a;border-color:#7a4247} .sheet .sb.good{color:#3bbd7e;border-color:#2c5a44} .sheet .sb.spec{color:var(--auto);border-color:var(--auto)}
+  .sheet .sb.rev{color:var(--gold);border-color:var(--gold);background:rgba(217,178,90,.08)}
   @media (max-width:520px){ .sheet .st-btns{grid-template-columns:repeat(3,1fr)} }
 
   .overlay{position:fixed;inset:0;background:rgba(5,8,14,.66);z-index:80;display:none;align-items:center;justify-content:center;padding:18px}
@@ -442,6 +443,8 @@ function openSheet(id){
   if(canAttr) b+='<button class="sb" data-m="attr"><span class="e">🏷</span>국산/외산</button>';
   if(canSpec) b+='<button class="sb spec" data-m="special"><span class="e">⭐</span>'+(n.special?'특화해제':'특화지정')+'</button>';
   if(n.kind!=='ceo') b+= closed ? '<button class="sb good" data-m="restore"><span class="e">♻</span>폐쇄취소</button>' : '<button class="sb danger" data-m="close"><span class="e">⛔</span>폐쇄</button>';
+  var canRevert=(n.kind!=='ceo') && ((n.changes&&n.changes.length)||(n.mergedParts&&n.mergedParts.length));
+  if(canRevert) b+='<button class="sb rev" data-m="revert"><span class="e">↩</span>원복</button>';
   document.getElementById('shBtns').innerHTML=b;
   document.getElementById('sheet').classList.add('on');
 }
@@ -459,9 +462,27 @@ document.getElementById('shBtns').addEventListener('click', function(e){
   if(m==='restore') return actClose(sel,false);
   if(m==='special') return actSpecial(sel);
   if(m==='attr') return actAttr(sel);
+  if(m==='revert') return actRevert(sel);
   if(m==='move') return startPending('move', sel);
   if(m==='merge') return startPending('merge', sel);
 });
+function actRevert(sel){
+  if(hasChg(sel,'new')){
+    askConfirm('"'+sel.name+'"은(는) 신설한 조직입니다. 삭제(신설 취소)할까요?', function(){
+      pushHistory(); removeFromParent(sel); selectedId=null; ensureIds(); render(); toast('신설 취소됨');
+    });
+    return;
+  }
+  pushHistory();
+  if(sel.oldName){ sel.name=sel.oldName; delete sel.oldName; }
+  if(sel.oldKind){ sel.kind=sel.oldKind; delete sel.oldKind; }
+  if(sel._ofl){ sel.flags=sel._ofl; delete sel._ofl; }
+  if(sel._osp!==undefined){ if(sel._osp) sel.special=sel._osp; else delete sel.special; delete sel._osp; }
+  if(sel._op!=null && idMap[sel._op] && parentMap[sel.id]!==sel._op){ removeFromParent(sel); idMap[sel._op].children.push(sel); }
+  delete sel._op;
+  sel.changes=[]; delete sel.mergedParts;
+  ensureIds(); selectedId=sel.id; render(); openSheet(sel.id); toast('원래 상태로 원복됨');
+}
 
 /* ═══════ 액션 ═══════ */
 function addOptions(kind){ return {ceo:['hq'], hq:['unit','tft','leaf'], unit:['tft','leaf'], tft:['leaf'], leaf:[]}[kind]||[]; }
@@ -510,7 +531,7 @@ function applyLevelChange(sel, kind, name, word){
   if(kind==='unit'||kind==='hq') sel.flags=sel.flags.filter(function(f){return f!=='team';});
   if(kind==='hq'&&!sel.color) sel.color='c1';
   var par=findParent(sel.id);
-  if(!canParent(kind,par)){ removeFromParent(sel); (nearestHqAncestor(sel.id)||firstHq()).children.push(sel); }
+  if(!canParent(kind,par)){ if(!isNew && sel._op==null) sel._op=parentMap[sel.id]; removeFromParent(sel); (nearestHqAncestor(sel.id)||firstHq()).children.push(sel); }
   if(name && name!==sel.name){ if(!isNew){ if(!sel.oldName) sel.oldName=sel.name; addChange(sel,'renamed'); } sel.name=name; }
   if(!isNew){
     rmChange(sel,'promoted'); rmChange(sel,'demoted');
@@ -521,6 +542,7 @@ function applyLevelChange(sel, kind, name, word){
 function actAttr(sel){
   askChoice('속성 선택 (국산 / 외산)', [{kind:'dom',label:'국산'},{kind:'imp',label:'외산 (외제·노란색)'}], function(k){
     pushHistory();
+    if(sel._ofl===undefined) sel._ofl=sel.flags.slice();
     sel.flags=sel.flags.filter(function(f){return f!=='import';});
     if(k==='imp') sel.flags.push('import');
     render(); openSheet(sel.id); toast(k==='imp'?'외산으로 지정':'국산으로 지정');
@@ -535,6 +557,7 @@ function actClose(sel, close){
 function actSpecial(sel){
   askText('특화업무명 (비우면 해제 · 예: 자동화전담)', sel.special||'', function(v){
     pushHistory();
+    if(sel._osp===undefined) sel._osp=(sel.special!==undefined?sel.special:null);
     if(!v){ delete sel.special; toast('특화 해제'); } else { sel.special=v; toast('특화 지정: '+v); }
     render(); openSheet(sel.id);
   });
@@ -556,7 +579,7 @@ function completePending(id){
   if(type==='move'){
     if(!canParent(src.kind,t)){ toast('그 위치로는 이동할 수 없습니다.'); return; }
     if(parentMap[src.id]===t.id){ cancelPending(); return; }
-    pushHistory(); removeFromParent(src); t.children=t.children||[]; t.children.push(src);
+    pushHistory(); if(!hasChg(src,'new') && src._op==null) src._op=parentMap[src.id]; removeFromParent(src); t.children=t.children||[]; t.children.push(src);
     if(!hasChg(src,'new')) addChange(src,'moved'); selectedId=src.id; endPending(); toast('이동되었습니다');
   } else {
     if(t.kind!==src.kind){ toast('같은 종류끼리만 통합할 수 있습니다.'); return; }
