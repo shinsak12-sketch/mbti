@@ -474,6 +474,17 @@ function actRevert(sel){
     return;
   }
   pushHistory();
+  // 통합 원복: 흡수됐던 조직을 원래 위치로 되살리고, 옮겨졌던 하위도 되돌림
+  if(sel._merges && sel._merges.length){
+    for(var i=sel._merges.length-1;i>=0;i--){
+      var rec=sel._merges[i];
+      (rec.moved||[]).forEach(function(cid){ var c=idMap[cid]; if(c){ removeFromParent(c); rmChange(c,'moved'); delete c._op; rec.node.children=rec.node.children||[]; if(rec.node.children.indexOf(c)<0) rec.node.children.push(c); } });
+      var par=idMap[rec.origParent]||findParent(sel.id)||firstHq();
+      par.children=par.children||[]; par.children.push(rec.node);
+      sel.name=rec.prevName;
+    }
+    delete sel._merges;
+  }
   if(sel.oldName){ sel.name=sel.oldName; delete sel.oldName; }
   if(sel.oldKind){ sel.kind=sel.oldKind; delete sel.oldKind; }
   if(sel._ofl){ sel.flags=sel._ofl; delete sel._ofl; }
@@ -588,9 +599,13 @@ function completePending(id){
     askText('통합 조직의 이름을 정하세요 (그대로 두려면 유지)', src.name, function(nm){
       var s=idMap[srcId], tt=idMap[tId]; if(!s||!tt) return;
       pushHistory();
-      (tt.children||[]).forEach(function(c){ if(!hasChg(c,'closed')){ if(!hasChg(c,'new')) addChange(c,'moved'); s.children.push(c); } });
+      var movedIds=[];
+      (tt.children||[]).forEach(function(c){ if(!hasChg(c,'closed')){ if(!hasChg(c,'new')) addChange(c,'moved'); s.children.push(c); movedIds.push(c.id); } });
+      tt.children=(tt.children||[]).filter(function(c){ return hasChg(c,'closed'); }); // 흡수 안 된(폐쇄) 하위는 tt에 유지
       var parts = (s.mergedParts&&s.mergedParts.length) ? s.mergedParts.slice() : [s.name];
       parts.push(tt.name);
+      s._merges = s._merges || [];
+      s._merges.push({ node: tt, origParent: parentMap[tt.id], moved: movedIds, prevName: s.name }); // 원복용 저장
       removeFromParent(tt);          // 흡수된 조직은 화면에서 제거
       s.mergedParts=parts;           // 통합 정보는 change와 별개로 유지(이동해도 안 사라짐)
       if(nm && nm!==s.name) s.name=nm;
