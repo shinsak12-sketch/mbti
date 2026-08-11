@@ -110,11 +110,23 @@
   .lc-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
   .lc-head h3{margin:0;font-size:16px}
   .lc-sub{color:var(--muted);font-size:12px}
-  .lc-legend{display:flex;gap:16px;font-size:11.5px;color:var(--muted);margin-bottom:12px}
+  .lc-metrics{display:flex;align-items:stretch;gap:12px;flex-wrap:wrap;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+  .lm{text-align:center;padding:2px 12px}
+  .lm-l{font-size:11px;color:var(--muted);font-weight:700;line-height:1.25}
+  .lm-l span{font-size:9.5px;opacity:.85}
+  .lm-v{font-size:27px;font-weight:900;margin-top:3px;line-height:1}
+  .lm.hl .lm-v{color:var(--new)}
+  .lm-d{font-size:11px;font-weight:900;color:var(--new);margin-top:3px}
+  .lm-ar{display:flex;align-items:center;font-size:22px;color:var(--accent);font-weight:900}
+  .lm-txt{flex:1;min-width:200px;display:flex;align-items:center;font-size:13px;line-height:1.5;padding-left:12px;border-left:1px solid var(--line)}
+  .lc-legend{display:flex;gap:16px;font-size:11.5px;color:var(--muted);margin-bottom:12px;flex-wrap:wrap}
   .lc-legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:middle}
   .lc-legend i.before{background:var(--muted);opacity:.6} .lc-legend i.after{background:var(--accent)}
+  .lc-legend .avgk{border-left:2px dashed var(--closed);padding-left:6px}
   .ltable{display:flex;flex-direction:column;gap:8px}
   .lrow{display:grid;grid-template-columns:82px 1fr 66px;align-items:center;gap:12px}
+  .lbars{position:relative}
+  .lavg{position:absolute;top:-3px;bottom:-3px;width:0;border-left:2px dashed var(--closed);opacity:.55;z-index:1}
   .lrow.lclosed .lname{color:var(--closed)}
   .lname{font-weight:800;font-size:13px}
   .lx{font-size:9px;font-weight:900;color:#fff;background:var(--closed);border-radius:4px;padding:1px 5px;margin-left:2px}
@@ -435,25 +447,39 @@ function themeHtml(th){
 }
 function nf(x){ return String(x).replace(/\B(?=(\d{3})+(?!\d))/g,','); }
 function renderLoad(){
+  var op=LOAD.filter(function(x){return x.a>0;});
+  var bv=LOAD.map(function(x){return x.b;}), av=op.map(function(x){return x.a;});
+  var bSpread=Math.max.apply(null,bv)-Math.min.apply(null,bv);
+  var aSpread=Math.max.apply(null,av)-Math.min.apply(null,av);
+  var aAvg=Math.round(av.reduce(function(s,v){return s+v;},0)/av.length);
+  var pct=Math.round((bSpread-aSpread)/bSpread*100);
   var maxv=Math.max.apply(null, LOAD.map(function(x){return Math.max(x.b,x.a);}));
+  var avgL=(aAvg/maxv*100);
   var rows=LOAD.map(function(x){
     var d=x.a-x.b, closed=x.a===0;
-    var dtxt=d===0?'±0':(d>0?'+'+nf(d):'-'+nf(-d));
+    var dtxt=d===0?'±0':(d>0?'+'+nf(d):'−'+nf(-d));
     var dcls=d>0?'up':(d<0?'dn':'');
     return '<div class="lrow'+(closed?' lclosed':'')+'"><span class="lname">'+x.n+(closed?' <span class="lx">폐쇄</span>':'')+'</span>'
-      +'<span class="lbars">'
+      +'<span class="lbars"><span class="lavg" style="left:'+avgL+'%"></span>'
         +'<span class="lb"><span class="lbfill before" style="width:'+(x.b/maxv*100)+'%"></span><span class="lbv">'+nf(x.b)+'</span></span>'
         +'<span class="lb"><span class="lbfill after" style="width:'+(x.a/maxv*100)+'%"></span><span class="lbv">'+nf(x.a)+'</span></span>'
       +'</span>'
       +'<span class="ldelta '+dcls+'">'+dtxt+'</span></div>';
   }).join('');
-  return '<div class="loadcard"><div class="lc-head"><h3>📊 개편 전후 부서별 배당량 재분배</h3><span class="lc-sub">26년 2분기 월평균 · 단위 건 · <b>전체 89,208 동일(총량 유지)</b></span></div>'
-    +'<div class="lc-legend"><span><i class="before"></i>개편 전</span><span><i class="after"></i>개편 후</span><span style="margin-left:auto">우측 = 증감</span></div>'
+  return '<div class="loadcard"><div class="lc-head"><h3>⚖ 개편 목표 — 부서 간 배당량 균형화 (26년 2분기 월평균)</h3></div>'
+    +'<div class="lc-metrics">'
+      +'<div class="lm"><div class="lm-l">개편 전 부서 격차<br><span>(최대−최소)</span></div><div class="lm-v">'+nf(bSpread)+'</div></div>'
+      +'<div class="lm-ar">→</div>'
+      +'<div class="lm hl"><div class="lm-l">개편 후 부서 격차<br><span>(최대−최소)</span></div><div class="lm-v">'+nf(aSpread)+'</div><div class="lm-d">▼ '+pct+'% 축소</div></div>'
+      +'<div class="lm-txt">강남부 폐쇄분과 과다 물량을 재분배해, 편중돼 있던 부서 배당량을 <b>모든 부서 약 '+nf(aAvg)+'건 수준으로 균형화</b>합니다. (전체 89,208 유지)</div>'
+    +'</div>'
+    +'<div class="lc-legend"><span><i class="before"></i>개편 전</span><span><i class="after"></i>개편 후</span><span class="avgk">개편 후 평균 '+nf(aAvg)+'</span><span style="margin-left:auto">우측 = 증감</span></div>'
     +'<div class="ltable">'+rows+'</div>'
-    +'<div class="lc-note">강남부 배당(7,724)은 <b>0으로 폐쇄</b>되어 강북·인천·호남 등으로 분산되고, 부산부는 울산 이관으로 <b>과다 물량이 완화(−1,554)</b>됩니다. 총 배당량은 유지한 채 권역 간 <b>부하를 균형화</b>합니다.</div></div>';
+    +'<div class="lc-note">개편 전에는 부서별 배당량이 <b>7,724 ~ 12,298</b>로 편차가 컸으나, 개편 후에는 <b>10,436 ~ 11,673</b>으로 <b>격차가 크게 줄어</b> 부서 간 업무 부하가 고르게 맞춰집니다.</div></div>';
 }
 function renderThemes(){
-  var html='<div class="phead"><div class="ey">Rationale</div><h1>개편 내역 · 배경</h1><p>주요 개편을 주제별로 — 무엇을(전→후), 왜(배경·목적·효과)</p></div>'+renderLoad()+THEMES.map(themeHtml).join('');
+  var parts=THEMES.map(function(th){ var h=themeHtml(th); if(th.redist) h+=renderLoad(); return h; });
+  var html='<div class="phead"><div class="ey">Rationale</div><h1>개편 내역 · 배경</h1><p>주요 개편을 주제별로 — 무엇을(전→후), 왜(배경·목적·효과)</p></div>'+parts.join('');
   document.getElementById('p2').innerHTML=html;
 }
 function renderChartPage(id,title,ey,desc,root,withChg){
