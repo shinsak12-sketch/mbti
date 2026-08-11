@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>조직개편(안) 발표자료 · v2</title>
+<style>
+  :root{
+    --bg:#eef2f8; --panel:#ffffff; --panel2:#f5f8fc; --ink:#1e2632; --muted:#647082; --line:#dbe2ec; --accent:#2f6fdb;
+    --c1:#3f6fd6; --c2:#12a06a; --c3:#e07a2a;
+    --new:#16a34a; --merged:#0d9488; --moved:#2563eb; --renamed:#d97706; --promoted:#7c3aed; --closed:#dc2626;
+    --imp:#b9791b; --imp-bg:#fbf3e2; --imp-bd:#e8d3a6; --smart:#2563c9; --smart-bg:#eaf1fd; --smart-bd:#c4d8f5; --auto:#c0392b;
+    --leaf-bg:#f7f9fd; --leaf-ink:#38465c;
+  }
+  body.dark{
+    --bg:#0f1420; --panel:#161d2c; --panel2:#1c2436; --ink:#e8ecf4; --muted:#93a0b8; --line:#2c374d; --accent:#4f8cff;
+    --c1:#5b8def; --c2:#31c48d; --c3:#f0883e;
+    --new:#2ecc71; --merged:#1abc9c; --moved:#4f8cff; --renamed:#f0b429; --promoted:#9d84e8; --closed:#e74c3c;
+    --imp:#e6b878; --imp-bg:rgba(224,150,60,.09); --imp-bd:#5a4526; --smart:#8fc0ff; --smart-bg:rgba(79,140,255,.1); --smart-bd:#274a72; --auto:#e05a4d;
+    --leaf-bg:#131a28; --leaf-ink:#cdd6e6;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
+  .topbar{position:sticky;top:0;z-index:20;background:var(--panel);border-bottom:1px solid var(--line);box-shadow:0 1px 8px rgba(20,40,80,.05)}
+  .topbar .in{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:11px 20px;flex-wrap:wrap}
+  .brand{font-size:15px;font-weight:900;letter-spacing:-.3px;white-space:nowrap}
+  .brand span{color:var(--muted);font-weight:600;font-size:12px;margin-left:8px}
+  .tabs{display:flex;gap:7px;margin-left:auto;flex-wrap:wrap}
+  .tab{border:1px solid var(--line);background:var(--panel2);color:var(--muted);padding:8px 15px;border-radius:22px;font-size:13px;font-weight:800;cursor:pointer;transition:.14s}
+  .tab:hover{color:var(--ink)}
+  .tab.on{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 3px 10px rgba(47,111,219,.3)}
+  .tbtn{border:1px solid var(--line);background:var(--panel2);color:var(--ink);padding:8px 12px;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer}
+  .wrap{max-width:1400px;margin:0 auto;padding:26px 20px 70px}
+  .panel{display:none;animation:fade .25s ease}
+  .panel.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .phead{margin-bottom:20px}
+  .phead .ey{font-size:11px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;font-weight:800}
+  .phead h1{font-size:26px;margin:5px 0 4px;letter-spacing:-.6px}
+  .phead p{margin:0;color:var(--muted);font-size:13.5px}
+
+  .cover{background:linear-gradient(135deg,var(--accent),#7c3aed);color:#fff;border-radius:20px;padding:34px 30px;margin-bottom:22px;box-shadow:0 12px 34px rgba(47,111,219,.28)}
+  .cover .ey{opacity:.85;font-size:12px;letter-spacing:3px;font-weight:800;text-transform:uppercase}
+  .cover h1{font-size:32px;margin:8px 0 8px;letter-spacing:-1px;line-height:1.15}
+  .cover p{margin:0;opacity:.92;font-size:14px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:800px){.grid2{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px 22px}
+  .card h3{margin:0 0 14px;font-size:14px;display:flex;align-items:center;gap:8px}
+  .card h3 .dot{width:10px;height:10px;border-radius:50%}
+  .statrow{display:flex;gap:10px;flex-wrap:wrap}
+  .stat{flex:1;min-width:82px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center}
+  .stat .n{font-size:24px;font-weight:900;line-height:1}
+  .stat .l{font-size:11px;color:var(--muted);font-weight:700;margin-top:5px}
+  .stat .d{font-size:10.5px;font-weight:800;margin-top:3px}
+  .up{color:var(--new)} .dn{color:var(--closed)}
+  .chgbars{display:flex;flex-direction:column;gap:9px}
+  .cbar{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700}
+  .cbar .tg{width:74px;text-align:center;color:#fff;border-radius:7px;padding:3px 0;font-size:12px;font-weight:800}
+  .cbar .bar{height:10px;border-radius:6px;flex:none}
+  .cbar .c{color:var(--muted);font-weight:600;font-size:12px}
+  .keylist{margin:0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:11px}
+  .keylist li{display:flex;gap:11px;align-items:flex-start;font-size:13.5px}
+  .keylist .ico{width:26px;height:26px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;font-weight:900}
+  .keylist .sub{color:var(--muted);font-size:12px;display:block;margin-top:1px}
+
+  /* 개편 내역 (주제 카드) */
+  .theme{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:0;margin-bottom:16px;overflow:hidden}
+  .theme.key{border-color:var(--accent);box-shadow:0 0 0 2px rgba(47,111,219,.14)}
+  .theme-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .theme-head h3{margin:0;font-size:16px;letter-spacing:-.3px}
+  .hqchip{font-size:11px;font-weight:900;color:#fff;border-radius:20px;padding:3px 11px;white-space:nowrap}
+  .hqchip.c1{background:var(--c1)} .hqchip.c2{background:var(--c2)} .hqchip.c3{background:var(--c3)}
+  .ttags{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
+  .theme-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:0}
+  @media(max-width:820px){.theme-grid{grid-template-columns:1fr}}
+  .ba{padding:18px;border-right:1px solid var(--line);display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--panel2)}
+  @media(max-width:820px){.ba{border-right:none;border-bottom:1px solid var(--line)}}
+  .ba-col{flex:1;min-width:120px}
+  .ba-lbl{font-size:10.5px;font-weight:800;letter-spacing:1px;color:var(--muted);margin-bottom:8px;text-transform:uppercase}
+  .ba-items{display:flex;flex-direction:column;gap:6px}
+  .babox{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:13px;font-weight:800;line-height:1.25}
+  .babox span{display:block;font-size:10.5px;color:var(--muted);font-weight:600;margin-top:2px}
+  .babox.hl-new{border-color:var(--new);color:var(--new)} .babox.hl-new span{color:var(--new);opacity:.8}
+  .babox.hl-promoted{border-color:var(--promoted);color:var(--promoted)} .babox.hl-promoted span{color:var(--promoted);opacity:.8}
+  .babox.hl-renamed{border-color:var(--renamed);color:var(--renamed)} .babox.hl-renamed span{color:var(--renamed);opacity:.8}
+  .babox.hl-closed{border-color:var(--closed);color:var(--closed);opacity:.75;text-decoration:line-through} .babox.hl-closed span{text-decoration:none;color:var(--closed)}
+  .babox.hl-merged{border-color:var(--merged);color:var(--merged)} .babox.hl-merged span{color:var(--merged);opacity:.8}
+  .ba-ar{font-size:22px;color:var(--accent);font-weight:900;flex:none}
+  .tnote{width:100%;margin-top:4px;font-size:11.5px;font-weight:700;color:var(--closed);background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.25);border-radius:8px;padding:6px 10px}
+  .why{padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+  .wrow{display:flex;gap:10px;align-items:flex-start}
+  .wh{flex:none;width:58px;font-size:11px;font-weight:900;color:#fff;background:var(--accent);border-radius:7px;padding:3px 0;text-align:center}
+  .wh.bg{background:var(--muted)} .wh.eff{background:var(--new)}
+  .wt{font-size:13px;line-height:1.5}
+  .wt b{font-weight:800}
+
+  .bdg{display:inline-block;font-size:9px;font-weight:900;border-radius:5px;padding:2px 7px;color:#fff}
+  .bdg.new{background:var(--new)} .bdg.merged{background:var(--merged)} .bdg.moved{background:var(--moved)}
+  .bdg.renamed{background:var(--renamed)} .bdg.promoted{background:var(--promoted)} .bdg.closed{background:var(--closed)}
+
+  /* 조직도 */
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin:0 0 16px;font-size:12px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:12px;height:12px;border-radius:3px;display:inline-block;border:1px solid rgba(120,120,120,.2)}
+  .ceo-area{display:flex;justify-content:center;margin-bottom:2px}
+  .ceo{background:linear-gradient(135deg,#2b3654,#1b2438);color:#fff;padding:13px 40px;border-radius:14px;font-size:18px;font-weight:900;text-align:center;box-shadow:0 8px 22px rgba(20,30,50,.3)}
+  .ceo small{display:block;font-size:10px;font-weight:700;opacity:.8;letter-spacing:2px;margin-top:2px}
+  .rail{width:2px;height:18px;background:var(--line);margin:8px auto 0}
+  .staff{position:relative;padding:4px 0 6px}
+  .staff::before{content:"";position:absolute;left:50%;top:0;height:100%;width:2px;background:var(--line);transform:translateX(-1px)}
+  .staff .sl{width:50%;display:flex;justify-content:flex-end;align-items:center}
+  .audit{border:1.5px dashed var(--c3);color:var(--c3);border-radius:11px;padding:7px 12px;font-size:12px;font-weight:800;background:var(--panel);text-align:center}
+  .audit small{display:block;font-size:9px;color:var(--muted);font-weight:600}
+  .hconn{width:22px;height:2px;background:var(--line)}
+  .cols{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:760px){.cols{grid-template-columns:1fr 1fr}}
+  @media(min-width:1120px){.cols{grid-template-columns:1fr 1fr 1fr}}
+  .hq{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;align-self:start}
+  .hq-head{display:flex;align-items:center;gap:9px;padding:13px 15px;border-left:5px solid var(--c1)}
+  .hq.c2 .hq-head{border-left-color:var(--c2)} .hq.c3 .hq-head{border-left-color:var(--c3)}
+  .hq-head .nm{font-size:15.5px;font-weight:900}
+  .hq-head .tag{margin-left:auto;font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:20px;padding:3px 9px;white-space:nowrap}
+  .hq-body{padding:5px 14px 14px}
+  .branch{position:relative;margin:11px 0 0 7px;padding-left:18px;border-left:2px solid var(--line)}
+  .branch:last-child{border-left-color:transparent}
+  .branch::before{content:"";position:absolute;left:0;top:16px;width:16px;height:2px;background:var(--line)}
+  .branch:last-child::after{content:"";position:absolute;left:0;top:0;width:2px;height:16px;background:var(--line)}
+  .unit{background:var(--panel2);border:1px solid var(--line);border-radius:11px;overflow:hidden}
+  .unit.tft{border-color:var(--promoted)}
+  .uhead{display:flex;align-items:center;gap:8px;padding:9px 12px;font-weight:800;font-size:13px;flex-wrap:wrap}
+  .uhead .ic{width:8px;height:8px;border-radius:50%;background:var(--c1);flex:none}
+  .c2 .uhead .ic{background:var(--c2)} .c3 .uhead .ic{background:var(--c3)}
+  .unit.tft .ic{background:var(--promoted)}
+  .uhead .cnt{margin-left:auto;font-size:10.5px;font-weight:700;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:1px 8px}
+  .support{display:inline-flex;align-items:center;gap:7px;margin:11px 0 0 7px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:12px;font-weight:800}
+  .support::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--c2)}
+  .c3 .support::before{background:var(--c3)}
+  .leaves{padding:2px 12px 10px;display:flex;flex-wrap:wrap;gap:5px}
+  .leaf{background:var(--leaf-bg);border:1px solid var(--line);border-radius:7px;padding:4px 9px;font-size:11.5px;color:var(--leaf-ink);font-weight:600;white-space:nowrap}
+  .leaf.team{color:var(--ink);font-weight:800}
+  .leaf.imp{border-color:var(--imp-bd);color:var(--imp);background:var(--imp-bg)}
+  .leaf.smart{border-color:var(--smart-bd);color:var(--smart);background:var(--smart-bg)}
+  .leaf.has-spec{border-color:var(--auto);box-shadow:0 0 0 2px rgba(192,57,43,.14)}
+  .lbdg{display:inline-block;font-size:8.5px;font-weight:900;border-radius:4px;padding:1px 5px;margin-left:4px;vertical-align:middle;color:#fff}
+  .lbdg.new{background:var(--new)} .lbdg.merged{background:var(--merged)} .lbdg.moved{background:var(--moved)} .lbdg.renamed{background:var(--renamed)} .lbdg.promoted{background:var(--promoted)}
+  .spec{display:inline-block;font-size:8.5px;font-weight:900;color:#fff;background:var(--auto);border-radius:4px;padding:1px 5px;margin-left:4px}
+  .chg-new{border-color:var(--new)!important;box-shadow:0 0 0 2px rgba(22,163,74,.16)}
+  .chg-merged{border-color:var(--merged)!important;box-shadow:0 0 0 2px rgba(13,148,136,.16)}
+  .chg-moved{border-color:var(--moved)!important;box-shadow:0 0 0 2px rgba(37,99,235,.14)}
+  .unit.chg-rp{border-color:var(--promoted)!important;box-shadow:0 0 0 2px rgba(124,58,237,.16)}
+  .old{color:var(--muted);text-decoration:line-through;font-size:10.5px;margin-left:5px}
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px}
+  @media print{ .topbar{position:static} .tabs,.tbtn{display:none} .panel{display:block!important;page-break-after:always} body{background:#fff} }
+</style>
+</head>
+<body>
+<div class="topbar"><div class="in">
+  <div class="brand">조직개편(안)<span>인사회의 발표자료 · v2 · 2026-08-11</span></div>
+  <div class="tabs">
+    <button class="tab on" data-p="p0">개요</button>
+    <button class="tab" data-p="p1">현재 조직도</button>
+    <button class="tab" data-p="p2">개편 내역 · 배경</button>
+    <button class="tab" data-p="p3">개편 후 조직도</button>
+    <button class="tbtn" id="themeBtn">🌙 다크</button>
+    <button class="tbtn" onclick="window.print()">🖨 인쇄</button>
+  </div>
+</div></div>
+<div class="wrap">
+  <section class="panel on" id="p0"></section>
+  <section class="panel" id="p1"></section>
+  <section class="panel" id="p2"></section>
+  <section class="panel" id="p3"></section>
+  <footer>인사회의 조직개편(안) · 발표자료 · v2 · 작성일 2026-08-11</footer>
+</div>
+
+<script>
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function team(n){ return {name:n,kind:'leaf',team:true}; }
+function part(n,t){ return {name:n,kind:'unit',children:t.map(team)}; }
+function support(n){ return {name:n,kind:'unit',support:true}; }
+function ct(n,o){ o=o||{}; if(n.indexOf('외제')===0)o.imp=true; if(/^SMART/.test(n))o.smart=true; return Object.assign({name:n,kind:'leaf'},o); }
+function bu(n,arr,o){ return Object.assign({name:n,kind:'unit',children:arr},o||{}); }
+function C(list){ return list.map(function(x){ return typeof x==='string'?ct(x):ct(x[0],x[1]); }); }
+var HQN={1:'경영지원',2:'수도권',3:'지방'};
+var CHG_META={new:{l:'신설'},closed:{l:'폐쇄'},moved:{l:'이동'},merged:{l:'통합'},renamed:{l:'명칭변경'},promoted:{l:'승격'}};
+
+var BEFORE={name:'대표이사',kind:'ceo',children:[
+  {name:'감사파트',kind:'audit'},
+  {name:'경영지원본부',kind:'hq',color:1,children:[
+    part('손사지원파트',['인사교육팀','총무경리팀']),
+    part('손사전략파트',['업무지원팀','기회통계팀','QI팀']),
+    {name:'네트워크운영TFT',kind:'tft'},{name:'업무TFT',kind:'tft'}
+  ]},
+  {name:'수도권보상본부',kind:'hq',color:2,children:[
+    support('수도본부지원팀'),
+    bu('강북차량보상부',C(['의정부','노원','성동','동대문','서대문','일산','외제일산','외제강북'])),
+    bu('강남차량보상부',C(['강남','강서','영등포','구로','제주','외제강남','외제강서'])),
+    bu('동서울차량보상부',C(['구리','강동','성남','춘천','원주','이천','강릉','외제강동'])),
+    bu('인천차량보상부',C(['서인천','동인천','남인천','부천','부평','김포','시흥','외제인천'])),
+    bu('경기차량보상부',C(['동수원','서수원','안산','안양','용인','오산','평택','외제경기'])),
+    bu('수도권SMART차량보상부',C(['SMART강북',['SMART강남',{spec:'자동화전담'}],'SMART동서울','SMART인천','SMART경기']))
+  ]},
+  {name:'지방보상본부',kind:'hq',color:3,children:[
+    support('지방본부지원팀'),
+    bu('부산차량보상부',C(['서부산','동부산','사상','창원','울산','김해','진주','외제부산'])),
+    bu('대구차량보상부',C(['남대구','동대구','서대구','북대구','포항','구미','안동','외제대구'])),
+    bu('충청차량보상부',C(['동대전','서대전','세종','충주','청주','천안','홍성','외제충청'])),
+    bu('호남차량보상부',C(['동광주','서광주','전주','군산','순천','목포','외제호남'])),
+    bu('지방SMART차량보상부',C(['SMART부산','SMART대구','SMART충청','SMART호남']))
+  ]}
+]};
+
+var AFTER={name:'대표이사',kind:'ceo',children:[
+  {name:'감사파트(QI)',kind:'audit'},
+  {name:'경영지원본부',kind:'hq',color:1,children:[
+    part('손사지원파트',['인사교육팀','총무경리팀']),
+    {name:'손사전략파트',kind:'unit',children:[team('업무지원팀'),team('기회통계팀'),{name:'디지털업무지원센터',kind:'leaf',team:true,chg:['new']}]},
+    {name:'네트워크운영파트',kind:'unit',chg:['renamed','promoted'],old:'네트워크운영TFT'},
+    {name:'업무TFT',kind:'tft'}
+  ]},
+  {name:'수도권보상본부',kind:'hq',color:2,children:[
+    support('수도본부지원팀'),
+    bu('서부차량보상부',C(['노원',['성동',{merged:'성동+동대문'}],'서대문','일산','외제일산','외제강북','외제강남',['강남',{chg:['moved']}]]),{chg:['renamed'],old:'강북차량보상부'}),
+    bu('동부차량보상부',C(['구리','강동','성남',['원주',{merged:'원주+춘천'}],'이천','강릉','외제강동',['의정부',{chg:['moved']}]]),{chg:['renamed'],old:'동서울차량보상부'}),
+    bu('인천차량보상부',C(['서인천','동인천','남인천','부천','부평','김포','외제인천',['영등포',{chg:['moved']}],['구로',{chg:['moved']}]])),
+    bu('경기차량보상부',C(['동수원','서수원','안산','안양','용인','오산','평택','외제경기',['시흥',{chg:['moved']}]])),
+    bu('수도권SMART차량보상부',C([['SMART서부',{renamed:1}],['SMART동부',{renamed:1}],'SMART인천','SMART경기']))
+  ]},
+  {name:'지방보상본부',kind:'hq',color:3,children:[
+    support('지방본부지원팀'),
+    bu('부산차량보상부',C(['서부산','동부산','사상','창원','김해','진주','외제부산'])),
+    bu('대구차량보상부',C(['남대구',['동대구',{merged:'동대구+서대구'}],'북대구','포항','구미','안동','외제대구',['울산',{chg:['moved']}]])),
+    bu('충청차량보상부',C(['동대전','서대전','세종','충주','청주','천안','홍성','외제충청'])),
+    bu('호남차량보상부',C(['동광주','서광주','전주','군산','순천','목포','외제호남',['제주',{chg:['moved']}]])),
+    bu('지방SMART차량보상부',C(['SMART부산','SMART대구','SMART충청','SMART호남']))
+  ]}
+]};
+// SMART 명칭변경 표시용
+(function(){ AFTER.children[2].children.forEach(function(u){ if(u.name==='수도권SMART차량보상부'){ u.children.forEach(function(c){ if(c.renamed){ c.chg=['renamed']; } }); } }); })();
+
+var CHGCOUNT={renamed:6, moved:8, closed:5, merged:3, new:1, promoted:1};
+
+/* 개편 내역 주제 */
+var THEMES=[
+  {hq:1, title:'네트워크 관리 기능 정규화 (TFT → 정규 부서)', tags:['promoted','renamed'],
+   before:[{name:'네트워크운영TFT',sub:'TFT · 임시조직'}],
+   after:[{name:'네트워크운영파트',sub:'부서 · 정규조직',hl:'promoted'}],
+   why:[
+     {h:'배경',cls:'bg',t:'협력·정비 네트워크 관리 수요가 지속 증가하나, 임시조직(TFT) 체계로는 상시·전문 대응에 한계.'},
+     {h:'목적',t:'네트워크 관리 기능을 <b>정규 부서로 승격</b>해 책임·권한을 명확히 하고 관리 체계를 상시화.'},
+     {h:'기대효과',cls:'eff',t:'네트워크 품질·비용 관리의 전문성과 연속성 강화.'}
+   ]},
+  {hq:1, title:'품질관리(QI) 기능 감사파트로 이관', tags:['renamed','closed'],
+   before:[{name:'QI팀',sub:'손사전략파트 하위'},{name:'감사파트',sub:'대표이사 직속'}],
+   after:[{name:'감사파트(QI)',sub:'QI 기능 통합 · 직속',hl:'renamed'}],
+   note:'손사전략파트 QI팀 폐쇄',
+   why:[
+     {h:'배경',cls:'bg',t:'손사 품질관리(QI)의 <b>독립성·객관성</b> 확보 필요.'},
+     {h:'목적',t:'QI 기능을 대표이사 직속 감사 기능과 결합(<b>감사파트(QI)</b>)해 독립 점검 체계로 전환.'},
+     {h:'기대효과',cls:'eff',t:'손사 품질에 대한 견제·감사 기능 강화, 실무-감사 분리.'}
+   ]},
+  {hq:1, title:'디지털업무지원센터 신설', tags:['new'],
+   before:[{name:'—',sub:'해당 조직 없음'}],
+   after:[{name:'디지털업무지원센터',sub:'손사전략파트 신설',hl:'new'}],
+   why:[
+     {h:'배경',cls:'bg',t:'손사 업무의 디지털 전환 가속, 시스템·데이터 기반 지원 수요 확대.'},
+     {h:'목적',t:'디지털 기반 업무지원을 전담할 조직 신설.'},
+     {h:'기대효과',cls:'eff',t:'데이터·자동화 기반 손사 지원 역량 강화.'}
+   ]},
+  {hq:2, key:true, title:'강남차량보상부 폐쇄 & 서부·동부 권역 재편 (수도권 핵심)', tags:['closed','renamed','moved'],
+   before:[{name:'강북차량보상부'},{name:'강남차량보상부',sub:'폐쇄 대상',hl:'closed'},{name:'동서울차량보상부'}],
+   after:[{name:'서부차량보상부',sub:'← 강북 명칭변경',hl:'renamed'},{name:'동부차량보상부',sub:'← 동서울 명칭변경',hl:'renamed'}],
+   note:'강남차량보상부 폐쇄 · SMART강남 폐쇄(자동화전담 재배치 검토 필요)',
+   why:[
+     {h:'배경',cls:'bg',t:'강남권역 물량·관할 조정 필요, 인접 권역 간 관할 중복 해소.'},
+     {h:'조치',t:'<b>강남차량보상부 폐쇄</b> → ① 강남·외제강남 센터는 <b>서부</b>로 이관 ② 영등포·구로는 <b>인천</b>으로 이관 ③ 강서·외제강서는 정리(폐쇄).'},
+     {h:'명칭',t:'권역 명확화를 위해 강북→<b>서부</b>, 동서울→<b>동부</b> (SMART강북→SMART서부, SMART동서울→SMART동부).'},
+     {h:'기대효과',cls:'eff',t:'권역 경계·관할 명확화, 인접 중복 해소로 관리 효율 제고.'}
+   ]},
+  {hq:2, title:'인접·소규모 센터 통합', tags:['merged'],
+   before:[{name:'성동 + 동대문',sub:'서부'},{name:'원주 + 춘천',sub:'동부'},{name:'동대구 + 서대구',sub:'지방·대구'}],
+   after:[{name:'성동 · 원주 · 동대구',sub:'통합 대표센터로 일원화',hl:'merged'}],
+   why:[
+     {h:'배경',cls:'bg',t:'인접·소규모 센터의 관할 중복 및 운영 비효율.'},
+     {h:'목적',t:'인접 센터를 통합해 관리 단위를 최적화.'},
+     {h:'기대효과',cls:'eff',t:'거점 집중으로 인력·비용 효율화, 관할 단순화.'}
+   ]},
+  {hq:3, title:'지방 관할 조정 (울산·제주 이관)', tags:['moved'],
+   before:[{name:'울산',sub:'부산차량보상부'},{name:'제주',sub:'강남차량보상부'}],
+   after:[{name:'울산 → 대구',sub:'접근성 기준 재배치',hl:'moved'},{name:'제주 → 호남',sub:'권역 편입',hl:'moved'}],
+   why:[
+     {h:'배경',cls:'bg',t:'지리적 접근성·관할 합리화 필요.'},
+     {h:'조치',t:'울산을 <b>대구 관할</b>로, 제주를 <b>호남 관할</b>로 이관.'},
+     {h:'기대효과',cls:'eff',t:'이동거리·현장 대응성 개선, 권역 정합성 제고.'}
+   ]}
+];
+
+/* 집계 */
+function stats(root){ var s={hq:0,unit:0,tft:0,center:0,team:0};
+  (function w(n){ (n.children||[]).forEach(function(c){
+    if(c.kind==='hq')s.hq++; else if(c.kind==='tft')s.tft++;
+    else if(c.kind==='unit')s.unit++;
+    else if(c.kind==='leaf'){ if(c.team)s.team++; else s.center++; }
+    w(c); }); })(root); return s; }
+
+/* 조직도 */
+function lbadges(n){ var o=''; (n.chg||[]).forEach(function(t){ o+=' <span class="lbdg '+t+'">'+CHG_META[t].l+'</span>'; }); if(n.merged) o+=' <span class="lbdg merged">통합: '+esc(n.merged)+'</span>'; if(n.spec) o+=' <span class="spec">'+esc(n.spec)+'</span>'; return o; }
+function chgcls(n){ var c=''; if(n.chg){ if(n.chg.indexOf('new')>=0)c=' chg-new'; else if(n.chg.indexOf('moved')>=0)c=' chg-moved'; } if(n.merged) c=' chg-merged'; return c; }
+function leafHtml(n){ var cls='leaf'+(n.team?' team':'')+(n.imp?' imp':'')+(n.smart?' smart':'')+(n.spec?' has-spec':'')+chgcls(n); return '<span class="'+cls+'">'+esc(n.name)+lbadges(n)+'</span>'; }
+function unitHtml(n){
+  if(n.support) return '<div class="support">'+esc(n.name)+'</div>';
+  var leaves=(n.children||[]).filter(function(c){return c.kind==='leaf';});
+  var isTft=n.kind==='tft'; var extra=isTft?' tft':''; if(n.chg&&(n.chg.indexOf('promoted')>=0||n.chg.indexOf('renamed')>=0)) extra+=' chg-rp';
+  var cnt=leaves.length?'<span class="cnt">'+leaves.length+'</span>':'';
+  var old=n.old?'<span class="old">'+esc(n.old)+'</span>':'';
+  var bdg=''; (n.chg||[]).forEach(function(t){ bdg+=' <span class="lbdg '+t+'">'+CHG_META[t].l+'</span>'; });
+  var h='<div class="branch"><div class="unit'+extra+'"><div class="uhead"><span class="ic"></span>'+esc(n.name)+old+bdg+cnt+'</div>';
+  if(leaves.length) h+='<div class="leaves">'+leaves.map(leafHtml).join('')+'</div>';
+  h+='</div></div>'; return h;
+}
+function hqHtml(n){
+  var kids=n.children||[];
+  var sup=kids.filter(function(c){return c.kind==='unit'&&c.support;});
+  var org=kids.filter(function(c){return (c.kind==='unit'&&!c.support)||c.kind==='tft';});
+  var uc=kids.filter(function(c){return c.kind==='unit'&&!c.support;}).length;
+  var tc=kids.filter(function(c){return c.kind==='tft';}).length;
+  var cc=0;(function w(nd){(nd.children||[]).forEach(function(c){ if(c.kind==='leaf'&&!c.team)cc++; w(c);});})(n);
+  var tp=[]; if(uc)tp.push('부서 '+uc); if(tc)tp.push('TFT '+tc); if(cc)tp.push('센터 '+cc);
+  return '<section class="hq c'+n.color+'"><div class="hq-head"><span class="nm">'+esc(n.name)+'</span><span class="tag">'+tp.join(' · ')+'</span></div><div class="hq-body">'
+    +sup.map(unitHtml).join('')+org.map(unitHtml).join('')+'</div></section>';
+}
+function chartHtml(root){
+  var audit=root.children.filter(function(c){return c.kind==='audit';})[0];
+  var hqs=root.children.filter(function(c){return c.kind==='hq';});
+  var h='<div class="ceo-area"><div class="ceo">대표이사<small>CEO</small></div></div><div class="rail"></div>';
+  if(audit) h+='<div class="staff"><div class="sl"><div class="audit">'+esc(audit.name)+'<small>대표이사 직속</small></div><div class="hconn"></div></div></div>';
+  h+='<div class="cols">'+hqs.map(hqHtml).join('')+'</div>'; return h;
+}
+function chartLegend(withChg){
+  var h='<div class="legend"><span><i style="background:var(--c1)"></i>경영지원</span><span><i style="background:var(--c2)"></i>수도권</span><span><i style="background:var(--c3)"></i>지방</span><span><i style="background:var(--imp)"></i>외제</span><span><i style="background:var(--smart)"></i>SMART</span>';
+  if(withChg) h+='<span><i style="background:var(--new)"></i>신설</span><span><i style="background:var(--merged)"></i>통합</span><span><i style="background:var(--moved)"></i>이동</span><span><i style="background:var(--renamed)"></i>명칭변경</span><span><i style="background:var(--promoted)"></i>승격</span>';
+  return h+'</div>';
+}
+
+/* 페이지 */
+function renderOverview(){
+  var b=stats(BEFORE), a=stats(AFTER);
+  function d(cur,orig){ var x=cur-orig; return x?'<div class="d '+(x>0?'up':'dn')+'">'+(x>0?'+':'')+x+'</div>':'<div class="d" style="color:var(--muted)">-</div>'; }
+  var order=['renamed','moved','closed','merged','new','promoted'];
+  var maxc=Math.max.apply(null,order.map(function(k){return CHGCOUNT[k]||0;}));
+  var bars=order.map(function(k){ var v=CHGCOUNT[k]||0; return '<div class="cbar"><span class="tg" style="background:var(--'+k+')">'+CHG_META[k].l+'</span><span class="bar" style="width:'+(v/maxc*150+10)+'px;background:var(--'+k+')"></span><span class="c">'+v+'건</span></div>'; }).join('');
+  var html=''
+    +'<div class="cover"><div class="ey">HR Reorganization Plan · v2</div><h1>수도권 권역 재편 및<br>손사 지원·품질 체계 정비(안)</h1><p>강남차량보상부 폐쇄 · 서부/동부 권역 정비 · 네트워크운영 정규화 · QI 감사 이관</p></div>'
+    +'<div class="grid2">'
+    +'<div class="card"><h3><span class="dot" style="background:var(--accent)"></span>조직 수 변화 (개편 전 → 후)</h3><div class="statrow">'
+      +'<div class="stat"><div class="n">'+a.hq+'</div><div class="l">본부</div>'+d(a.hq,b.hq)+'</div>'
+      +'<div class="stat"><div class="n">'+a.unit+'</div><div class="l">부서</div>'+d(a.unit,b.unit)+'</div>'
+      +'<div class="stat"><div class="n">'+a.tft+'</div><div class="l">TFT</div>'+d(a.tft,b.tft)+'</div>'
+      +'<div class="stat"><div class="n">'+a.center+'</div><div class="l">센터</div>'+d(a.center,b.center)+'</div>'
+    +'</div><p style="color:var(--muted);font-size:12px;margin:12px 0 0">※ 강남차량보상부 폐쇄로 부서 1↓, 네트워크운영 승격으로 TFT 1↓·부서 1↑ (부서 수 동일). 센터 '+(b.center-a.center)+'개 순감.</p></div>'
+    +'<div class="card"><h3><span class="dot" style="background:var(--merged)"></span>개편 유형별 건수</h3><div class="chgbars">'+bars+'</div></div>'
+    +'</div>'
+    +'<div class="card" style="margin-top:16px"><h3><span class="dot" style="background:var(--promoted)"></span>핵심 개편 사항</h3><ul class="keylist">'
+      +'<li><span class="ico" style="background:var(--closed)">✕</span><div><b>수도권 — 강남차량보상부 폐쇄 & 서부·동부 권역 재편</b><span class="sub">강남부 폐쇄 후 센터 재배치(서부·인천), 강북→서부·동서울→동부 명칭 정비</span></div></li>'
+      +'<li><span class="ico" style="background:var(--promoted)">↑</span><div><b>네트워크운영TFT → 네트워크운영파트 승격</b><span class="sub">임시조직을 정규 부서로 전환, 네트워크 관리 기능 상시화</span></div></li>'
+      +'<li><span class="ico" style="background:var(--renamed)">◎</span><div><b>품질관리(QI) 기능 감사파트로 이관</b><span class="sub">QI팀 폐쇄 → 대표이사 직속 감사파트(QI)로 통합, 독립 점검 체계</span></div></li>'
+      +'<li><span class="ico" style="background:var(--new)">＋</span><div><b>디지털업무지원센터 신설 · 지방 관할 조정</b><span class="sub">디지털 지원 전담 신설, 울산→대구·제주→호남 이관, 인접센터 통합</span></div></li>'
+    +'</ul></div>';
+  document.getElementById('p0').innerHTML=html;
+}
+function baBox(it){ return '<div class="babox'+(it.hl?' hl-'+it.hl:'')+'">'+esc(it.name)+(it.sub?'<span>'+esc(it.sub)+'</span>':'')+'</div>'; }
+function themeHtml(th){
+  var tags=(th.tags||[]).map(function(t){return '<span class="bdg '+t+'">'+CHG_META[t].l+'</span>';}).join('');
+  var before=(th.before||[]).map(baBox).join('');
+  var after=(th.after||[]).map(baBox).join('');
+  var why=(th.why||[]).map(function(w){ return '<div class="wrow"><span class="wh '+(w.cls||'')+'">'+esc(w.h)+'</span><span class="wt">'+w.t+'</span></div>'; }).join('');
+  var note=th.note?'<div class="tnote">⚠ '+esc(th.note)+'</div>':'';
+  return '<div class="theme'+(th.key?' key':'')+'"><div class="theme-head"><span class="hqchip c'+th.hq+'">'+HQN[th.hq]+'</span><h3>'+esc(th.title)+'</h3><span class="ttags">'+tags+'</span></div>'
+    +'<div class="theme-grid"><div class="ba"><div class="ba-col"><div class="ba-lbl">개편 전</div><div class="ba-items">'+before+'</div></div><div class="ba-ar">→</div><div class="ba-col"><div class="ba-lbl">개편 후</div><div class="ba-items">'+after+'</div></div>'+note+'</div>'
+    +'<div class="why">'+why+'</div></div></div>';
+}
+function renderThemes(){
+  var html='<div class="phead"><div class="ey">Rationale</div><h1>개편 내역 · 배경</h1><p>주요 개편을 주제별로 — 무엇을(전→후), 왜(배경·목적·효과)</p></div>'+THEMES.map(themeHtml).join('');
+  document.getElementById('p2').innerHTML=html;
+}
+function renderChartPage(id,title,ey,desc,root,withChg){
+  document.getElementById(id).innerHTML='<div class="phead"><div class="ey">'+ey+'</div><h1>'+title+'</h1><p>'+desc+'</p></div>'+chartLegend(withChg)+chartHtml(root);
+}
+
+renderOverview();
+renderChartPage('p1','현재 조직도','As-Is','개편 전 · 본부 3 / 부서 15 / TFT 2 / 센터 79',BEFORE,false);
+renderThemes();
+renderChartPage('p3','개편 후 조직도','To-Be','변경점 색상 강조 · 폐쇄·통합된 조직은 제외',AFTER,true);
+
+document.querySelector('.tabs').addEventListener('click',function(e){
+  var t=e.target.closest('.tab'); if(!t) return;
+  document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('on')});
+  document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('on')});
+  t.classList.add('on'); document.getElementById(t.getAttribute('data-p')).classList.add('on'); window.scrollTo({top:0});
+});
+document.getElementById('themeBtn').addEventListener('click',function(){ var d=document.body.classList.toggle('dark'); this.textContent=d?'☀️ 라이트':'🌙 다크'; });
+</script>
+</body>
+</html>
