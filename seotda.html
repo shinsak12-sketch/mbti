@@ -252,7 +252,7 @@
   @keyframes stackin{from{transform:scale(.5) translateY(40px);opacity:0}to{transform:none;opacity:1}}
   .scard{position:absolute;inset:0;border-radius:14px;background:#fff;overflow:visible;}
   .scard .art{position:absolute;inset:0;border-radius:14px;background-image:var(--hwatu);background-size:1000% 200%;background-repeat:no-repeat;}
-  .sback{transform:translate(-7px,-8px) rotate(-3.5deg);box-shadow:0 14px 30px rgba(0,0,0,.6), 0 0 0 1px rgba(0,0,0,.4);transition:transform .35s cubic-bezier(.2,1.2,.4,1);}
+  .sback{transform:translate(-6px,-3px) rotate(-2.5deg);box-shadow:0 14px 30px rgba(0,0,0,.6), 0 0 0 1px rgba(0,0,0,.4);transition:transform .35s cubic-bezier(.2,1.2,.4,1);}
   .sback .art{filter:brightness(.92);}
   .sback::after{content:'';position:absolute;inset:0;border-radius:14px;box-shadow:inset 0 0 0 10px #c8322b;pointer-events:none;opacity:1;transition:opacity .3s;}
   .sback.lift::after{opacity:0;}
@@ -655,8 +655,8 @@ async function revealSeat(si,quick){
   stage.front.classList.add('slide'); stage.thumb.classList.add('slide');
   stage.front.style.transitionDuration=slideMs+'ms'; stage.thumb.style.transitionDuration=slideMs+'ms';
   await waitHard(30);
-  stage.front.style.transform=`translateY(${(H*.09).toFixed(1)}px) rotate(.8deg)`;
-  stage.thumb.style.transform=`translateY(${(H*.09).toFixed(1)}px) rotate(-24deg)`;
+  stage.front.style.transform=`translateY(${(H*.055).toFixed(1)}px) rotate(.5deg)`;
+  stage.thumb.style.transform=`translateY(${(H*.055).toFixed(1)}px) rotate(-24deg)`;
   await wait(slideMs+ (quick?120:520));
   stage.front.classList.remove('slide'); stage.thumb.classList.remove('slide');
   stage.front.style.transitionDuration=''; stage.thumb.style.transitionDuration='';
