@@ -17,6 +17,7 @@
     --r:22px;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  [hidden]{display:none!important;}
   html,body{height:100%;}
   body{
     font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
@@ -291,6 +292,40 @@
   @keyframes cmtpop{0%{transform:scale(.2) rotate(-8deg);opacity:0}100%{transform:none;opacity:1}}
   @keyframes cmtshake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
   @keyframes emobounce{from{transform:translateY(0) scale(1)}to{transform:translateY(-6px) scale(1.12)}}
+  .pick{display:flex;flex-direction:column;align-items:center;gap:16px;}
+  .pick-title{font-weight:900;font-size:17px;color:#fff;letter-spacing:-.3px;text-shadow:0 2px 0 rgba(0,0,0,.5);animation:pop .5s cubic-bezier(.3,1.6,.5,1);}
+  .pick-cards{display:flex;gap:14px;perspective:900px;}
+  .pcard{width:min(22vw,100px);aspect-ratio:5/8;border-radius:10px;background:var(--back-bg);cursor:pointer;
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,.55), inset 0 0 0 3px rgba(120,20,15,.6), 0 14px 26px rgba(0,0,0,.6);
+    transition:transform .18s cubic-bezier(.2,1.4,.4,1), opacity .3s, box-shadow .2s;animation:pickin .5s cubic-bezier(.2,1.3,.4,1) both;}
+  .pcard:nth-child(1){animation-delay:.03s;transform:rotate(-6deg) translateY(6px);}
+  .pcard:nth-child(2){animation-delay:.09s;}
+  .pcard:nth-child(3){animation-delay:.15s;transform:rotate(6deg) translateY(6px);}
+  .pcard:active{transform:scale(.94)!important;}
+  .pcard.gone{opacity:0;transform:translateY(-80px) rotate(20deg) scale(.6)!important;}
+  .pcard.keep{transform:translateY(-6px) scale(1.04)!important;box-shadow:inset 0 0 0 2px rgba(255,255,255,.55), inset 0 0 0 3px rgba(120,20,15,.6), 0 0 0 3px var(--gold), 0 14px 26px rgba(0,0,0,.6);}
+  @keyframes pickin{from{opacity:0;transform:translateY(40px) scale(.6)}to{opacity:1}}
+  .bin{position:absolute;right:16px;top:calc(16px + env(safe-area-inset-top));display:flex;flex-direction:column;align-items:center;gap:6px;animation:rise .4s cubic-bezier(.2,.9,.3,1.2);}
+  .bcard{width:54px;aspect-ratio:5/8;position:relative;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.4,0,.2,1);perspective:600px;}
+  .bcard.open{transform:rotateY(180deg);}
+  .bcard .b-back,.bcard .b-face{position:absolute;inset:0;border-radius:6px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;box-shadow:0 8px 16px rgba(0,0,0,.6);}
+  .bcard .b-back{background:var(--back-bg);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.5), 0 8px 16px rgba(0,0,0,.6);}
+  .bcard .b-face{transform:rotateY(180deg);background:#c8322b;}
+  .bcard .b-face .art{position:absolute;inset:-1px;border-radius:6px;background-image:var(--hwatu);background-size:1000% 200%;background-repeat:no-repeat;}
+  .bin-lbl{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.06em;}
+  .bin.reveal .bin-lbl{color:var(--gold);}
+  .bin.reveal .bcard{animation:binpop .6s cubic-bezier(.3,1.6,.5,1) .6s both;}
+  @keyframes binpop{0%{scale:1}50%{scale:1.35}100%{scale:1.15}}
+  .stage-regret{min-height:0;font-weight:800;font-size:15px;color:var(--muted);text-align:center;letter-spacing:-.2px;padding:0 10px;word-break:keep-all;}
+  .stage-regret.show{animation:pop .5s cubic-bezier(.3,1.6,.5,1);}
+  .stage-regret b{color:#fff;}
+  .stage-regret.ouch{color:#ff9d95;font-size:17px;}
+  .stage-regret.ouch b{color:#ffe08a;}
+  .stage-regret.phew{color:#9fe0b8;}
+  .seat.three .card{--w:min(66px,25vw);}
+  @media (min-width:560px){.seat.three .card{--w:70px;}}
+  .card.discard{opacity:.5;filter:grayscale(.7) drop-shadow(0 6px 8px rgba(0,0,0,.4));}
+  .card.discard::after{content:'버림';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-14deg);background:rgba(0,0,0,.78);color:#fff;font-size:11px;font-weight:900;padding:3px 8px;border-radius:6px;letter-spacing:.05em;border:1.5px solid rgba(255,255,255,.6);z-index:3;}
   .stage-close{display:none;max-width:320px;margin-top:4px;animation:rise .4s cubic-bezier(.2,.9,.3,1.2);}
   .stage.done .stage-close{display:inline-flex;}
   .stage.done .stage-hint{display:none;}
@@ -311,7 +346,7 @@
       <div class="logo">
         <span class="tag">LUNCH BOKBULBOK</span>
         <h1>점심 섯다</h1>
-        <p>화투 2장 · 탭 한 번에 쪼는 맛 · 걸린 패가 점심 쏨</p>
+        <p>화투 2장 또는 3장 · 손가락 쪼기 · 걸린 패가 점심 쏨</p>
       </div>
 
       <div class="field-label"><span>인원수</span><small>2 ~ 10명</small></div>
@@ -319,6 +354,12 @@
         <button class="round" id="minus" aria-label="인원 줄이기">−</button>
         <div class="num"><span id="countNum">4</span><small>PLAYERS</small></div>
         <button class="round" id="plus" aria-label="인원 늘리기">+</button>
+      </div>
+
+      <div class="field-label"><span>패 수</span><small>3장은 최대 6명</small></div>
+      <div class="inset modes" id="cpModes">
+        <button class="mode on" data-cp="2"><span class="ic">🎴</span><b>2장 · 정통</b><small>받은 두 장 그대로 쪼기</small></button>
+        <button class="mode" data-cp="3"><span class="ic">🃏</span><b>3장 · 한 장 버리기</b><small>안 보고 한 장 버린 뒤 쪼기</small></button>
       </div>
 
       <div class="field-label"><span>누가 걸리나</span><small>시작 전 선택</small></div>
@@ -375,7 +416,15 @@
 
 <div class="stage" id="stage" aria-hidden="true">
   <div class="stage-title" id="stageTitle">1번 패</div>
-  <div class="stack-wrap">
+  <div class="pick" id="pick" hidden>
+    <div class="pick-title">버릴 패 하나를 탭</div>
+    <div class="pick-cards" id="pickCards"></div>
+  </div>
+  <div class="bin" id="bin" hidden>
+    <div class="bcard" id="bcard"><div class="b-back"></div><div class="b-face" id="bface"></div></div>
+    <div class="bin-lbl">버린 패</div>
+  </div>
+  <div class="stack-wrap" id="stackWrap">
     <div class="stack" id="stack">
       <div class="scard sback" id="sBack"></div>
       <div class="scard sfront" id="sFront"><div class="sf-face"></div><div class="sf-back"></div></div>
@@ -384,6 +433,7 @@
   </div>
   <div class="stage-hand" id="stageHand"></div>
   <div class="stage-cmt" id="stageCmt"></div>
+  <div class="stage-regret" id="stageRegret"></div>
   <button class="btn block stage-close" id="stageClose">닫기 · 다음 사람</button>
   <div class="stage-hint" id="stageHint">탭하면 바로 까기</div>
 </div>
@@ -503,7 +553,7 @@ const vib=(p)=>{ try{ navigator.vibrate&&navigator.vibrate(p); }catch(e){} };
    상태 / 화면
    ========================================================= */
 const state={
-  count:4, mode:'low', special:true, sound:true,
+  count:4, cp:2, mode:'low', special:true, sound:true,
   round:0, seats:[], busy:false, finished:false, tied:[],
 };
 const $=(s)=>document.querySelector(s);
@@ -519,10 +569,17 @@ const MODE_LABEL={low:'낮은 패 걸림',high:'높은 패 걸림'};
 /* ---- 설정 ---- */
 function renderCount(){
   el.countNum.textContent=state.count;
-  $('#minus').disabled=state.count<=2; $('#plus').disabled=state.count>=10;
+  const max=state.cp===3?6:10;
+  if(state.count>max){ state.count=max; el.countNum.textContent=state.count; }
+  $('#minus').disabled=state.count<=2; $('#plus').disabled=state.count>=max;
 }
 $('#minus').onclick=()=>{ if(state.count>2){state.count--;renderCount();S.tick();} };
-$('#plus').onclick =()=>{ if(state.count<10){state.count++;renderCount();S.tick();} };
+$('#plus').onclick =()=>{ if(state.count<(state.cp===3?6:10)){state.count++;renderCount();S.tick();} };
+document.querySelectorAll('#cpModes .mode').forEach(b=>b.onclick=()=>{
+  state.cp=+b.dataset.cp;
+  document.querySelectorAll('#cpModes .mode').forEach(x=>x.classList.toggle('on',x===b));
+  renderCount(); S.tick();
+});
 document.querySelectorAll('#modes .mode').forEach(b=>b.onclick=()=>{
   state.mode=b.dataset.mode;
   document.querySelectorAll('#modes .mode').forEach(x=>x.classList.toggle('on',x===b));
@@ -533,7 +590,7 @@ $('#sound').onclick=function(){ state.sound=!state.sound; this.classList.toggle(
 $('#start').onclick=()=>{
   S.ctx();
   state.round=0;
-  el.modePill.textContent=MODE_LABEL[state.mode];
+  el.modePill.textContent=MODE_LABEL[state.mode]+(state.cp===3?' · 3장':'');
   show(el.game);
   startRound();
 };
@@ -547,11 +604,11 @@ function startRound(){
   state.finished=false; state.tied=[];
   state.seats=[];
   for(let i=0;i<state.count;i++){
-    const seat=document.createElement('div'); seat.className='inset seat'; seat.dataset.si=i;
+    const seat=document.createElement('div'); seat.className='inset seat'+(state.cp===3?' three':''); seat.dataset.si=i;
     seat.innerHTML=`<div class="who"><div class="nm"><i>${i+1}</i>번 패</div><div class="st">0 / 2</div></div>
-      <div class="cards"></div><div class="hand"><span class="wait">탭 · 쪼기</span></div>`;
+      <div class="cards"></div><div class="hand"><span class="wait">${state.cp===3?'탭 · 한 장 버리고 쪼기':'탭 · 쪼기'}</span></div>`;
     el.table.appendChild(seat);
-    state.seats.push({cards:[],flipped:[false,false],el:seat,active:true,hand:null});
+    state.seats.push({cards:[],flipped:[false,false],el:seat,active:true,hand:null,discard:null,discardIdx:-1,cardEls:[]});
   }
   dealTo(state.seats.map((_,i)=>i));
 }
@@ -561,19 +618,20 @@ function dealTo(idx){
   const deck=shuffle(DECK_DEF);
   idx.forEach((si,k)=>{
     const s=state.seats[si];
-    s.cards=[deck[k*2],deck[k*2+1]]; s.flipped=[false,false]; s.hand=null; s.active=true; s.revealing=false;
+    const cp=state.cp;
+    s.cards=deck.slice(k*cp,k*cp+cp); s.flipped=[false,false]; s.hand=null; s.active=true; s.revealing=false; s.discard=null; s.discardIdx=-1;
     s.el.classList.remove('done','out','dim','hit','high','tie');
     s.el.querySelectorAll('.stamp,.rankno').forEach(x=>x.remove());
-    s.el.querySelector('.st').textContent='0 / 2';
-    s.el.querySelector('.hand').innerHTML='<span class="wait">탭 · 쪼기</span>';
-    const cw=s.el.querySelector('.cards'); cw.innerHTML='';
-    s.cards.forEach((c,ci)=>{ const ce=makeCard(c,si,ci); ce.style.opacity='0'; cw.appendChild(ce); });
+    s.el.querySelector('.st').textContent=cp===3?'3장':'0 / 2';
+    s.el.querySelector('.hand').innerHTML=`<span class="wait">${cp===3?'탭 · 한 장 버리고 쪼기':'탭 · 쪼기'}</span>`;
+    const cw=s.el.querySelector('.cards'); cw.innerHTML=''; s.cardEls=[];
+    s.cards.forEach((c,ci)=>{ const ce=makeCard(c,si,ci); ce.style.opacity='0'; cw.appendChild(ce); s.cardEls.push(ce); });
   });
   setTimeout(()=>{
     el.deck.classList.remove('shuffling'); el.deckMsg.textContent='패 돌리는 중...';
     const dr=el.deck.getBoundingClientRect();
     const all=[];
-    for(let ci=0;ci<2;ci++) idx.forEach(si=>all.push(state.seats[si].el.querySelectorAll('.card')[ci]));
+    for(let ci=0;ci<state.cp;ci++) idx.forEach(si=>all.push(state.seats[si].cardEls[ci]));
     all.forEach((ce,k)=>{
       const r=ce.getBoundingClientRect();
       const dx=dr.left+dr.width/2-(r.left+r.width/2), dy=dr.top+dr.height/2-(r.top+r.height/2);
@@ -620,7 +678,7 @@ function comment(h,label){
 }
 
 /* ---- 쪼기 스테이지: 앞장을 엄지로 밀어 내리며 뒷장 공개 ---- */
-const stage={ el:$('#stage'), title:$('#stageTitle'), stack:$('#stack'), back:$('#sBack'), front:$('#sFront'), thumb:$('#thumb'), hand:$('#stageHand'), cmt:$('#stageCmt'), close:$('#stageClose'), hint:$('#stageHint'), skip:false, open:false, closeResolve:null };
+const stage={ el:$('#stage'), title:$('#stageTitle'), stack:$('#stack'), wrap:$('#stackWrap'), pick:$('#pick'), pickCards:$('#pickCards'), bin:$('#bin'), bcard:$('#bcard'), bface:$('#bface'), regret:$('#stageRegret'), back:$('#sBack'), front:$('#sFront'), thumb:$('#thumb'), hand:$('#stageHand'), cmt:$('#stageCmt'), close:$('#stageClose'), hint:$('#stageHint'), skip:false, open:false, closeResolve:null };
 stage.el.addEventListener('click',(e)=>{ if(stage.open && !stage.el.classList.contains('done')) stage.skip=true; });
 stage.close.addEventListener('click',(e)=>{ e.stopPropagation(); if(stage.closeResolve){ const r=stage.closeResolve; stage.closeResolve=null; r(); } });
 const wait=(ms)=>new Promise(r=>{ const t0=performance.now(); const tick=()=>{ if(stage.skip||performance.now()-t0>=ms) r(); else requestAnimationFrame(tick); }; tick(); });
@@ -629,17 +687,44 @@ const waitHard=(ms)=>new Promise(r=>setTimeout(r,ms));
 async function revealSeat(si,quick){
   const s=state.seats[si];
   if(!s||!s.active||s.revealing||stage.open) return;
-  const cards=[...s.el.querySelectorAll('.card')];
-  if(cards.every(c=>c._isDone())) return;
+  if(s.flipped.every(Boolean)) return;
   s.revealing=true; stage.open=true; stage.skip=false;
-  const [c1,c2]=s.cards; // c1: 앞장(바로 공개), c2: 뒷장(쪼기)
   stage.title.textContent=`${si+1}번 패`;
-  stage.hand.innerHTML=''; stage.cmt.innerHTML=''; stage.cmt.className='stage-cmt'; stage.el.classList.remove('done'); stage.hint.textContent=quick?'':'탭하면 바로 까기';
+  stage.hand.innerHTML=''; stage.cmt.innerHTML=''; stage.cmt.className='stage-cmt'; stage.regret.innerHTML=''; stage.regret.className='stage-regret';
+  stage.el.classList.remove('done'); stage.hint.textContent='';
+  stage.bin.hidden=true; stage.bin.className='bin'; stage.bcard.classList.remove('open');
+  stage.el.classList.add('show'); stage.el.setAttribute('aria-hidden','false');
+  S.ctx();
+
+  // 0) 3장 모드: 안 보고 한 장 버리기
+  let discard=null;
+  if(s.cards.length===3){
+    stage.wrap.hidden=true; stage.pick.hidden=false;
+    stage.pickCards.innerHTML='';
+    const pcs=s.cards.map((c,i)=>{ const d=document.createElement('div'); d.className='pcard'; d.dataset.i=i; stage.pickCards.appendChild(d); return d; });
+    let idx;
+    if(quick){ await waitHard(220); idx=rand(3); }
+    else {
+      idx=await new Promise(res=>{ pcs.forEach(d=>d.addEventListener('click',(e)=>{ e.stopPropagation(); res(+d.dataset.i); },{once:true})); });
+    }
+    S.noise(.08,.25,1500); vib(15);
+    pcs[idx].classList.add('gone'); pcs.forEach((d,i)=>{ if(i!==idx) d.classList.add('keep'); });
+    discard=s.cards[idx]; s.discard=discard; s.discardIdx=idx;
+    s.cards=s.cards.filter((_,i)=>i!==idx);
+    // 버린 패 슬롯 (뒷면)
+    await waitHard(quick?200:380);
+    stage.bface.innerHTML=cardFace(discard);
+    stage.bin.hidden=false;
+    await waitHard(quick?220:420);
+    stage.pick.hidden=true; stage.wrap.hidden=false;
+    stage.stack.style.animation='none'; void stage.stack.offsetWidth; stage.stack.style.animation='';
+  } else { stage.pick.hidden=true; stage.wrap.hidden=false; }
+  stage.skip=false;
+  const [c1,c2]=s.cards; // c1: 앞장(바로 공개), c2: 뒷장(쪼기)
+  stage.hint.textContent=quick?'':'탭하면 바로 까기';
   stage.back.innerHTML=cardFace(c2);
   stage.front.innerHTML=`<div class="flipper"><div class="sf-back"></div><div class="sf-face">${cardFace(c1)}</div></div>`;
   stage.front.className='scard sfront'; stage.front.style.transform=''; stage.back.className='scard sback'; stage.thumb.className='thumb'; stage.thumb.style.transform='';
-  stage.el.classList.add('show'); stage.el.setAttribute('aria-hidden','false');
-  S.ctx();
 
   const T = quick ? .35 : 1; // 전체 공개 시 빠른 리듬
   // 1) 앞장 먼저 까기
@@ -668,7 +753,7 @@ async function revealSeat(si,quick){
   stage.back.classList.add('lift');
   S.flip(); vib([20,30,50]);
   // 좌석 카드도 동시에 오픈
-  cards.forEach(c=>c._show());
+  s.cardEls.forEach((c,i)=>{ if(i===s.discardIdx){ c._show(); c.classList.add('discard'); } else c._show(); });
   const h=baseHand(c1,c2);
   const ms=[c1.m,c2.m].sort((a,b)=>a-b).join('-');
   let label=h.name;
@@ -686,7 +771,26 @@ async function revealSeat(si,quick){
   stage.cmt.className='stage-cmt show '+cm.cls;
   if(cm.cls==='hot'){ burstAt(stage.stack,true); S.gong(); }
   else if(cm.cls==='bad'){ rainAt(stage.stack, cm.emo==='💩'?['💩','💩','🪦','😵']:['😱','💧','🫠']); S.fail(); vib([60,40,60]); }
-  if(quick){ await waitHard(900); }
+  // 3장 모드: 버린 패 공개 + 아까비 판정
+  if(discard){
+    await waitHard(quick?350:900);
+    stage.bin.classList.add('reveal'); stage.bcard.classList.add('open');
+    S.noise(.06,.22,1900);
+    const alts=[baseHand(discard,c1),baseHand(discard,c2)].sort((a,b)=>b.score-a.score); const best=alts[0];
+    let rg;
+    if(best.score>h.score){
+      const big = best.tier==='top'||best.tier==='ddaeng';
+      rg={cls:'ouch',html:`${big?'😭':'🥲'} 아까비! 버린 <b>${MONTH_NAME[discard.m]}</b> 들었으면 <b>${best.name}</b>`};
+      await waitHard(650); if(big){ rainAt(stage.bin,['💸','😭','💔']); S.fail(); vib([80,50,80,50,120]); } else { S.tone(300,.2,.12,'triangle',-120); vib(40); }
+    } else if(best.score===h.score){
+      rg={cls:'',html:`🤷 버린 <b>${MONTH_NAME[discard.m]}</b> 들어도 똑같이 <b>${best.name}</b>`};
+    } else {
+      rg={cls:'phew',html:`👍 잘 버렸다! <b>${MONTH_NAME[discard.m]}</b> 들었으면 최대 <b>${best.name}</b>`};
+      await waitHard(650); S.tone(720,.14,.12); vib(20);
+    }
+    stage.regret.innerHTML=rg.html; stage.regret.className='stage-regret show '+rg.cls;
+  }
+  if(quick){ await waitHard(discard?1200:900); }
   else { stage.el.classList.add('done'); await new Promise(r=>{ stage.closeResolve=r; }); }
   // 5) 스테이지 닫고 좌석에 반영
   stage.el.classList.remove('show'); stage.el.setAttribute('aria-hidden','true'); stage.open=false;
