@@ -639,7 +639,7 @@ async function revealSeat(si,quick){
   // 4) 확! 앞장 옆으로 쳐내고 뒷장 공개
   stage.skip=false;
   stage.front.classList.add('snap');
-  stage.front.style.transform=`translate(${(H*.36).toFixed(1)}px, ${(H*.30).toFixed(1)}px) rotate(16deg)`;
+  stage.front.style.transform=`translate(${(H*.24).toFixed(1)}px, ${(H*.30).toFixed(1)}px) rotate(14deg)`;
   stage.thumb.classList.remove('show');
   stage.back.classList.add('lift');
   S.flip(); vib([20,30,50]);
