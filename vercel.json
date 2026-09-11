@@ -3,6 +3,7 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
-    { "source": "/records", "destination": "/records.html" }
+    { "source": "/records", "destination": "/records.html" },
+    { "source": "/seotda", "destination": "/seotda.html" }
   ]
 }
