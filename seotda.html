@@ -221,9 +221,6 @@
     filter:brightness(.55);
   }
   .card .face .art{position:absolute;inset:0;background-image:var(--hwatu);background-size:1000% 200%;background-repeat:no-repeat;image-rendering:auto;}
-  .card .face .chip{position:absolute;left:5px;top:5px;min-width:20px;height:20px;padding:0 5px;border-radius:7px;display:grid;place-items:center;
-    font-size:12px;font-weight:900;color:#fff;background:rgba(0,0,0,.72);box-shadow:0 1px 0 rgba(255,255,255,.25) inset, 0 2px 4px rgba(0,0,0,.4);letter-spacing:-.5px;}
-  .card .face .lbl{position:absolute;right:5px;bottom:5px;padding:2px 6px;border-radius:6px;font-size:9.5px;font-weight:800;color:#fff;background:rgba(0,0,0,.6);letter-spacing:-.2px;white-space:nowrap;}
   .card .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.15));pointer-events:none;border-radius:9px;}
   .card .back{
     transform-origin:50% 0%;backface-visibility:hidden;-webkit-backface-visibility:hidden;
@@ -257,11 +254,7 @@
   @keyframes stackin{from{transform:scale(.5) translateY(40px);opacity:0}to{transform:none;opacity:1}}
   .scard{position:absolute;inset:0;border-radius:14px;background:#fff;overflow:visible;}
   .scard .art{position:absolute;inset:0;border-radius:14px;background-image:var(--hwatu);background-size:1000% 200%;background-repeat:no-repeat;}
-  .scard .chip{position:absolute;left:9px;top:9px;min-width:30px;height:30px;padding:0 8px;border-radius:10px;display:grid;place-items:center;font-size:17px;font-weight:900;color:#fff;background:rgba(0,0,0,.72);}
-  .scard .lbl{position:absolute;right:9px;bottom:9px;padding:4px 9px;border-radius:8px;font-size:13px;font-weight:800;color:#fff;background:rgba(0,0,0,.6);white-space:nowrap;}
   .sback{transform:none;box-shadow:0 14px 30px rgba(0,0,0,.6), 0 0 0 1px rgba(0,0,0,.4);transition:transform .35s cubic-bezier(.2,1.2,.4,1);}
-  .sback .chip,.sback .lbl{opacity:0;transition:opacity .25s;}
-  .sback.lift .chip,.sback.lift .lbl{opacity:1;}
   .sback .art{filter:brightness(.92);}
   .sback.lift{transform:translate(-14px,-10px) rotate(-7deg) scale(1.04);}
   .sfront{transform-style:preserve-3d;transition:transform .2s cubic-bezier(.25,.9,.3,1);box-shadow:0 18px 40px rgba(0,0,0,.65), 0 0 0 1px rgba(0,0,0,.35);will-change:transform;}
@@ -420,8 +413,7 @@ function cardFace(c){
   const label = c.t==='kwang'?'광':c.t==='tti'?'띠':'열';
   const k = (c.t==='kwang' || (c.m===8 ? c.t==='kwang' : c.t==='yeol')) ? 0 : 1;
   const x = ((c.m-1)*100/9).toFixed(3), y = k*100;
-  return `<div class="art" style="background-position:${x}% ${y}%" role="img" aria-label="${c.m}월 ${MONTH_NAME[c.m]} ${label}"></div>
-    <span class="chip">${c.m}</span><span class="lbl">${MONTH_NAME[c.m]}·${label}</span>`;
+  return `<div class="art" style="background-position:${x}% ${y}%" role="img" aria-label="${c.m}월 ${MONTH_NAME[c.m]} ${label}"></div>`;
 }
 
 /* =========================================================
