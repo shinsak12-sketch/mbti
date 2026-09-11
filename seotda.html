@@ -259,7 +259,9 @@
   .scard .art{position:absolute;inset:0;border-radius:14px;background-image:var(--hwatu);background-size:1000% 200%;background-repeat:no-repeat;}
   .scard .chip{position:absolute;left:9px;top:9px;min-width:30px;height:30px;padding:0 8px;border-radius:10px;display:grid;place-items:center;font-size:17px;font-weight:900;color:#fff;background:rgba(0,0,0,.72);}
   .scard .lbl{position:absolute;right:9px;bottom:9px;padding:4px 9px;border-radius:8px;font-size:13px;font-weight:800;color:#fff;background:rgba(0,0,0,.6);white-space:nowrap;}
-  .sback{transform:translate(-6px,-8px) rotate(-3deg);box-shadow:0 14px 30px rgba(0,0,0,.6), 0 0 0 1px rgba(0,0,0,.4);transition:transform .35s cubic-bezier(.2,1.2,.4,1);}
+  .sback{transform:none;box-shadow:0 14px 30px rgba(0,0,0,.6), 0 0 0 1px rgba(0,0,0,.4);transition:transform .35s cubic-bezier(.2,1.2,.4,1);}
+  .sback .chip,.sback .lbl{opacity:0;transition:opacity .25s;}
+  .sback.lift .chip,.sback.lift .lbl{opacity:1;}
   .sback .art{filter:brightness(.92);}
   .sback.lift{transform:translate(-14px,-10px) rotate(-7deg) scale(1.04);}
   .sfront{transform-style:preserve-3d;transition:transform .2s cubic-bezier(.25,.9,.3,1);box-shadow:0 18px 40px rgba(0,0,0,.65), 0 0 0 1px rgba(0,0,0,.35);will-change:transform;}
@@ -630,8 +632,8 @@ async function revealSeat(si,quick){
   stage.front.classList.add('slide'); stage.thumb.classList.add('slide');
   stage.front.style.transitionDuration=slideMs+'ms'; stage.thumb.style.transitionDuration=slideMs+'ms';
   await waitHard(30);
-  stage.front.style.transform=`translateY(${(H*.21).toFixed(1)}px) rotate(1.2deg)`;
-  stage.thumb.style.transform=`translateY(${(H*.21).toFixed(1)}px) rotate(-24deg)`;
+  stage.front.style.transform=`translateY(${(H*.09).toFixed(1)}px) rotate(.8deg)`;
+  stage.thumb.style.transform=`translateY(${(H*.09).toFixed(1)}px) rotate(-24deg)`;
   await wait(slideMs+ (quick?120:520));
   stage.front.classList.remove('slide'); stage.thumb.classList.remove('slide');
   stage.front.style.transitionDuration=''; stage.thumb.style.transitionDuration='';
