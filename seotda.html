@@ -239,14 +239,23 @@
   .card.flipped .face{filter:none;}
   .card.flipped .shade{opacity:0;}
   .card.flipped{filter:drop-shadow(0 6px 8px rgba(0,0,0,.4));}
-  .card.peeling{cursor:default;z-index:5;animation:cardjit 1.15s ease-in-out both;}
-  .card.peeling .back{animation:peel 1.15s cubic-bezier(.45,.02,.35,1) both;}
-  .card.peeling .face{animation:facelight 1.15s cubic-bezier(.45,.02,.35,1) both;}
-  .card.peeling .shade{animation:shadefade 1.15s cubic-bezier(.45,.02,.35,1) both;}
-  @keyframes peel{0%{transform:rotateX(0)}18%{transform:rotateX(22deg)}40%{transform:rotateX(38deg)}58%{transform:rotateX(52deg)}72%{transform:rotateX(64deg)}82%{transform:rotateX(78deg)}100%{transform:rotateX(180deg)}}
+  .card.peeling{cursor:default;z-index:5;}
+  .card.peeling.fast .back{animation:peelfast .4s cubic-bezier(.5,0,.3,1) both;}
+  .card.peeling.fast .face{animation:facelight .4s ease both;}
+  .card.peeling.fast .shade{animation:shadefade .4s ease both;}
+  .card.peeling.slow{animation:cardjit 1.7s ease-in-out both;}
+  .card.peeling.slow .back{animation:peelslow 1.7s linear both;}
+  .card.peeling.slow .face{animation:facelight 1.7s cubic-bezier(.45,.02,.35,1) both;}
+  .card.peeling.slow .shade{animation:shadefade 1.7s cubic-bezier(.45,.02,.35,1) both;}
+  @keyframes peelfast{0%{transform:rotateX(0)}100%{transform:rotateX(180deg)}}
+  @keyframes peelslow{
+    0%{transform:rotateX(0)} 12%{transform:rotateX(18deg)} 22%{transform:rotateX(16deg)}
+    38%{transform:rotateX(34deg)} 48%{transform:rotateX(31deg)}
+    62%{transform:rotateX(50deg)} 70%{transform:rotateX(48deg)}
+    82%{transform:rotateX(70deg)} 88%{transform:rotateX(84deg)} 100%{transform:rotateX(180deg)} }
   @keyframes facelight{0%{filter:brightness(.55)}70%{filter:brightness(.8)}100%{filter:brightness(1)}}
   @keyframes shadefade{0%{opacity:1}70%{opacity:.45}100%{opacity:0}}
-  @keyframes cardjit{0%,100%{transform:translate(0,0)}45%{transform:translate(-1px,1px) rotate(-.6deg)}55%{transform:translate(1.5px,-1px) rotate(.8deg)}65%{transform:translate(-2px,1px) rotate(-1deg)}75%{transform:translate(2px,0) rotate(1.2deg)}85%{transform:translate(-1px,-1px) rotate(-.5deg)}}
+  @keyframes cardjit{0%,100%{transform:translate(0,0)}30%{transform:translate(-1px,1px) rotate(-.5deg)}45%{transform:translate(1.5px,-1px) rotate(.7deg)}60%{transform:translate(-2px,1px) rotate(-1deg)}72%{transform:translate(2px,0) rotate(1.2deg)}84%{transform:translate(-2px,-1px) rotate(-1.2deg)}92%{transform:translate(1px,1px) rotate(.6deg)}}
   .card.hint{animation:wob .5s ease;}
   @keyframes wob{0%,100%{transform:rotate(0)}25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
 
@@ -301,7 +310,7 @@
       <div class="start-wrap">
         <button class="btn block" id="start">🎴 섯기 · 시작</button>
       </div>
-      <p class="hint">패를 돌린 뒤 <b>각자 원하는 자리</b>를 고르고, 카드를 <b>한 번 탭</b>하면 쪼면서 공개됨<br>모두 공개되면 걸린 패 자리에서 바로 결과 뜸</p>
+      <p class="hint">패를 돌린 뒤 <b>각자 원하는 자리</b>를 고르고, 자리를 <b>한 번 탭</b>하면 한 장은 바로 까고 두 번째 장을 쪼면서 공개<br>모두 공개되면 걸린 패 자리에서 바로 결과 뜸</p>
     </div>
     <p class="foot">족보: 38광땡 › 18·13광땡 › 장땡~삥땡 › 알리·독사·구삥·장삥·장사·세륙 › 갑오~망통</p>
   </section>
@@ -492,7 +501,7 @@ function startRound(){
   for(let i=0;i<state.count;i++){
     const seat=document.createElement('div'); seat.className='inset seat'; seat.dataset.si=i;
     seat.innerHTML=`<div class="who"><div class="nm"><i>${i+1}</i>번 패</div><div class="st">0 / 2</div></div>
-      <div class="cards"></div><div class="hand"><span class="wait">탭해서 쪼기</span></div>`;
+      <div class="cards"></div><div class="hand"><span class="wait">탭하면 한 장 까고 한 장 쪼기</span></div>`;
     el.table.appendChild(seat);
     state.seats.push({cards:[],flipped:[false,false],el:seat,active:true,hand:null});
   }
@@ -504,11 +513,11 @@ function dealTo(idx){
   const deck=shuffle(DECK_DEF);
   idx.forEach((si,k)=>{
     const s=state.seats[si];
-    s.cards=[deck[k*2],deck[k*2+1]]; s.flipped=[false,false]; s.hand=null; s.active=true;
+    s.cards=[deck[k*2],deck[k*2+1]]; s.flipped=[false,false]; s.hand=null; s.active=true; s.revealing=false;
     s.el.classList.remove('done','out','dim','hit','high','tie');
     s.el.querySelectorAll('.stamp,.rankno').forEach(x=>x.remove());
     s.el.querySelector('.st').textContent='0 / 2';
-    s.el.querySelector('.hand').innerHTML='<span class="wait">탭해서 쪼기</span>';
+    s.el.querySelector('.hand').innerHTML='<span class="wait">탭하면 한 장 까고 한 장 쪼기</span>';
     const cw=s.el.querySelector('.cards'); cw.innerHTML='';
     s.cards.forEach((c,ci)=>{ const ce=makeCard(c,si,ci); ce.style.opacity='0'; cw.appendChild(ce); });
   });
@@ -533,31 +542,50 @@ function dealTo(idx){
   }, 700);
 }
 
-/* ---- 카드 & 탭 쪼기 ---- */
-const PEEL_MS=1150;
+/* ---- 카드 & 탭 쪼기 (자리 탭 → 1장 빨리, 2장째 천천히) ---- */
+const FAST_MS=400, SLOW_MS=1700;
 function makeCard(card,si,ci){
   const ce=document.createElement('div'); ce.className='card'; ce.dataset.si=si; ce.dataset.ci=ci;
   ce.innerHTML=`<div class="face">${cardFace(card)}<div class="shade"></div></div><div class="back"></div>`;
   let done=false, running=false;
-  const go=(silent)=>{
-    if(done||running) return; running=true;
-    ce.classList.add('peeling');
+  ce._flip=(speed,silent)=>new Promise(res=>{
+    if(done||running){ res(); return; } running=true;
+    const ms = speed==='fast'?FAST_MS:SLOW_MS;
+    ce.classList.add('peeling',speed);
     S.ctx();
-    // 쪼는 동안 틱 소리 + 진동
-    let n=0; const iv=setInterval(()=>{ n++; if(!silent) S.tick(); if(n>4) vib(5); if(n>=8) clearInterval(iv); }, PEEL_MS/9);
+    let iv=null;
+    if(speed==='slow'){
+      let n=0; iv=setInterval(()=>{ n++; if(!silent) S.tick(); if(n>3) vib(6); if(n>=9) clearInterval(iv); }, ms/10);
+    } else if(!silent){ S.tick(); }
     setTimeout(()=>{
-      clearInterval(iv);
+      if(iv) clearInterval(iv);
       done=true; running=false;
-      ce.classList.remove('peeling'); ce.classList.add('flipped');
-      S.flip(); vib([18,30,40]);
+      ce.classList.remove('peeling','fast','slow'); ce.classList.add('flipped');
+      if(speed==='slow'){ S.flip(); vib([18,30,40]); } else { S.noise(.05,.22,2000); vib(12); }
       onFlipped(si,ci,silent);
-    }, PEEL_MS);
-  };
-  ce.addEventListener('click',(e)=>{ e.preventDefault(); if(state.busy||state.finished) return; go(false); });
+      res();
+    }, ms);
+  });
+  ce._isDone=()=>done;
+  ce.addEventListener('click',(e)=>{ e.preventDefault(); if(state.busy||state.finished) return; revealSeat(si,false); });
   ce.addEventListener('contextmenu',e=>e.preventDefault());
   ce.addEventListener('dragstart',e=>e.preventDefault());
-  ce._forceFlip=()=>go(true);
   return ce;
+}
+async function revealSeat(si,silent){
+  const s=state.seats[si];
+  if(!s||!s.active||s.revealing) return;
+  const cards=[...s.el.querySelectorAll('.card')].filter(c=>!c._isDone());
+  if(!cards.length) return;
+  s.revealing=true;
+  if(cards.length===2){
+    await cards[0]._flip('fast',silent);
+    await new Promise(r=>setTimeout(r,220));
+    await cards[1]._flip('slow',silent);
+  } else {
+    await cards[0]._flip('slow',silent);
+  }
+  s.revealing=false;
 }
 
 function onFlipped(si,ci,silent){
@@ -583,9 +611,9 @@ function onFlipped(si,ci,silent){
 
 $('#revealAll').onclick=()=>{
   if(state.busy||state.finished) return;
-  const cards=[...el.table.querySelectorAll('.seat:not(.out) .card:not(.flipped)')];
-  if(!cards.length) return;
-  cards.forEach((c,i)=>setTimeout(()=>c._forceFlip(),i*260));
+  const idx=state.seats.map((s,i)=>s.active&&!s.flipped.every(Boolean)?i:-1).filter(i=>i>=0);
+  if(!idx.length) return;
+  idx.forEach((si,i)=>setTimeout(()=>revealSeat(si,true),i*450));
 };
 $('#redeal').onclick=()=>{ if(state.busy) return; startRound(); };
 $('#toSetup').onclick=()=>{ show(el.setup); };
