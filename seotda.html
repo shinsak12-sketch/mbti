@@ -263,7 +263,8 @@
   .sback .art{filter:brightness(.92);}
   .sback.lift{transform:translate(-14px,-10px) rotate(-7deg) scale(1.04);}
   .sfront{transform-style:preserve-3d;transition:transform .2s cubic-bezier(.25,.9,.3,1);box-shadow:0 18px 40px rgba(0,0,0,.65), 0 0 0 1px rgba(0,0,0,.35);will-change:transform;}
-  .sfront.snap{transition:transform .38s cubic-bezier(.3,1.35,.45,1);}
+  .sfront.slide,.thumb.slide{transition-timing-function:cubic-bezier(.22,.61,.36,1);}
+  .sfront.snap{transition:transform .38s cubic-bezier(.3,1.35,.45,1) !important;}
   .sfront .sf-face,.sfront .sf-back{position:absolute;inset:0;border-radius:14px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;}
   .sfront .sf-face{transform:rotateY(180deg);background:#fff;}
   .sfront .sf-back{background:var(--back-bg);box-shadow:inset 0 0 0 3px #2b0a08, inset 0 0 0 8px #d95a4f, inset 0 0 0 10px #2b0a08;}
@@ -286,8 +287,6 @@
   .stage-hand .big.top{background:linear-gradient(180deg,#ff8f85,#c8322b 55%,#8e1f1a);color:#fff;box-shadow:0 8px 0 #4a0f0c, 0 20px 34px -10px rgba(0,0,0,.8);}
   .stage-hand .big.low{background:linear-gradient(180deg,#8c9a94,#5c6a64);color:#fff;box-shadow:0 8px 0 #2e3835;}
   .stage-hint{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.08em;}
-  .stage.shake .stack{animation:stshake .12s ease-in-out;}
-  @keyframes stshake{0%,100%{transform:translate(0,0)}50%{transform:translate(2px,-1px) rotate(.6deg)}}
   .toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translate(-50%,20px);padding:12px 18px;border-radius:999px;font-weight:800;font-size:14px;color:#2a1d05;
     background:linear-gradient(180deg,#f3d98a,var(--gold-2));box-shadow:0 4px 0 var(--gold-3), 0 14px 24px -8px rgba(0,0,0,.7);opacity:0;transition:.3s;z-index:60;pointer-events:none;white-space:nowrap;}
   .toast.show{opacity:1;transform:translate(-50%,0);}
@@ -339,7 +338,7 @@
       <div class="start-wrap">
         <button class="btn block" id="start">🎴 섯기 · 시작</button>
       </div>
-      <p class="hint">패를 돌린 뒤 <b>각자 원하는 자리</b>를 고르고, 자리를 <b>한 번 탭</b>하면 손에 두 장을 잡고, 앞장을 엄지로 밀어 내리며 뒷장을 쪼아 공개<br>모두 공개되면 걸린 패 자리에서 바로 결과 뜸</p>
+      <p class="hint">패를 돌린 뒤 <b>각자 원하는 자리</b>를 고르고, 자리를 <b>한 번 탭</b>하면 손에 두 장을 잡고, 앞장을 엄지로 스르륵 살짝 내리다가 확 공개<br>모두 공개되면 걸린 패 자리에서 바로 결과 뜸</p>
     </div>
     <p class="foot">족보: 38광땡 › 18·13광땡 › 장땡~삥땡 › 알리·독사·구삥·장삥·장사·세륙 › 갑오~망통</p>
   </section>
@@ -542,7 +541,7 @@ function startRound(){
   for(let i=0;i<state.count;i++){
     const seat=document.createElement('div'); seat.className='inset seat'; seat.dataset.si=i;
     seat.innerHTML=`<div class="who"><div class="nm"><i>${i+1}</i>번 패</div><div class="st">0 / 2</div></div>
-      <div class="cards"></div><div class="hand"><span class="wait">탭 · 잡고 쪼기</span></div>`;
+      <div class="cards"></div><div class="hand"><span class="wait">탭 · 쪼기</span></div>`;
     el.table.appendChild(seat);
     state.seats.push({cards:[],flipped:[false,false],el:seat,active:true,hand:null});
   }
@@ -558,7 +557,7 @@ function dealTo(idx){
     s.el.classList.remove('done','out','dim','hit','high','tie');
     s.el.querySelectorAll('.stamp,.rankno').forEach(x=>x.remove());
     s.el.querySelector('.st').textContent='0 / 2';
-    s.el.querySelector('.hand').innerHTML='<span class="wait">탭 · 잡고 쪼기</span>';
+    s.el.querySelector('.hand').innerHTML='<span class="wait">탭 · 쪼기</span>';
     const cw=s.el.querySelector('.cards'); cw.innerHTML='';
     s.cards.forEach((c,ci)=>{ const ce=makeCard(c,si,ci); ce.style.opacity='0'; cw.appendChild(ce); });
   });
@@ -617,7 +616,7 @@ async function revealSeat(si,quick){
   stage.el.classList.add('show'); stage.el.setAttribute('aria-hidden','false');
   S.ctx();
 
-  const T = quick ? .45 : 1; // 전체 공개 시 빠른 리듬
+  const T = quick ? .35 : 1; // 전체 공개 시 빠른 리듬
   // 1) 앞장 먼저 까기
   await waitHard(300*T+100);
   stage.front.classList.add('up'); S.noise(.06,.25,1800); vib(12);
@@ -625,17 +624,17 @@ async function revealSeat(si,quick){
   // 2) 엄지 등장
   stage.thumb.classList.add('show');
   await wait(260*T);
-  // 3) 리듬 있게 밀어 내리기 (조금 → 멈칫 → 조금 더 → 멈칫 ...)
+  // 3) 스무스하게 살짝만 밀어 내리기 (한 번의 느린 이동, 흔들림 없음)
   const H=stage.stack.getBoundingClientRect().height;
-  const steps=[{y:.09,rot:.6,hold:380},{y:.19,rot:1.4,hold:420},{y:.30,rot:2.2,hold:470},{y:.43,rot:3.2,hold:560},{y:.55,rot:4,hold:440}];
-  for(const st of steps){
-    if(stage.skip) break;
-    stage.front.style.transform=`translateY(${(st.y*H).toFixed(1)}px) rotate(${st.rot}deg)`;
-    stage.thumb.style.transform=`translateY(${(st.y*H).toFixed(1)}px) rotate(-24deg)`;
-    S.tick(); vib(8);
-    stage.el.classList.add('shake'); setTimeout(()=>stage.el.classList.remove('shake'),140);
-    await wait(st.hold*T);
-  }
+  const slideMs=Math.round(2300*T);
+  stage.front.classList.add('slide'); stage.thumb.classList.add('slide');
+  stage.front.style.transitionDuration=slideMs+'ms'; stage.thumb.style.transitionDuration=slideMs+'ms';
+  await waitHard(30);
+  stage.front.style.transform=`translateY(${(H*.21).toFixed(1)}px) rotate(1.2deg)`;
+  stage.thumb.style.transform=`translateY(${(H*.21).toFixed(1)}px) rotate(-24deg)`;
+  await wait(slideMs+ (quick?120:520));
+  stage.front.classList.remove('slide'); stage.thumb.classList.remove('slide');
+  stage.front.style.transitionDuration=''; stage.thumb.style.transitionDuration='';
   // 4) 확! 앞장 옆으로 쳐내고 뒷장 공개
   stage.skip=false;
   stage.front.classList.add('snap');
