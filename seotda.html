@@ -736,21 +736,21 @@ async function revealSeat(si,quick){
 
   const T = quick ? .35 : 1; // 전체 공개 시 빠른 리듬
   // 1) 앞장 먼저 까기
-  await waitHard(300*T+100);
+  await waitHard(260*T+90);
   stage.front.classList.add('up'); S.noise(.06,.25,1800); vib(12);
-  await waitHard(380*T+60);
+  await waitHard(330*T+50);
   // 2) 엄지 등장
   stage.thumb.classList.add('show');
-  await wait(260*T);
+  await wait(220*T);
   // 3) 스무스하게 살짝만 밀어 내리기 (한 번의 느린 이동, 흔들림 없음)
   const H=stage.stack.getBoundingClientRect().height;
-  const slideMs=Math.round(2300*T);
+  const slideMs=Math.round(1700*T);
   stage.front.classList.add('slide'); stage.thumb.classList.add('slide');
   stage.front.style.transitionDuration=slideMs+'ms'; stage.thumb.style.transitionDuration=slideMs+'ms';
   await waitHard(30);
   stage.front.style.transform=`translateY(${(H*.055).toFixed(1)}px) rotate(.5deg)`;
   stage.thumb.style.transform=`translateY(${(H*.055).toFixed(1)}px) rotate(-24deg)`;
-  await wait(slideMs+ (quick?120:520));
+  await wait(slideMs+ (quick?100:400));
   stage.front.classList.remove('slide'); stage.thumb.classList.remove('slide');
   stage.front.style.transitionDuration=''; stage.thumb.style.transitionDuration='';
   // 4) 확! 앞장 옆으로 쳐내고 뒷장 공개
