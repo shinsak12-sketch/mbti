@@ -750,7 +750,7 @@ async function revealSeat(si,quick){
   await waitHard(30);
   stage.front.style.transform=`translateY(${(H*.055).toFixed(1)}px) rotate(.5deg)`;
   stage.thumb.style.transform=`translateY(${(H*.055).toFixed(1)}px) rotate(-24deg)`;
-  await wait(slideMs+ (quick?100:400));
+  await wait(slideMs+ (quick?60:150));
   stage.front.classList.remove('slide'); stage.thumb.classList.remove('slide');
   stage.front.style.transitionDuration=''; stage.thumb.style.transitionDuration='';
   // 4) 확! 앞장 옆으로 쳐내고 뒷장 공개
