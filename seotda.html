@@ -196,7 +196,7 @@
   }
   .hand .badge.top{background:linear-gradient(180deg,#ff8f85,#c8322b 55%,#8e1f1a);color:#fff;box-shadow:0 4px 0 #4a0f0c, 0 8px 14px -6px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.4);}
   .hand .badge.low{background:linear-gradient(180deg,#8c9a94,#5c6a64);color:#fff;box-shadow:0 4px 0 #2e3835, inset 0 1px 0 rgba(255,255,255,.3);}
-  .hand .wait{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.04em;}
+  .hand .wait{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.02em;word-break:keep-all;}
   .seat.done .wait{display:none;}
   @keyframes pop{0%{transform:scale(.4);opacity:0}100%{transform:scale(1);opacity:1}}
 
@@ -501,7 +501,7 @@ function startRound(){
   for(let i=0;i<state.count;i++){
     const seat=document.createElement('div'); seat.className='inset seat'; seat.dataset.si=i;
     seat.innerHTML=`<div class="who"><div class="nm"><i>${i+1}</i>번 패</div><div class="st">0 / 2</div></div>
-      <div class="cards"></div><div class="hand"><span class="wait">탭하면 한 장 까고 한 장 쪼기</span></div>`;
+      <div class="cards"></div><div class="hand"><span class="wait">탭 · 한 장 까고 한 장 쪼기</span></div>`;
     el.table.appendChild(seat);
     state.seats.push({cards:[],flipped:[false,false],el:seat,active:true,hand:null});
   }
@@ -517,7 +517,7 @@ function dealTo(idx){
     s.el.classList.remove('done','out','dim','hit','high','tie');
     s.el.querySelectorAll('.stamp,.rankno').forEach(x=>x.remove());
     s.el.querySelector('.st').textContent='0 / 2';
-    s.el.querySelector('.hand').innerHTML='<span class="wait">탭하면 한 장 까고 한 장 쪼기</span>';
+    s.el.querySelector('.hand').innerHTML='<span class="wait">탭 · 한 장 까고 한 장 쪼기</span>';
     const cw=s.el.querySelector('.cards'); cw.innerHTML='';
     s.cards.forEach((c,ci)=>{ const ce=makeCard(c,si,ci); ce.style.opacity='0'; cw.appendChild(ce); });
   });
