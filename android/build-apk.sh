@@ -23,6 +23,7 @@ WWW="$WORK/apk/assets/www"; mkdir -p "$WWW/icons"
 for f in lunch.html seotda.html pan.html archery.html race.html; do [ -f "$HERE/../$f" ] && cp "$HERE/../$f" "$WWW/"; done
 [ -f "$WWW/lunch.html" ] && cp "$WWW/lunch.html" "$WWW/index.html"
 cp "$HERE"/../icons/*.png "$WWW/icons/" 2>/dev/null || true
+mkdir -p "$WWW/bgm"; cp "$HERE"/../bgm/*.mp3 "$WWW/bgm/" 2>/dev/null || true
 # 4) apktool build (내장 aapt2)
 java -jar "$TOOLS/apktool.jar" b "$WORK/apk" --use-aapt2 -o "$WORK/unsigned.apk" -p "$TOOLS/framework" >/dev/null
 # 5) 정렬 + v1/v2/v3 서명 (디버그 키 자동 생성)
