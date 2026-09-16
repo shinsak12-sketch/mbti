@@ -539,7 +539,7 @@ el.startBtn.onclick=()=>{
   el.startBtn.textContent='↻ 다시';
   state.strike={x:0,y:0}; placePalm(0,0); el.palm.classList.add('show'); el.board.classList.add('aiming');
   if(state.ctrl==='sensor'){ el.ready.hidden=false; el.meter.classList.add('armed'); el.turn.innerHTML='<b>타점</b>을 끌어 정하고 · 위로 <b>훅!</b>'; }
-  else { el.power.hidden=false; el.board.classList.add('touchable'); el.pwFill.style.width='0%'; el.turn.innerHTML='<b>타점</b>을 꾹 누르다 놓으세요 · 누른 채 끌면 기울기'; }
+  else { el.power.hidden=false; el.board.classList.add('touchable'); el.pwFill.style.width='0%'; el.turn.innerHTML='<b>타점</b> 꾹 누르다 놓기 · 끌면 기울기'; }
   vib(20);
 };
 
