@@ -1,0 +1,17 @@
+{
+  "name": "점심 복불복",
+  "short_name": "점심복불복",
+  "description": "섯다 · 판치기로 점심 쏘는 사람 정하기",
+  "start_url": "/lunch",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d3628",
+  "theme_color": "#0d3628",
+  "lang": "ko",
+  "icons": [
+    { "src": "/icons/lunch-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/lunch-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/lunch-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

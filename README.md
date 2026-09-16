@@ -9,6 +9,8 @@
 | `/` (`index.html`) | 이름 입력 → 12문항 → **결과 보기**(정산 로딩 연출) → 결과 + **공유하기** |
 | `/records` (`records.html`) | 전체 기록: 참가자 목록 + 유형 분포 통계 |
 | `/api/results` | 결과 저장(POST) / 조회(GET) 서버리스 함수 (Neon) |
+| `/lunch` (`lunch.html`) | 🍱 **점심 복불복 홈**: 섯다 / 판치기 선택 (APK 앱의 첫 화면) |
+| `/pan` (`pan.html`) | 🪙 **판치기**: 폰을 위로 탁 쳐서(가속도 센서) 동전 튀기기 · 한 사람 한 번 · 뒤집힌 개수로 등수 · 센서 없으면 화면 꾹 누르기 |
 | `/seotda` (`seotda.html`) | 🎴 **점심 섯다 복불복**: 인원·패 수(2장/3장 한 장 버리기)·걸림 기준(낮은/높은 패) 선택 → 화투 딜 → 자리 골라 탭 → 엄지로 밀어 쪼기 → 걸린 패 자리에 바로 결과 (단일 HTML, 서버 불필요, 순수 랜덤) |
 
 ## 🧭 4개 축 (표준 MBTI · 대물보상 버전)
@@ -66,3 +68,15 @@ npx vercel dev            # http://localhost:3000
 - **기질군 색상**: `GROUPS`
 
 > 재미로 보는 테스트이며, 실제 심리검사(MBTI®)와는 무관합니다.
+
+## 📱 안드로이드 APK (점심 복불복 앱)
+
+`android/` 폴더에 WebView 껍데기 앱과 빌드 스크립트가 있습니다. Android SDK 없이 `javac + dx + apktool + uber-apk-signer`로 빌드합니다 (JDK 17+ 필요).
+
+```bash
+./android/build-apk.sh          # → android/out/lunch-bokbulbok.apk
+```
+
+- 앱 첫 화면은 `lunch.html`(홈) → 섯다 / 판치기
+- 웹 페이지들은 `https://app.local/` 가상 호스트로 assets에서 서빙되어 보안 컨텍스트가 유지됨 (가속도 센서 사용 가능)
+- 디버그 키로 서명되므로 설치 시 "출처를 알 수 없는 앱" 허용 필요

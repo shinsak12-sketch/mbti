@@ -2,8 +2,25 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/", "destination": "/index.html" },
-    { "source": "/records", "destination": "/records.html" },
-    { "source": "/seotda", "destination": "/seotda.html" }
+    {
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/records",
+      "destination": "/records.html"
+    },
+    {
+      "source": "/seotda",
+      "destination": "/seotda.html"
+    },
+    {
+      "source": "/lunch",
+      "destination": "/lunch.html"
+    },
+    {
+      "source": "/pan",
+      "destination": "/pan.html"
+    }
   ]
 }

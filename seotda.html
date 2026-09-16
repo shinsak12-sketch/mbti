@@ -337,6 +337,7 @@
   .stage-close{display:none;max-width:320px;margin-top:4px;animation:rise .4s cubic-bezier(.2,.9,.3,1.2);}
   .stage.done .stage-close{display:inline-flex;}
   .stage.done .stage-hint{display:none;}
+  .home-link{position:absolute;left:14px;top:14px;text-decoration:none;color:var(--muted);font-weight:800;font-size:13px;padding:8px 12px;border-radius:999px;background:rgba(0,0,0,.28);box-shadow:inset 3px 3px 7px rgba(0,0,0,.6), inset -2px -2px 5px rgba(255,255,255,.06);z-index:2;}
   .toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translate(-50%,20px);padding:12px 18px;border-radius:999px;font-weight:800;font-size:14px;color:#2a1d05;
     background:linear-gradient(180deg,#f3d98a,var(--gold-2));box-shadow:0 4px 0 var(--gold-3), 0 14px 24px -8px rgba(0,0,0,.7);opacity:0;transition:.3s;z-index:60;pointer-events:none;white-space:nowrap;}
   .toast.show{opacity:1;transform:translate(-50%,0);}
@@ -351,6 +352,7 @@
   <!-- ========== 설정 ========== -->
   <section id="scr-setup" class="screen active">
     <div class="panel setup">
+      <a class="home-link" href="lunch.html">‹ 홈</a>
       <div class="logo">
         <span class="tag">LUNCH BOKBULBOK</span>
         <h1>점심 섯다</h1>
