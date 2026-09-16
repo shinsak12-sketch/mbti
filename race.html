@@ -267,8 +267,7 @@
   @keyframes warpout{to{transform:scale(.1,1.8) translateY(-30px);opacity:0}}
   @keyframes warpin{from{transform:scale(.1,1.8) translateY(-30px);opacity:0}60%{transform:scale(1.2,.85);opacity:1}to{transform:none}}
   .runner.ghostout .spr{opacity:.15;}
-  #track.overview .item{font-size:24px;}
-  #track.overview .rk,#track.overview .crowd{display:none;}
+  #track.prerace .item{display:none;}
   .item{position:absolute;left:0;top:0;transform:translate(-50%,-50%) scale(var(--sc,1));font-size:30px;line-height:1;z-index:3;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.45));}
   .item span{display:block;animation:itemidle 1.6s ease-in-out infinite;}
   .item.good span{animation:itemgood 1.1s ease-in-out infinite;filter:drop-shadow(0 0 8px #fff2c4);}
@@ -288,8 +287,8 @@
   .evemo{position:absolute;left:0;top:0;transform:translate(-50%,-50%) scale(0);font-size:40px;line-height:1;z-index:9;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5));animation:evemo 1.4s cubic-bezier(.3,1.6,.5,1) forwards;}
   @keyframes evemo{0%{transform:translate(-50%,-50%) scale(0) rotate(-20deg)}18%{transform:translate(-50%,-70%) scale(1.3) rotate(8deg)}70%{transform:translate(-50%,-90%) scale(1.1) rotate(-4deg);opacity:1}100%{transform:translate(-50%,-130%) scale(.8);opacity:0}}
   .evbar{position:absolute;left:50%;top:62px;transform:translate(-50%,-30px);z-index:11;pointer-events:none;opacity:0;
-    padding:8px 16px;border-radius:999px;font-weight:900;font-size:14px;color:#1a1a1a;white-space:nowrap;background:linear-gradient(180deg,#fff7dc,#ffe08a);box-shadow:0 6px 0 var(--gold-3), 0 14px 26px rgba(0,0,0,.5);border:2px solid #fff;}
-  .evbar.show{animation:evbar 2.2s cubic-bezier(.3,1.5,.5,1) forwards;}
+    padding:5px 12px;border-radius:999px;font-weight:800;font-size:12px;color:#fff;white-space:nowrap;background:rgba(0,0,0,.42);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.25);}
+  .evbar.show{animation:evbar 1.6s cubic-bezier(.3,1.5,.5,1) forwards;}
   @keyframes evbar{0%{opacity:0;transform:translate(-50%,-30px) scale(.7)}12%{opacity:1;transform:translate(-50%,0) scale(1.05)}18%{transform:translate(-50%,0) scale(1)}85%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-20px)}}
   .finish{position:absolute;left:0;right:0;height:14px;background:repeating-conic-gradient(#111 0 25%,#fff 0 50%) 0 0/14px 14px;z-index:4;box-shadow:0 0 12px rgba(0,0,0,.4);}
   .finish::before{content:'🏁 FINISH';position:absolute;left:8px;top:-22px;font-size:13px;font-weight:900;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.6);letter-spacing:.1em;}
@@ -529,16 +528,17 @@ function setupRace(){
   const pickItem=()=>{ let q=rnd()*itw; for(const [k,w] of ITEM_POOL){ q-=w; if(q<=0) return k; } return 'banana'; };
   if(state.events) state.runners.forEach(r=>{
     const cnt=LEN[state.len].items[0]+rand(LEN[state.len].items[1]-LEN[state.len].items[0]+1); const xs=[];
-    for(let k=0;k<cnt;k++){ let x, tries=0; do{ x=L*(0.14+0.74*(k+0.15+rnd()*0.7)/cnt); tries++; }while(xs.some(o=>Math.abs(o-x)<L*0.07)&&tries<8); xs.push(x);
+    for(let k=0;k<cnt;k++){ let x, tries=0; do{ x=L*(0.2+0.68*(k+0.15+rnd()*0.7)/cnt); tries++; }while(xs.some(o=>Math.abs(o-x)<L*0.07)&&tries<8); xs.push(x);
       const key=pickItem(); const e=EVENTS[key]; const d=document.createElement('div'); d.className='item'+(e.good?' good':''); d.innerHTML=`<span>${e.emo}</span>`; d.style.left=(r.i*cw+cw/2)+'px'; d.style.setProperty('--sc',sc); el.track.appendChild(d);
       state.items.push({x,key,el:d,col:r.i,hit:false}); }
   });
-  state.zoom=Math.min(1,(START_Y()-130)/L); el.track.classList.add('overview');
+  state.zoom=1; el.track.classList.add('prerace');
   state.runners.forEach(r=>{ r.el.classList.add('stop'); render(r); });
   placeStatics();
   el.startBtn.disabled=false; el.startBtn.textContent='▶ 출발'; el.reroll.disabled=false;
-  el.turn.innerHTML='캐릭터·트랙 함정 보고 <b>각자 주자</b> 정하기 · 맘에 안 들면 다시 뽑기';
+  el.turn.innerHTML='캐릭터 보고 <b>각자 주자</b> 정하기 · 맘에 안 들면 다시 뽑기';
 }
+function maxGap(){ return Math.max(200,START_Y()-230); }
 function sy(x){ return START_Y()-(x-state.cam)*state.zoom; }
 function render(r){ r.el.style.transform=`translate(0,${sy(r.x).toFixed(1)}px)`; }
 function placeStatics(){
@@ -555,10 +555,8 @@ async function startRace(){
   state.schedule=[]; for(let k=0;k<evCount;k++) state.schedule.push({t:T*(0.08+0.78*(k+rnd())/evCount),done:false});
   state.used=new Set(); state.usedN={};
   el.turn.innerHTML='제자리에…';
-  const z0=state.zoom, zt=performance.now(); el.track.classList.remove('overview');
-  const zoomIn=()=>{ const k=Math.min(1,(performance.now()-zt)/1500); const e=1-Math.pow(1-k,3); state.zoom=z0+(1-z0)*e; placeStatics(); state.runners.forEach(render); if(k<1) requestAnimationFrame(zoomIn); }; requestAnimationFrame(zoomIn);
   for(const s of ['3','2','1']){ big(s); S.beep(); vib(15); await waitHard(650); }
-  state.zoom=1; placeStatics(); state.runners.forEach(render);
+  el.track.classList.remove('prerace');
   big('출발!'); S.go(); vib([40,30,80]); el.flash.classList.remove('go'); void el.flash.offsetWidth; el.flash.classList.add('go');
   state.runners.forEach(r=>{ r.el.classList.remove('stop'); });
   el.turn.innerHTML='달린다!! <b>순위 변동</b> 주목';
@@ -583,10 +581,10 @@ function applyEvent(r,key,now){
   if(e.ride){ const ahead=state.runners.filter(o=>o!==r&&o.fin===null&&o.x>r.x&&o.x-r.x<260).sort((a,b)=>a.x-b.x)[0]; if(!ahead){ r.state=null; r.cls=''; r.mul=1; return false; } r.rideOn=ahead; }
   if(!e.warp){ r.queue=[]; if(e.then) r.queue.push(e.then); if(e.after) r.queue.push(e.after); }
   r.trail=!!e.trail||key==='dash'||key==='wings';
-  if(!e.item) bubble(r,e.txt); evEmo(r,e.item?(e.good?'✨':'💥'):e.emo); evBanner(r,e.txt); if(e.snd) S[e.snd](); vib(e.shake?[20,30,40]:12);
+  evEmo(r,e.item?(e.good?'✨':'💥'):e.emo); evBanner(r,e.txt); if(e.snd) S[e.snd](); vib(e.shake?[20,30,40]:12);
   if(e.shake){ el.track.classList.remove('shake'); void el.track.offsetWidth; el.track.classList.add('shake'); }
   setClasses(r);
-  if(e.chain){ state.runners.forEach(o=>{ if(o!==r&&o.fin===null&&!o.state&&!o.c.immuneAll&&Math.abs(o.x-r.x)<70&&o.x<r.x&&rnd()<0.6&&!(o.c.immune&&o.c.immune.includes('fall'))){ o.state='fall'; o.cls='fall'; o.until=now+0.9; o.mul=0; bubble(o,'앗 같이 넘어짐'); evEmo(o,'💫'); setClasses(o); } }); }
+  if(e.chain){ state.runners.forEach(o=>{ if(o!==r&&o.fin===null&&!o.state&&!o.c.immuneAll&&Math.abs(o.x-r.x)<70&&o.x<r.x&&rnd()<0.6&&!(o.c.immune&&o.c.immune.includes('fall'))){ o.state='fall'; o.cls='fall'; o.until=now+0.9; o.mul=0; evEmo(o,'💫'); setClasses(o); } }); }
   return true;
 }
 function setClasses(r){ r.el.className='runner '+(r.c.kind==='run'?'':r.c.kind)+(r.cls?' '+r.cls:''); }
@@ -628,10 +626,10 @@ function runLoop(T){
       if(r.state&&now>=r.until){ r.state=null; r.cls=''; r.mul=1; r.rideOn=null; r.trail=false; const q=r.queue.shift(); if(q){ r.state='after'; r.cls=q.cls; r.until=now+q.dur; r.mul=q.mul!=null?q.mul:1; if(q.jump){ const from=r.x; r.x+=q.jump; state.items.forEach(it=>{ if(it.col===r.i&&!it.hit&&it.x>from&&it.x<=r.x){ it.el.classList.add('over'); } }); sparkleAt(r,14); S.warp(); } if(q.cls==='boost') r.trail=true; } setClasses(r); }
       const p=clamp(r.x/L,0,1);
       r.noise+=(rnd()-.5)*0.18 - r.noise*0.08; r.noise=clamp(r.noise,-0.25,0.25);
-      let band=1; if(p>0.45&&maxX-minX>L*0.22){ if(r.x<minX+L*0.05) band=1.08; if(r.x>=maxX-1) band=0.95; }
+      let band=1; const gap=maxX-minX, MAXG=maxGap(); if(gap>MAXG*0.55){ const k=clamp((gap-MAXG*0.55)/(MAXG*0.45),0,1); if(r.x<minX+L*0.04) band=1+0.18*k; if(r.x>=maxX-1) band=1-0.16*k; }
       let v=base*r.c.curve(p)*(1+r.noise)*r.mul*band;
       if(r.rideOn){ r.x=r.rideOn.x-14; v=0; }
-      const prevX=r.x; r.x+=v*dt; if(state.items.length) checkItems(r,prevX,now);
+      const prevX=r.x; r.x+=v*dt; if(r.fin===null&&r.x>minX+MAXG) r.x=minX+MAXG; if(state.items.length) checkItems(r,prevX,now);
       if(r.trail&&t-trailT>40){ ghostTrail(r); }
       if(r.x>=L&&r.fin===null){ r.fin=now; finishOrder.push(r); r.cls=''; r.state=null; r.trail=false; setClasses(r); S.ding(); vib(15); r.chip.querySelector('.t').textContent=now.toFixed(2)+'s'; }
       render(r);
@@ -639,7 +637,9 @@ function runLoop(T){
     if(t-trailT>40) trailT=t;
     // 카메라 (세로): 선두가 화면 38% 지점에 오도록
     const leadX=Math.max(...state.runners.map(r=>Math.min(r.x,L)));
-    const camTarget=clamp(leadX-(START_Y()-H()*0.36),0,L-(START_Y()-70));
+    const lastX=alive.length?Math.min(...alive.map(r=>r.x)):leadX; const gapNow=Math.max(0,leadX-lastX);
+    const leadScreenY=clamp(START_Y()-gapNow-90,130,H()*0.36); // 간격 커지면 선두를 더 위로 → 꼴찌도 화면 안
+    const camTarget=clamp(leadX-(START_Y()-leadScreenY),0,L-(START_Y()-70));
     state.cam+= (camTarget-state.cam)*Math.min(1,dt*6/ts);
     placeStatics();
     el.clock.textContent=now.toFixed(2);
