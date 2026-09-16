@@ -590,7 +590,7 @@ function runLoop(T){
       render(r);
     }
     // 카메라
-    const leadX=Math.max(...state.runners.filter(r=>r.fin===null).map(r=>r.x).concat([0]));
+    const leadX=Math.max(...state.runners.map(r=>Math.min(r.x,L)));
     const camTarget=clamp(leadX-W()*0.58,0,L-W()+150); state.cam=state.cam==null?0:state.cam+(camTarget-state.cam)*Math.min(1,dt*6/ts);
     el.bg.style.setProperty('--bgx',(-state.cam*0.9)+'px');
     state.finEl.style.left=(L-state.cam+58)+'px'; state.crowdEl.style.left=(L-state.cam+58-140)+'px'; state.markers.forEach(m=>m.el.style.left=(m.x-state.cam+58)+'px');
