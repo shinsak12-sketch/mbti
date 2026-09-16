@@ -255,6 +255,9 @@
     background:linear-gradient(180deg,#f3d98a,var(--gold) 50%,var(--gold-2));box-shadow:0 8px 0 var(--gold-3), 0 20px 34px -10px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.7);border:3px solid #fff2c4;}
   .rpop.show{animation:rpop .6s cubic-bezier(.3,1.6,.4,1) forwards;}
   .rpop.zero{background:linear-gradient(180deg,#8c9a94,#5c6a64);color:#fff;box-shadow:0 8px 0 #2e3835, 0 20px 34px -10px rgba(0,0,0,.8);}
+  .rpop.nak{background:linear-gradient(180deg,#ff8f85,#c8322b 55%,#8e1f1a);color:#fff;box-shadow:0 8px 0 #4a0f0c, 0 20px 34px -10px rgba(0,0,0,.8);animation:rpop .6s cubic-bezier(.3,1.6,.4,1) forwards, nakshake .5s ease .6s;}
+  @keyframes nakshake{0%,100%{transform:translate(-50%,-50%) scale(1)}25%{transform:translate(calc(-50% - 8px),-50%) scale(1)}75%{transform:translate(calc(-50% + 8px),-50%) scale(1)}}
+  .history .chip.nak{background:linear-gradient(180deg,#e0554b,#8e1f1a);color:#fff;box-shadow:0 2px 0 #4a0f0c;font-size:12px;}
   .rpop.all{background:linear-gradient(180deg,#ff8f85,#c8322b 55%,#8e1f1a);color:#fff;box-shadow:0 8px 0 #4a0f0c, 0 20px 34px -10px rgba(0,0,0,.8);}
   .rpop small{display:block;font-size:12px;letter-spacing:.12em;opacity:.85;margin-bottom:2px;}
   @keyframes rpop{to{transform:translate(-50%,-50%) scale(1)}}
@@ -311,7 +314,7 @@
       <div class="start-wrap">
         <button class="btn block" id="start">🪙 판 깔기</button>
       </div>
-      <p class="hint">한 사람씩 <b>시작</b>을 누르고 폰을 위로 탁! · 뒤집힌 개수가 그 사람 점수<br>동전마다 받는 힘이 달라요 · 약하게 맞은 동전은 안 튀고, 세게 맞은 동전은 높이 떠서 돌아요</p>
+      <p class="hint">한 사람씩 <b>시작</b>을 누르고 폰을 위로 탁! · 뒤집힌 개수가 그 사람 점수<br>세게 칠수록 <b>수직</b>으로 정확히 올려야 해요 · 기울면 옆으로 쓸려 판 밖 → <b>낙(0점)</b><br>약하게 맞은 동전은 안 튀고, 세게 맞은 동전은 높이 떠서 돌아요</p>
     </div>
     <p class="foot">판 밖으로 나간 동전은 무효 · 등수는 사람들이 직접 비교</p>
   </section>
@@ -339,7 +342,7 @@
           </div>
           <div class="power" id="power" hidden>
             <div class="pw-bar"><i id="pwFill"></i></div>
-            <div class="pw-txt">누른 위치가 센 쪽 · 위를 누르면 위쪽 동전이 더 튐</div>
+            <div class="pw-txt">가운데를 누를수록 수직 · 가장자리는 옆으로 쓸림 · 세게 칠수록 더 크게</div>
           </div>
           <div class="rpop" id="rpop"></div>
           <div class="meter" id="meter"><i></i></div>
@@ -347,7 +350,7 @@
         <div class="history" id="history"><span class="lbl">기록</span></div>
         <div class="notice" id="notice"></div>
       </div>
-      <p class="foot">뒤집힌 동전(숫자면) 개수가 점수 · 약하게 맞은 동전은 안 튐 · 판 밖은 무효 · 시작을 다시 누르면 새 판</p>
+      <p class="foot">뒤집힌 동전(숫자면) 개수가 점수 · 약하게 맞은 동전은 안 튐 · 한 개라도 판 밖이면 낙(0점) · 세게 칠수록 수직으로!</p>
     </div>
   </div>
 <div class="toast" id="toast"></div>
@@ -405,7 +408,7 @@ $('#start').onclick=async()=>{
 $('#toSetup').onclick=()=>{ state.armed=false; show(el.setup); };
 
 /* ---- 가속도 센서 ---- */
-const sensor={ listening:false, got:false, thr:13, peakT:0, peak:0, latSum:0, betaSum:0, gammaSum:0, betaPeak:0, gammaPeak:0, n:0, lp:{x:0,y:0,z:0}, lpInit:false, lastHit:0, gyro:false };
+const sensor={ listening:false, got:false, thr:13, peakT:0, peak:0, peakVec:null, latSum:0, betaSum:0, gammaSum:0, betaPeak:0, gammaPeak:0, n:0, lp:{x:0,y:0,z:0}, lpInit:false, g:{x:0,y:0,z:9.8}, gInit:false, lastHit:0, gyro:false };
 async function sensorSetup(){
   sensor.thr=SENS_THR[state.sens];
   if(typeof DeviceMotionEvent==='undefined'){ state.sensorOk=false; state.ctrl='touch'; el.notice.textContent='이 기기는 움직임 센서를 못 써서 화면 누르기로 전환'; return; }
@@ -417,7 +420,8 @@ async function sensorSetup(){
 }
 function onMotion(e){
   sensor.got=true;
-  let ax,ay,az; const a=e.acceleration;
+  let ax,ay,az; const a=e.acceleration; const gi=e.accelerationIncludingGravity;
+  if(gi&&gi.x!=null){ if(!sensor.gInit){ sensor.g={x:gi.x,y:gi.y,z:gi.z}; sensor.gInit=true; } else { sensor.g.x=sensor.g.x*.94+gi.x*.06; sensor.g.y=sensor.g.y*.94+gi.y*.06; sensor.g.z=sensor.g.z*.94+gi.z*.06; } }
   if(a&&a.x!=null&&(a.x!==0||a.y!==0||a.z!==0)){ ax=a.x; ay=a.y; az=a.z; }
   else{ const g=e.accelerationIncludingGravity; if(!g||g.x==null) return;
     if(!sensor.lpInit){ sensor.lp={x:g.x,y:g.y,z:g.z}; sensor.lpInit=true; }
@@ -428,14 +432,21 @@ function onMotion(e){
   if(el.game.classList.contains('active')) el.meterFill.style.width=clamp(mag/(sensor.thr*2)*100,0,100)+'%';
   if(!state.armed||state.busy||state.ctrl!=='sensor') return;
   const now=performance.now(); if(now-sensor.lastHit<2000) return;
-  if(mag>sensor.thr){ if(!sensor.peakT){ sensor.peakT=now; sensor.peak=mag; sensor.latSum=ax; sensor.betaSum=beta; sensor.gammaSum=gamma; sensor.betaPeak=beta; sensor.gammaPeak=gamma; sensor.n=1; } else { sensor.peak=Math.max(sensor.peak,mag); sensor.latSum+=ax; sensor.betaSum+=beta; sensor.gammaSum+=gamma; if(Math.abs(beta)>Math.abs(sensor.betaPeak)) sensor.betaPeak=beta; if(Math.abs(gamma)>Math.abs(sensor.gammaPeak)) sensor.gammaPeak=gamma; sensor.n++; } }
+  if(mag>sensor.thr){ if(!sensor.peakT||mag>sensor.peak) sensor.peakVec={x:ax,y:ay,z:az}; if(!sensor.peakT){ sensor.peakT=now; sensor.peak=mag; sensor.latSum=ax; sensor.betaSum=beta; sensor.gammaSum=gamma; sensor.betaPeak=beta; sensor.gammaPeak=gamma; sensor.n=1; } else { sensor.peak=Math.max(sensor.peak,mag); sensor.latSum+=ax; sensor.betaSum+=beta; sensor.gammaSum+=gamma; if(Math.abs(beta)>Math.abs(sensor.betaPeak)) sensor.betaPeak=beta; if(Math.abs(gamma)>Math.abs(sensor.gammaPeak)) sensor.gammaPeak=gamma; sensor.n++; } }
   if(sensor.peakT && now-sensor.peakT>140){
     const force=clamp((sensor.peak-sensor.thr)/(sensor.thr*1.6),0,1);
     // 상하 편차: 자이로 beta(가로축 회전) · 좌우 편차: gamma(세로축 회전). 자이로 없으면 가속도 x로 좌우만
     let pitch=clamp(sensor.betaPeak/260,-1,1), roll=clamp(sensor.gammaPeak/260,-1,1);
     if(!sensor.gyro){ pitch=0; roll=clamp((sensor.latSum/sensor.n)/10,-1,1); }
     if(state.invert) pitch=-pitch;
-    sensor.peakT=0; sensor.lastHit=now; hit(force,roll,pitch);
+    // 수직도: 최대 가속 벡터를 중력 방향에 투영 → 수직 성분 / 옆 성분
+    let tiltX=0, tiltY=0;
+    const v=sensor.peakVec||{x:ax,y:ay,z:az}; const gm=Math.hypot(sensor.g.x,sensor.g.y,sensor.g.z)||9.8; const gx=sensor.g.x/gm, gy=sensor.g.y/gm, gz=sensor.g.z/gm;
+    const vm=Math.hypot(v.x,v.y,v.z)||1; const dot=v.x*gx+v.y*gy+v.z*gz;
+    const lx=v.x-dot*gx, ly=v.y-dot*gy, lz=v.z-dot*gz; const lm=Math.hypot(lx,ly,lz);
+    const tilt=clamp(lm/vm,0,1);
+    if(lm>0.01){ const dm=Math.hypot(lx,ly)||1; tiltX=tilt*(lx/dm); tiltY=tilt*(ly/dm); }
+    sensor.peakT=0; sensor.lastHit=now; hit(force,roll,pitch,tiltX,tiltY);
   }
 }
 
@@ -510,20 +521,23 @@ el.board.addEventListener('pointerdown',(e)=>{
   const loop=(t)=>{ if(!pw.on) return; const p=((t-pw.t0)%1400)/1400; pw.val=p<.5?p*2:(1-p)*2; el.pwFill.style.width=(pw.val*100).toFixed(1)+'%'; if(Math.floor((t-pw.t0)/90)%2===0) S.tick(); pw.raf=requestAnimationFrame(loop); };
   pw.raf=requestAnimationFrame(loop);
 });
-const pwRelease=()=>{ if(!pw.on) return; pw.on=false; cancelAnimationFrame(pw.raf); el.board.classList.remove('pressing'); if(state.busy||!state.armed) return; hit(clamp(pw.val,0.05,1), pw.x*0.9, pw.y*0.9); };
+const pwRelease=()=>{ if(!pw.on) return; pw.on=false; cancelAnimationFrame(pw.raf); el.board.classList.remove('pressing'); if(state.busy||!state.armed) return; hit(clamp(pw.val,0.05,1), pw.x*0.9, pw.y*0.9, pw.x, pw.y); };
 el.board.addEventListener('pointerup',pwRelease); el.board.addEventListener('pointercancel',pwRelease); el.board.addEventListener('contextmenu',e=>e.preventDefault());
 
 /* ---- 치기 → 물리 ---- */
-async function hit(force,roll,pitch){
+async function hit(force,roll,pitch,tiltX,tiltY){
   if(state.busy||!state.armed) return;
-  roll=roll||0; pitch=pitch||0;
+  roll=roll||0; pitch=pitch||0; tiltX=tiltX||0; tiltY=tiltY||0;
+  const tilt=clamp(Math.hypot(tiltX,tiltY),0,1); const vert=1-tilt;
+  // 파워가 클수록 기울기에 의한 옆 이동이 급격히 커짐 (수직이면 거의 없음)
+  const drift=Math.pow(force,1.6)*tilt*760;
   state.busy=true; state.armed=false; el.meter.classList.remove('armed');
   el.ready.hidden=true; el.power.hidden=true; el.board.classList.remove('touchable');
   el.board.classList.remove('shake'); void el.board.offsetWidth; el.board.classList.add('shake');
   S.slap(force); vib([30+Math.round(force*60)]);
   const {pw:pw_,ph,bw,bh}=padDims(); const sc=pw_/300;
   const hx=pw_/2, hy=ph/2;
-  showForceMap(force,roll,pitch);
+  showForceMap(force,roll,pitch); state.lastVert=vert;
   coinObjs.forEach(c=>{
     c.landed=false; c.out=false; c.final=null; c.bounces=0; c.pw=pw_; c.ph=ph; c.bw=bw; c.bh=bh; c.jumped=false;
     // 동전 위치별로 받는 힘: 전체 세기 + 상하 편차(위쪽 +) + 좌우 편차 + 판 요철 노이즈
@@ -538,21 +552,29 @@ async function hit(force,roll,pitch){
     // 회전: 힘에 비례 + 편차 · 약하면 반 바퀴 근처에서 멈칫, 세면 여러 바퀴
     c.rotV=(f*700+rnd()*(520+f*1800))*(rnd()<.5?-1:1);
     // 센 쪽에서 약한 쪽으로 쓸림
-    c.vx=(-roll*f*150+(rnd()-.5)*(30+f*90))*sc;
-    c.vy=( pitch*f*150+(rnd()-.5)*(30+f*80))*sc;
+    // 옆 이동: 기울기 방향으로 파워^1.6 비례 + 센 쪽→약한 쪽 쓸림 + 파워 비례 흩어짐
+    c.vx=( tiltX*drift -roll*f*90 +(rnd()-.5)*(30+force*140))*sc;
+    c.vy=(-tiltY*drift +pitch*f*90 +(rnd()-.5)*(30+force*120))*sc;
   });
   await simulate(sc);
-  const flips=coinObjs.filter(c=>!c.out&&c.final==='B').length, outs=coinObjs.filter(c=>c.out).length, still=coinObjs.filter(c=>!c.jumped).length;
+  const rawFlips=coinObjs.filter(c=>!c.out&&c.final==='B').length, outs=coinObjs.filter(c=>c.out).length, still=coinObjs.filter(c=>!c.jumped).length;
+  const nak=outs>0; const flips=nak?0:rawFlips;
   coinObjs.forEach(c=>{ if(!c.out&&c.final==='B') c.el.classList.add('flipped'); });
-  state.history.push(flips); renderHistory();
-  const sub=[outs?`판 밖 ${outs}`:null, still?`안 튐 ${still}`:null].filter(Boolean).join(' · ') || 'ALL JUMPED';
-  el.rpop.innerHTML=`<small>${sub}</small>${flips}개 뒤집음`;
-  el.rpop.className='rpop show'+(flips===0?' zero':flips===state.coins?' all':'');
-  S.pop(); vib([20,40,20]);
-  if(flips===state.coins){ burstAt(el.pad,['🪙','✨','👑','💰']); S.gong(); }
-  else if(flips===0){ rainAt(el.pad,['💩','😱','🫠']); S.fail(); }
+  state.history.push(nak?'낙':flips); renderHistory();
+  if(nak){
+    el.rpop.innerHTML=`<small>판 밖 ${outs}개 · 무효</small>낙! 0점`;
+    el.rpop.className='rpop show nak';
+    S.drop(); S.fail(); vib([80,50,80,50,150]); rainAt(el.pad,['💥','😵','🫠']);
+  } else {
+    const sub=[still?`안 튐 ${still}`:null].filter(Boolean).join(' · ') || 'ALL JUMPED';
+    el.rpop.innerHTML=`<small>${sub}</small>${flips}개 뒤집음`;
+    el.rpop.className='rpop show'+(flips===0?' zero':flips===state.coins?' all':'');
+    S.pop(); vib([20,40,20]);
+    if(flips===state.coins){ burstAt(el.pad,['🪙','✨','👑','💰']); S.gong(); }
+    else if(flips===0){ rainAt(el.pad,['💩','😱','🫠']); S.fail(); }
+  }
   const dir=[]; if(Math.abs(pitch)>.25) dir.push(pitch>0?'위쪽 강':'아래쪽 강'); if(Math.abs(roll)>.25) dir.push(roll>0?'오른쪽 강':'왼쪽 강');
-  el.turn.innerHTML=`<b>${flips}개</b> 뒤집음 · 힘 ${Math.round(force*100)}%${dir.length?' · '+dir.join(' · '):' · 고르게'}`;
+  el.turn.innerHTML=`${nak?'<b>낙</b> 0점':`<b>${flips}개</b> 뒤집음`} · 힘 ${Math.round(force*100)}% · 수직 ${Math.round(vert*100)}%${dir.length?' · '+dir.join(' · '):''}`;
   await waitHard(400);
   state.busy=false;
 };
@@ -610,7 +632,7 @@ function simulate(sc){
 }
 function renderHistory(){
   const h=state.history.slice(-12);
-  el.history.innerHTML='<span class="lbl">기록</span>'+(h.length?h.map((v,i)=>`<span class="chip ${i===h.length-1?'last':''}">${v}</span>`).join(''):'<span class="lbl" style="opacity:.6">아직 없음</span>');
+  el.history.innerHTML='<span class="lbl">기록</span>'+(h.length?h.map((v,i)=>`<span class="chip ${i===h.length-1?'last':''} ${v==='낙'?'nak':''}">${v}</span>`).join(''):'<span class="lbl" style="opacity:.6">아직 없음</span>');
 }
 function burstAt(anchor,emo){
   const r=anchor.getBoundingClientRect(); const cx=r.left+r.width/2, cy=r.top+r.height/2;
