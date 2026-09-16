@@ -222,6 +222,12 @@
   .reticle .ring::after{top:50%;left:-12px;height:2px;width:calc(100% + 24px);transform:translateY(-50%);}
   .reticle .dot{position:absolute;left:0;top:0;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:#ff3c3c;box-shadow:0 0 0 1px #fff;}
   .reticle.shaky .ring{border-color:rgba(255,120,40,.95);}
+  .ghost{position:absolute;left:0;top:0;width:0;height:0;z-index:5;pointer-events:none;opacity:0;transition:opacity .2s;}
+  .ghost.show{opacity:1;}
+  .ghost .g{position:absolute;left:0;top:0;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;border:2px dashed rgba(255,255,255,.9);background:rgba(255,255,255,.18);box-shadow:0 0 0 1px rgba(0,0,0,.35);}
+  .ghost span{position:absolute;left:14px;top:-8px;font-size:10px;font-weight:900;color:#fff;background:rgba(3,14,10,.7);padding:2px 6px;border-radius:6px;white-space:nowrap;}
+  .ghost.ok .g{border-color:#6fcf97;background:rgba(111,207,151,.25);}
+  .ghost.bad .g{border-color:#ff8f85;background:rgba(255,143,133,.25);}
   .bow{position:absolute;left:50%;bottom:-6%;width:min(70%,300px);transform:translateX(-50%);pointer-events:none;z-index:5;filter:drop-shadow(0 10px 16px rgba(0,0,0,.5));}
   .bow svg{width:100%;height:auto;display:block;overflow:visible;}
   .draw-hint{position:absolute;left:50%;bottom:22%;transform:translateX(-50%);z-index:7;pointer-events:none;text-align:center;
@@ -234,6 +240,9 @@
   .gauge i{position:absolute;left:0;right:0;bottom:0;height:0;border-radius:999px;}
   .gauge.pw i{background:linear-gradient(0deg,#6fcf97,var(--gold) 60%,#ff8f85);}
   .gauge.st i{background:linear-gradient(0deg,#ff8f85,#ffd27a 50%,#6fcf97);height:100%;}
+  .gauge .minmark{position:absolute;left:-4px;right:-4px;height:3px;background:#fff;box-shadow:0 0 6px rgba(255,255,255,.9), 0 0 0 1px rgba(0,0,0,.4);border-radius:2px;z-index:2;}
+  .gauge .minmark em{position:absolute;right:20px;top:-8px;font-style:normal;font-size:10px;font-weight:900;color:#fff;background:rgba(3,14,10,.7);padding:2px 6px;border-radius:6px;white-space:nowrap;}
+  .gauge.pw.low i{filter:saturate(.5) brightness(.8);}
   .gauge .lbl{position:absolute;left:50%;top:-18px;transform:translateX(-50%);font-size:9px;font-weight:900;color:rgba(255,255,255,.7);letter-spacing:.06em;}
   .counter{position:absolute;left:12px;top:12px;z-index:7;font-weight:900;font-size:13px;color:#fff;padding:6px 10px;border-radius:999px;background:rgba(3,14,10,.55);box-shadow:0 4px 10px rgba(0,0,0,.4);}
   .counter b{color:var(--gold);}
@@ -336,6 +345,7 @@
           <div class="target-wrap" id="targetWrap"><div class="stand"></div><svg viewBox="0 0 200 200" id="targetSvg"></svg></div>
           <div id="hits"></div>
           <div class="reticle" id="reticle"><div class="ring"></div><div class="dot"></div></div>
+          <div class="ghost" id="ghost"><div class="g"></div><span>예상 낙점</span></div>
           <div class="bow" id="bow">
             <svg viewBox="0 0 300 260" id="bowSvg">
               <defs><linearGradient id="limb" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6b4a2a"/><stop offset=".5" stop-color="#d9a45c"/><stop offset="1" stop-color="#6b4a2a"/></linearGradient></defs>
@@ -349,9 +359,9 @@
               </g>
             </svg>
           </div>
-          <div class="draw-hint" id="drawHint" hidden><span class="arrowdown">⬇</span>누르고 아래로 끌어 당기기<small>놓으면 발사 · 오래 버티면 떨려요</small></div>
+          <div class="draw-hint" id="drawHint" hidden><span class="arrowdown">⬇</span>누르고 아래로 끌어 당기기<small>흰 선(최소 힘) 넘겨야 과녁에 닿음 · 오래 버티면 떨려요</small></div>
           <div class="holdmsg" id="holdmsg"></div>
-          <div class="gauges"><div class="gauge pw"><span class="lbl">힘</span><i id="pwFill"></i></div><div class="gauge st"><span class="lbl">팔</span><i id="stFill"></i></div></div>
+          <div class="gauges"><div class="gauge pw"><span class="lbl">힘</span><i id="pwFill"></i><span class="minmark" id="minmark"><em>최소</em></span></div><div class="gauge st"><span class="lbl">팔</span><i id="stFill"></i></div></div>
           <div class="counter" id="counter">화살 <b>0</b> / 3</div>
           <div class="rpop" id="rpop"></div>
         </div>
@@ -389,7 +399,7 @@ const vib=(p)=>{ try{ navigator.vibrate&&navigator.vibrate(p); }catch(e){} };
 const DIST={ near:{td:.74,ty:.36,shake:1.0,label:'근거리',fly:.45}, mid:{td:.54,ty:.33,shake:1.35,label:'중거리',fly:.6}, far:{td:.38,ty:.31,shake:1.8,label:'원거리',fly:.8} };
 const state={ arrows:3, dist:'mid', sound:true, invert:false, armed:false, busy:false, shot:0, scores:[], history:[] };
 const el={ setup:$('#scr-setup'), game:$('#scr-game'), arrowNum:$('#arrowNum'), range:$('#range'), targetWrap:$('#targetWrap'), targetSvg:$('#targetSvg'), hits:$('#hits'), reticle:$('#reticle'),
-  stringPath:$('#stringPath'), arrowG:$('#arrowG'), bow:$('#bow'), drawHint:$('#drawHint'), holdmsg:$('#holdmsg'), pwFill:$('#pwFill'), stFill:$('#stFill'), counter:$('#counter'), rpop:$('#rpop'), turn:$('#turn'), history:$('#history'), startBtn:$('#startBtn'), infoPill:$('#infoPill'), toast:$('#toast') };
+  ghost:$('#ghost'), minmark:$('#minmark'), stringPath:$('#stringPath'), arrowG:$('#arrowG'), bow:$('#bow'), drawHint:$('#drawHint'), holdmsg:$('#holdmsg'), pwFill:$('#pwFill'), stFill:$('#stFill'), counter:$('#counter'), rpop:$('#rpop'), turn:$('#turn'), history:$('#history'), startBtn:$('#startBtn'), infoPill:$('#infoPill'), toast:$('#toast') };
 function toast(msg,ms=1700){ el.toast.textContent=msg; el.toast.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>el.toast.classList.remove('show'),ms); }
 function show(scr){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); scr.classList.add('active'); window.scrollTo({top:0}); }
 
@@ -414,17 +424,18 @@ function setupRange(){
   el.targetSvg.innerHTML=svg;
   el.hits.innerHTML='';
   el.counter.innerHTML=`화살 <b>${state.shot}</b> / ${state.arrows}`;
+  const md=minDraw(); el.minmark.style.bottom=(md*100).toFixed(1)+'%'; el.minmark.querySelector('em').textContent=`최소 ${Math.round(md*100)}%`;
 }
 function targetGeom(){ const r=el.targetWrap.getBoundingClientRect(), g=el.range.getBoundingClientRect(); return {cx:r.left-g.left+r.width/2, cy:r.top-g.top+r.height/2, R:r.width/2}; }
 function scoreAt(x,y){ const t=targetGeom(); const d=Math.hypot(x-t.cx,y-t.cy); const ring=d/(t.R/10); if(d>t.R) return {s:0,x:false}; const s=Math.max(1,10-Math.floor(ring)); return {s, x:d<t.R/20}; }
 
 /* ---- 시작 / 대기 ---- */
-function setIdle(){ state.armed=false; el.reticle.classList.remove('show'); el.drawHint.hidden=true; el.holdmsg.className='holdmsg'; el.pwFill.style.height='0%'; el.stFill.style.height='100%'; setBow(0,0); el.startBtn.textContent='▶ 시작'; }
+function setIdle(){ state.armed=false; el.reticle.classList.remove('show'); el.ghost.className='ghost'; el.drawHint.hidden=true; el.holdmsg.className='holdmsg'; el.pwFill.style.height='0%'; el.stFill.style.height='100%'; setBow(0,0); el.startBtn.textContent='▶ 시작'; }
 el.startBtn.onclick=()=>{
   if(state.busy) return; S.ctx();
   state.shot=0; state.scores=[]; setupRange(); el.rpop.className='rpop';
   state.armed=true; el.drawHint.hidden=false; el.startBtn.textContent='↻ 다시';
-  el.turn.innerHTML=`<b>1발째</b> · 누르고 아래로 끌어 당기기`;
+  el.turn.innerHTML=`<b>1발째</b> · 최소 힘 <b>${Math.round(minDraw()*100)}%</b> 이상 당기기`;
   vib(15);
 };
 
@@ -470,7 +481,13 @@ function updatePull(t){
   el.reticle.classList.toggle('shaky',fatigue>.5||pull.draw>.85);
   setBow(pull.draw,pull.ax);
   el.pwFill.style.height=(pull.draw*100).toFixed(1)+'%'; el.stFill.style.height=((1-fatigue)*100).toFixed(1)+'%';
+  const md=minDraw(), low=pull.draw<md;
+  el.pwFill.parentElement.classList.toggle('low',low);
+  const gy=pull.ret.y+dropFor(pull.draw);
+  el.ghost.style.transform=`translate(${pull.ret.x.toFixed(1)}px, ${Math.min(gy,el.range.clientHeight-10).toFixed(1)}px)`;
+  el.ghost.className='ghost '+(pull.draw>.05?'show ':'')+(low?'bad':'ok');
   if(fatigue>.75){ el.holdmsg.textContent='팔 떨림!! 빨리 놓아요'; el.holdmsg.className='holdmsg show warn'; }
+  else if(low&&pull.draw>.05){ el.holdmsg.textContent=`힘 부족 · 최소 ${Math.round(md*100)}%`; el.holdmsg.className='holdmsg show warn'; }
   else if(pull.draw>.15){ el.holdmsg.textContent=fatigue>.4?'숨 참기…':(pull.draw>.8?'풀 드로우!':'조준 중'); el.holdmsg.className='holdmsg show'; }
   else { el.holdmsg.className='holdmsg'; }
   if(t-pull.lastBeat>(fatigue>.5?380:700)){ pull.lastBeat=t; if(pull.draw>.2){ S.creak(pull.draw); if(fatigue>.4){ S.heart(); vib(fatigue>.75?[15,40,15]:8); } } }
@@ -478,19 +495,21 @@ function updatePull(t){
 const release=async()=>{
   if(!pull.on) return; pull.on=false; cancelAnimationFrame(pull.raf);
   el.holdmsg.className='holdmsg';
-  if(pull.draw<0.12){ setBow(0,0); el.reticle.classList.remove('show'); toast('시위를 살짝 놓았어요 · 다시 당기기'); if(state.armed) el.drawHint.hidden=false; return; }
+  if(pull.draw<0.12){ setBow(0,0); el.reticle.classList.remove('show'); el.ghost.className='ghost'; toast('시위를 살짝 놓았어요 · 다시 당기기'); if(state.armed) el.drawHint.hidden=false; return; }
   await shoot(pull.draw, pull.ret);
 };
 el.range.addEventListener('pointerup',release); el.range.addEventListener('pointercancel',release); el.range.addEventListener('contextmenu',e=>e.preventDefault());
 
+function dropFor(draw){ const t=targetGeom(); const d=DIST[state.dist]; return Math.pow(1-draw,2.2)*t.R*(1.6+(d.shake-1)*1.2); }
+function minDraw(){ const d=DIST[state.dist]; const k=1.6+(d.shake-1)*1.2; return 1-Math.pow(1/k,1/2.2); } // 처짐이 과녁 반지름과 같아지는 힘
 async function shoot(draw,ret){
   state.busy=true; state.armed=false;
   const t=targetGeom(); const d=DIST[state.dist];
   // 처짐: 약하게 당기면 아래로 떨어짐 (거리 멀수록 더)
-  const drop=Math.pow(1-draw,2.2)*t.R*(1.6+ (d.shake-1)*1.2);
+  const drop=dropFor(draw);
   const ix=ret.x+(rnd()-.5)*4, iy=ret.y+drop+(rnd()-.5)*4;
   // 발사 연출
-  S.twang(); vib(25); setBow(0,0); el.reticle.classList.remove('show');
+  S.twang(); vib(25); setBow(0,0); el.reticle.classList.remove('show'); el.ghost.className='ghost';
   el.range.classList.remove('recoil'); void el.range.offsetWidth; el.range.classList.add('recoil');
   el.arrowG.style.opacity='0';
   const fly=document.createElement('div'); fly.className='arrow-fly'; el.range.appendChild(fly);
@@ -536,7 +555,7 @@ async function shoot(draw,ret){
     state.busy=false; return;
   }
   el.rpop.className='rpop';
-  el.turn.innerHTML=`<b>${state.shot+1}발째</b> · 현재 ${total}점 · 누르고 아래로 끌기`;
+  el.turn.innerHTML=`<b>${state.shot+1}발째</b> · 현재 ${total}점 · 최소 힘 ${Math.round(minDraw()*100)}%`;
   state.busy=false; state.armed=true; el.drawHint.hidden=false;
 }
 function spark(x,y){
