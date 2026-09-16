@@ -20,7 +20,7 @@ java -cp "$TOOLS/dx.jar" com.android.dx.command.Main --dex --min-sdk-version=24 
 rm -rf "$WORK/apk"; cp -r "$HERE/skel" "$WORK/apk"; cp "$WORK/classes.dex" "$WORK/apk/classes.dex"
 # 웹 게임 파일 동기화 (repo 루트의 게임 페이지들)
 WWW="$WORK/apk/assets/www"; mkdir -p "$WWW/icons"
-for f in lunch.html seotda.html pan.html; do [ -f "$HERE/../$f" ] && cp "$HERE/../$f" "$WWW/"; done
+for f in lunch.html seotda.html pan.html archery.html; do [ -f "$HERE/../$f" ] && cp "$HERE/../$f" "$WWW/"; done
 [ -f "$WWW/lunch.html" ] && cp "$WWW/lunch.html" "$WWW/index.html"
 cp "$HERE"/../icons/*.png "$WWW/icons/" 2>/dev/null || true
 # 4) apktool build (내장 aapt2)

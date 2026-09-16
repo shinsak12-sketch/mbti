@@ -21,6 +21,10 @@
     {
       "source": "/pan",
       "destination": "/pan.html"
+    },
+    {
+      "source": "/archery",
+      "destination": "/archery.html"
     }
   ]
 }
