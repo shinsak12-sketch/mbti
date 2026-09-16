@@ -576,7 +576,7 @@ function runLoop(T){
     const alive=state.runners.filter(r=>r.fin===null);
     const xs=state.runners.map(r=>r.x); const maxX=Math.max(...xs), minX=Math.min(...alive.map(r=>r.x));
     for(const r of state.runners){
-      if(r.fin!==null){ r.x=Math.min(r.x+base*0.6*dt, L+70+r.i*6); if(r.x>=L+70+r.i*6&&!r.el.classList.contains('stop')){ r.el.classList.add('stop'); } render(r); continue; }
+      if(r.fin!==null){ const stopX=L+16+(r.i%3)*14; r.x=Math.min(r.x+base*0.6*dt, stopX); if(r.x>=stopX&&!r.el.classList.contains('stop')){ r.el.classList.add('stop'); } render(r); continue; }
       // 상태 만료 → 후속 상태
       if(r.state&&now>=r.until){ r.state=null; r.cls=''; r.mul=1; r.rideOn=null; const q=r.queue.shift(); if(q){ r.state='after'; r.cls=q.cls; r.until=now+q.dur; r.mul=q.mul!=null?q.mul:1; } setClasses(r); }
       const p=clamp(r.x/L,0,1);
@@ -591,9 +591,9 @@ function runLoop(T){
     }
     // 카메라
     const leadX=Math.max(...state.runners.filter(r=>r.fin===null).map(r=>r.x).concat([0]));
-    const camTarget=clamp(leadX-W()*0.58,0,L-W()+90); state.cam=state.cam==null?0:state.cam+(camTarget-state.cam)*Math.min(1,dt*6/ts);
+    const camTarget=clamp(leadX-W()*0.58,0,L-W()+150); state.cam=state.cam==null?0:state.cam+(camTarget-state.cam)*Math.min(1,dt*6/ts);
     el.bg.style.setProperty('--bgx',(-state.cam*0.9)+'px');
-    state.finEl.style.left=(L-state.cam)+'px'; state.crowdEl.style.left=(L-state.cam-140)+'px'; state.markers.forEach(m=>m.el.style.left=(m.x-state.cam)+'px');
+    state.finEl.style.left=(L-state.cam+58)+'px'; state.crowdEl.style.left=(L-state.cam+58-140)+'px'; state.markers.forEach(m=>m.el.style.left=(m.x-state.cam+58)+'px');
     el.clock.textContent=now.toFixed(2);
     // 순위
     const rank=state.runners.slice().sort((a,b)=>(a.fin!==null&&b.fin!==null)?a.fin-b.fin:(a.fin!==null?-1:(b.fin!==null?1:b.x-a.x)));
