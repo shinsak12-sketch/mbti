@@ -222,12 +222,12 @@
   .reticle .ring::after{top:50%;left:-12px;height:2px;width:calc(100% + 24px);transform:translateY(-50%);}
   .reticle .dot{position:absolute;left:0;top:0;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:#ff3c3c;box-shadow:0 0 0 1px #fff;}
   .reticle.shaky .ring{border-color:rgba(255,120,40,.95);}
-  .ghost{position:absolute;left:0;top:0;width:0;height:0;z-index:5;pointer-events:none;opacity:0;transition:opacity .2s;}
-  .ghost.show{opacity:1;}
-  .ghost .g{position:absolute;left:0;top:0;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;border:2px dashed rgba(255,255,255,.9);background:rgba(255,255,255,.18);box-shadow:0 0 0 1px rgba(0,0,0,.35);}
-  .ghost span{position:absolute;left:14px;top:-8px;font-size:10px;font-weight:900;color:#fff;background:rgba(3,14,10,.7);padding:2px 6px;border-radius:6px;white-space:nowrap;}
-  .ghost.ok .g{border-color:#6fcf97;background:rgba(111,207,151,.25);}
-  .ghost.bad .g{border-color:#ff8f85;background:rgba(255,143,133,.25);}
+  .landing{position:absolute;left:0;top:0;width:0;height:0;z-index:5;pointer-events:none;opacity:0;transition:opacity .2s;}
+  .landing.show{opacity:1;}
+  .landing .g{position:absolute;left:0;top:0;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;border:2px dashed rgba(255,255,255,.9);background:rgba(255,255,255,.18);box-shadow:0 0 0 1px rgba(0,0,0,.35);}
+  .landing span{position:absolute;left:14px;top:-8px;font-size:10px;font-weight:900;color:#fff;background:rgba(3,14,10,.7);padding:2px 6px;border-radius:6px;white-space:nowrap;}
+  .landing.ok .g{border-color:#6fcf97;background:rgba(111,207,151,.25);}
+  .landing.bad .g{border-color:#ff8f85;background:rgba(255,143,133,.25);}
   .bow{position:absolute;left:50%;bottom:-6%;width:min(70%,300px);transform:translateX(-50%);pointer-events:none;z-index:5;filter:drop-shadow(0 10px 16px rgba(0,0,0,.5));}
   .bow svg{width:100%;height:auto;display:block;overflow:visible;}
   .draw-hint{position:absolute;left:50%;bottom:22%;transform:translateX(-50%);z-index:7;pointer-events:none;text-align:center;
@@ -241,7 +241,9 @@
   .gauge.pw i{background:linear-gradient(0deg,#6fcf97,var(--gold) 60%,#ff8f85);}
   .gauge.st i{background:linear-gradient(0deg,#ff8f85,#ffd27a 50%,#6fcf97);height:100%;}
   .gauge .minmark{position:absolute;left:-4px;right:-4px;height:3px;background:#fff;box-shadow:0 0 6px rgba(255,255,255,.9), 0 0 0 1px rgba(0,0,0,.4);border-radius:2px;z-index:2;}
-  .gauge .minmark em{position:absolute;right:20px;top:-8px;font-style:normal;font-size:10px;font-weight:900;color:#fff;background:rgba(3,14,10,.7);padding:2px 6px;border-radius:6px;white-space:nowrap;}
+  .gauge.pw{overflow:visible;}
+  .gauge.pw i{border-radius:0 0 999px 999px;}
+  .gauge .minmark em{position:absolute;right:22px;top:-8px;font-style:normal;font-size:10px;font-weight:900;color:#fff;background:rgba(3,14,10,.7);padding:2px 6px;border-radius:6px;white-space:nowrap;}
   .gauge.pw.low i{filter:saturate(.5) brightness(.8);}
   .gauge .lbl{position:absolute;left:50%;top:-18px;transform:translateX(-50%);font-size:9px;font-weight:900;color:rgba(255,255,255,.7);letter-spacing:.06em;}
   .counter{position:absolute;left:12px;top:12px;z-index:7;font-weight:900;font-size:13px;color:#fff;padding:6px 10px;border-radius:999px;background:rgba(3,14,10,.55);box-shadow:0 4px 10px rgba(0,0,0,.4);}
@@ -345,7 +347,7 @@
           <div class="target-wrap" id="targetWrap"><div class="stand"></div><svg viewBox="0 0 200 200" id="targetSvg"></svg></div>
           <div id="hits"></div>
           <div class="reticle" id="reticle"><div class="ring"></div><div class="dot"></div></div>
-          <div class="ghost" id="ghost"><div class="g"></div><span>예상 낙점</span></div>
+          <div class="landing" id="ghost"><div class="g"></div><span>예상 낙점</span></div>
           <div class="bow" id="bow">
             <svg viewBox="0 0 300 260" id="bowSvg">
               <defs><linearGradient id="limb" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6b4a2a"/><stop offset=".5" stop-color="#d9a45c"/><stop offset="1" stop-color="#6b4a2a"/></linearGradient></defs>
@@ -430,7 +432,7 @@ function targetGeom(){ const r=el.targetWrap.getBoundingClientRect(), g=el.range
 function scoreAt(x,y){ const t=targetGeom(); const d=Math.hypot(x-t.cx,y-t.cy); const ring=d/(t.R/10); if(d>t.R) return {s:0,x:false}; const s=Math.max(1,10-Math.floor(ring)); return {s, x:d<t.R/20}; }
 
 /* ---- 시작 / 대기 ---- */
-function setIdle(){ state.armed=false; el.reticle.classList.remove('show'); el.ghost.className='ghost'; el.drawHint.hidden=true; el.holdmsg.className='holdmsg'; el.pwFill.style.height='0%'; el.stFill.style.height='100%'; setBow(0,0); el.startBtn.textContent='▶ 시작'; }
+function setIdle(){ state.armed=false; el.reticle.classList.remove('show'); el.ghost.className='landing'; el.drawHint.hidden=true; el.holdmsg.className='holdmsg'; el.pwFill.style.height='0%'; el.stFill.style.height='100%'; setBow(0,0); el.startBtn.textContent='▶ 시작'; }
 el.startBtn.onclick=()=>{
   if(state.busy) return; S.ctx();
   state.shot=0; state.scores=[]; setupRange(); el.rpop.className='rpop';
@@ -485,7 +487,7 @@ function updatePull(t){
   el.pwFill.parentElement.classList.toggle('low',low);
   const gy=pull.ret.y+dropFor(pull.draw);
   el.ghost.style.transform=`translate(${pull.ret.x.toFixed(1)}px, ${Math.min(gy,el.range.clientHeight-10).toFixed(1)}px)`;
-  el.ghost.className='ghost '+(pull.draw>.05?'show ':'')+(low?'bad':'ok');
+  el.ghost.className='landing '+(pull.draw>.05?'show ':'')+(low?'bad':'ok');
   if(fatigue>.75){ el.holdmsg.textContent='팔 떨림!! 빨리 놓아요'; el.holdmsg.className='holdmsg show warn'; }
   else if(low&&pull.draw>.05){ el.holdmsg.textContent=`힘 부족 · 최소 ${Math.round(md*100)}%`; el.holdmsg.className='holdmsg show warn'; }
   else if(pull.draw>.15){ el.holdmsg.textContent=fatigue>.4?'숨 참기…':(pull.draw>.8?'풀 드로우!':'조준 중'); el.holdmsg.className='holdmsg show'; }
@@ -495,7 +497,7 @@ function updatePull(t){
 const release=async()=>{
   if(!pull.on) return; pull.on=false; cancelAnimationFrame(pull.raf);
   el.holdmsg.className='holdmsg';
-  if(pull.draw<0.12){ setBow(0,0); el.reticle.classList.remove('show'); el.ghost.className='ghost'; toast('시위를 살짝 놓았어요 · 다시 당기기'); if(state.armed) el.drawHint.hidden=false; return; }
+  if(pull.draw<0.12){ setBow(0,0); el.reticle.classList.remove('show'); el.ghost.className='landing'; toast('시위를 살짝 놓았어요 · 다시 당기기'); if(state.armed) el.drawHint.hidden=false; return; }
   await shoot(pull.draw, pull.ret);
 };
 el.range.addEventListener('pointerup',release); el.range.addEventListener('pointercancel',release); el.range.addEventListener('contextmenu',e=>e.preventDefault());
@@ -509,7 +511,7 @@ async function shoot(draw,ret){
   const drop=dropFor(draw);
   const ix=ret.x+(rnd()-.5)*4, iy=ret.y+drop+(rnd()-.5)*4;
   // 발사 연출
-  S.twang(); vib(25); setBow(0,0); el.reticle.classList.remove('show'); el.ghost.className='ghost';
+  S.twang(); vib(25); setBow(0,0); el.reticle.classList.remove('show'); el.ghost.className='landing';
   el.range.classList.remove('recoil'); void el.range.offsetWidth; el.range.classList.add('recoil');
   el.arrowG.style.opacity='0';
   const fly=document.createElement('div'); fly.className='arrow-fly'; el.range.appendChild(fly);
