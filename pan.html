@@ -214,7 +214,22 @@
       linear-gradient(160deg,#5b3f2c 0%,#3f2a1c 100%);
     box-shadow:0 22px 44px rgba(0,0,0,.65), 0 7px 0 #22150c, 0 9px 0 #1a100a, inset 0 1px 0 rgba(255,255,255,.18), inset 0 0 0 1px rgba(0,0,0,.35);
   }
+  .pad.diamond{width:92%;height:94%;border-radius:0;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);box-shadow:none;}
+  .pad.circle{width:78%;height:88%;border-radius:50%;}
+  .pad.diamond .label,.pad.circle .label{display:none;}
+  .pad-shadow{position:absolute;left:50%;top:50%;transform:translate(-50%,calc(-50% + 10px));border-radius:10px;background:#1a100a;pointer-events:none;filter:blur(2px);}
   .pad::before{content:'';position:absolute;inset:10px 12px;border-radius:6px;border:1.5px dashed rgba(255,255,255,.14);pointer-events:none;}
+  .pad.diamond::before{inset:0;border:none;background:linear-gradient(45deg,transparent 48%,rgba(255,255,255,.08) 49%,rgba(255,255,255,.08) 51%,transparent 52%),linear-gradient(-45deg,transparent 48%,rgba(255,255,255,.08) 49%,rgba(255,255,255,.08) 51%,transparent 52%);}
+  .pad.circle::before{inset:10px;border-radius:50%;}
+  .palm{position:absolute;left:50%;top:50%;width:0;height:0;z-index:4;pointer-events:none;opacity:0;transition:opacity .25s;}
+  .palm.show{opacity:1;}
+  .palm .ring{position:absolute;left:0;top:0;width:var(--pr);height:var(--pr);margin:calc(var(--pr)/-2) 0 0 calc(var(--pr)/-2);border-radius:50%;border:2px dashed rgba(255,230,140,.75);box-shadow:0 0 0 6px rgba(233,201,106,.12), inset 0 0 30px rgba(233,201,106,.15);animation:palmpulse 1.4s ease-in-out infinite;}
+  .palm .hand{position:absolute;left:0;top:0;transform:translate(-50%,-56%) rotate(-12deg);font-size:calc(var(--pr)*.62);line-height:1;filter:drop-shadow(0 8px 12px rgba(0,0,0,.6));opacity:.92;}
+  .palm .tag{position:absolute;left:0;top:calc(var(--pr)/2 + 6px);transform:translate(-50%,0);font-size:11px;font-weight:900;color:#2a1d05;background:linear-gradient(180deg,#f3d98a,var(--gold-2));padding:3px 8px;border-radius:999px;white-space:nowrap;box-shadow:0 2px 0 var(--gold-3);}
+  @keyframes palmpulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.06);opacity:1}}
+  .board.aiming{cursor:crosshair;touch-action:none;}
+  .palm.hit .hand{animation:palmslap .35s ease-out;}
+  @keyframes palmslap{0%{transform:translate(-50%,-56%) rotate(-12deg) scale(1.3)}60%{transform:translate(-50%,-50%) rotate(-12deg) scale(.92)}100%{transform:translate(-50%,-56%) rotate(-12deg) scale(1)}}
   .pad .fmap{position:absolute;inset:0;border-radius:10px;opacity:0;pointer-events:none;mix-blend-mode:screen;}
   .pad .fmap.show{animation:fmap 1.6s ease-out forwards;}
   @keyframes fmap{0%{opacity:0}15%{opacity:1}70%{opacity:1}100%{opacity:0}}
@@ -236,11 +251,11 @@
   .meter{position:absolute;left:14px;right:14px;bottom:12px;height:6px;border-radius:6px;background:rgba(0,0,0,.45);overflow:hidden;box-shadow:inset 2px 2px 4px rgba(0,0,0,.6);z-index:3;}
   .meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,#6fcf97,var(--gold),#ff8f85);transition:width .08s linear;}
   .meter.armed{box-shadow:inset 2px 2px 4px rgba(0,0,0,.6), 0 0 0 2px var(--gold);}
-  .overlay-hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;text-align:center;
+  .overlay-hint{position:absolute;left:50%;top:12px;transform:translate(-50%,0);z-index:5;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;text-align:center;
     padding:16px 22px;border-radius:18px;background:rgba(3,14,10,.62);backdrop-filter:blur(4px);box-shadow:0 10px 30px rgba(0,0,0,.5);}
-  .overlay-hint .phone{font-size:44px;line-height:1;animation:phoneup 1s ease-in-out infinite;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5));}
+  .overlay-hint .phone{font-size:30px;line-height:1;animation:phoneup 1s ease-in-out infinite;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5));}
   @keyframes phoneup{0%,100%{transform:translateY(6px) rotate(-6deg)}50%{transform:translateY(-10px) rotate(4deg)}}
-  .overlay-hint b{font-size:18px;color:#fff;letter-spacing:-.3px;}
+  .overlay-hint b{font-size:15px;color:#fff;letter-spacing:-.3px;}
   .overlay-hint small{color:var(--muted);font-weight:700;font-size:12px;word-break:keep-all;}
   .power{position:absolute;left:14px;right:14px;bottom:26px;z-index:5;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;}
   .pw-bar{width:100%;height:16px;border-radius:999px;background:rgba(0,0,0,.5);box-shadow:inset 3px 3px 6px rgba(0,0,0,.6), inset -2px -2px 4px rgba(255,255,255,.06);overflow:hidden;}
@@ -289,6 +304,13 @@
         <button class="round" id="cplus" aria-label="동전 늘리기">+</button>
       </div>
 
+      <div class="field-label"><span>판 모양</span><small>밖으로 나가면 낙</small></div>
+      <div class="inset modes three" id="shapeModes">
+        <button class="mode on" data-shape="rect"><span class="ic">⬛</span><b>네모</b><small>정통 · 넓음</small></button>
+        <button class="mode" data-shape="diamond"><span class="ic">🔶</span><b>다이아</b><small>모서리 위험</small></button>
+        <button class="mode" data-shape="circle"><span class="ic">⚪</span><b>동그라미</b><small>사방 위험</small></button>
+      </div>
+
       <div class="field-label"><span>치는 방법</span><small>센서 없으면 자동 전환</small></div>
       <div class="inset modes" id="ctrlModes">
         <button class="mode on" data-ctrl="sensor"><span class="ic">📱</span><b>폰 치기</b><small>폰 들고 위로 탁 · 가속도 센서</small></button>
@@ -314,7 +336,7 @@
       <div class="start-wrap">
         <button class="btn block" id="start">🪙 판 깔기</button>
       </div>
-      <p class="hint">한 사람씩 <b>시작</b>을 누르고 폰을 위로 탁! · 뒤집힌 개수가 그 사람 점수<br>세게 칠수록 <b>수직</b>으로 정확히 올려야 해요 · 기울면 옆으로 쓸려 판 밖 → <b>낙(0점)</b><br>약하게 맞은 동전은 안 튀고, 세게 맞은 동전은 높이 떠서 돌아요</p>
+      <p class="hint">한 사람씩 <b>시작</b>을 누르고 폰을 위로 탁! · 뒤집힌 개수가 그 사람 점수<br>시작 → 손바닥을 끌어 <b>타점</b>을 정하고 → 폰을 위로 훅!<br>타점 가까운 동전은 세게 튀며 바깥으로 밀리고, 먼 동전은 약하게 받아요 · 세게 칠수록 <b>수직</b>으로 · 하나라도 판 밖이면 <b>낙(0점)</b></p>
     </div>
     <p class="foot">판 밖으로 나간 동전은 무효 · 등수는 사람들이 직접 비교</p>
   </section>
@@ -333,16 +355,17 @@
       <div class="panel" style="padding:14px 12px 14px">
         <div class="turn" id="turn">시작을 누르면 센서가 켜짐</div>
         <div class="board" id="board">
-          <div class="pad" id="pad"><span class="label">PAN</span></div>
+          <div class="pad rect" id="pad"><span class="label">PAN</span></div>
+          <div class="palm" id="palm"><div class="ring"></div><div class="hand">✋</div><div class="tag">타점 · 끌어서 이동</div></div>
           <div class="coins" id="coins"></div>
           <div class="overlay-hint" id="ready" hidden>
             <div class="phone">📱</div>
-            <b>지금! 위로 탁 치세요</b>
-            <small>폰을 세게 들어 올리면 동전이 튀어요</small>
+            <b>타점 잡고 위로 훅!</b>
+            <small>손바닥을 끌어 타점을 정하고 폰을 들어 올리세요</small>
           </div>
           <div class="power" id="power" hidden>
             <div class="pw-bar"><i id="pwFill"></i></div>
-            <div class="pw-txt">가운데를 누를수록 수직 · 가장자리는 옆으로 쓸림 · 세게 칠수록 더 크게</div>
+            <div class="pw-txt">누른 곳이 타점 · 누른 채 끌면 그쪽으로 기울어 침</div>
           </div>
           <div class="rpop" id="rpop"></div>
           <div class="meter" id="meter"><i></i></div>
@@ -377,9 +400,9 @@ const S={
 };
 const vib=(p)=>{ try{ navigator.vibrate&&navigator.vibrate(p); }catch(e){} };
 
-const state={ coins:6, ctrl:'sensor', sens:'mid', sound:true, invert:false, busy:false, armed:false, sensorOk:null, history:[] };
+const state={ coins:6, shape:'rect', ctrl:'sensor', sens:'mid', sound:true, invert:false, busy:false, armed:false, sensorOk:null, history:[], strike:{x:0,y:0} };
 const el={ setup:$('#scr-setup'), game:$('#scr-game'), coinNum:$('#coinNum'), board:$('#board'), pad:$('#pad'), coins:$('#coins'),
-  meter:$('#meter'), meterFill:$('#meter i'), ready:$('#ready'), power:$('#power'), pwFill:$('#pwFill'), rpop:$('#rpop'), turn:$('#turn'),
+  meter:$('#meter'), meterFill:$('#meter i'), palm:$('#palm'), ready:$('#ready'), power:$('#power'), pwFill:$('#pwFill'), rpop:$('#rpop'), turn:$('#turn'),
   notice:$('#notice'), history:$('#history'), startBtn:$('#startBtn'), coinPill:$('#coinPill'), toast:$('#toast') };
 const SENS_THR={low:19,mid:13,high:9};
 function toast(msg,ms=1700){ el.toast.textContent=msg; el.toast.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>el.toast.classList.remove('show'),ms); }
@@ -393,12 +416,13 @@ function renderSetup(){
 $('#cminus').onclick=()=>{ if(state.coins>3){state.coins--;renderSetup();S.tick();} };
 $('#cplus').onclick =()=>{ if(state.coins<8){state.coins++;renderSetup();S.tick();} };
 function bindModes(sel,key,attr,after){ document.querySelectorAll(sel+' .mode').forEach(b=>b.onclick=()=>{ state[key]=b.dataset[attr]; document.querySelectorAll(sel+' .mode').forEach(x=>x.classList.toggle('on',x===b)); S.tick(); after&&after(); }); }
-bindModes('#ctrlModes','ctrl','ctrl',renderSetup); bindModes('#sensModes','sens','sens');
+bindModes('#ctrlModes','ctrl','ctrl',renderSetup); bindModes('#sensModes','sens','sens'); bindModes('#shapeModes','shape','shape');
 $('#invert').onclick=function(){ state.invert=!state.invert; this.classList.toggle('on',state.invert); this.setAttribute('aria-checked',state.invert); S.tick(); };
 $('#sound').onclick=function(){ state.sound=!state.sound; this.classList.toggle('on',state.sound); this.setAttribute('aria-checked',state.sound); if(state.sound) S.tick(); };
 $('#start').onclick=async()=>{
   S.ctx();
-  el.coinPill.textContent=`동전 ${state.coins}개`;
+  el.coinPill.textContent=`동전 ${state.coins}개 · ${({rect:'네모',diamond:'다이아',circle:'동그라미'})[state.shape]}`;
+  el.pad.className='pad '+state.shape;
   show(el.game);
   state.history=[]; renderHistory();
   layCoins(); setIdle();
@@ -469,12 +493,19 @@ const COIN_BACK=`<svg viewBox="0 0 100 100">
   <path d="M22 50 q 6 -14 14 -18 M78 50 q -6 -14 -14 -18 M22 50 q 6 14 14 18 M78 50 q -6 14 -14 18" fill="none" stroke="#7a7e88" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>
 </svg>`;
 function padDims(){ const r=el.pad.getBoundingClientRect(), b=el.board.getBoundingClientRect(); return {pw:r.width,ph:r.height,bw:b.width,bh:b.height}; }
+function inShape(x,y,pw,ph,margin){ // 판 좌표(중심 기준)가 판 안인지 · margin: 동전 반지름 여유
+  const hw=pw/2-margin, hh=ph/2-margin;
+  if(state.shape==='circle') return (x*x)/(hw*hw)+(y*y)/(hh*hh)<=1;
+  if(state.shape==='diamond') return Math.abs(x)/hw+Math.abs(y)/hh<=1;
+  return Math.abs(x)<=hw&&Math.abs(y)<=hh;
+}
 function layCoins(){
   el.coins.innerHTML=''; coinObjs=[];
   const n=state.coins; const {pw,ph,bw,bh}=padDims();
   const cs=pw*0.21; el.coins.style.setProperty('--cs',cs+'px');
   const cols=n<=4?2:(n<=6?2:3), rows=Math.ceil(n/cols);
-  const gapY=Math.min(cs*1.9,(ph-cs*1.4)/Math.max(1,rows-1)), gapX=Math.min(cs*1.9,(pw-cs*1.4)/Math.max(1,cols-1));
+  const shrink=state.shape==='rect'?1:0.72;
+  const gapY=Math.min(cs*1.9,(ph-cs*1.4)/Math.max(1,rows-1))*shrink, gapX=Math.min(cs*1.9,(pw-cs*1.4)/Math.max(1,cols-1))*shrink;
   for(let i=0;i<n;i++){
     const c=i%cols, r=Math.floor(i/cols); const inRow=Math.min(n-r*cols,cols);
     const x=(c-(inRow-1)/2)*gapX+(rnd()-.5)*10;
@@ -496,7 +527,7 @@ function render(c){
 
 /* ---- 시작/다시 ---- */
 function setIdle(){
-  state.armed=false; el.meter.classList.remove('armed'); el.ready.hidden=true; el.power.hidden=true; el.board.classList.remove('touchable','pressing');
+  state.armed=false; el.meter.classList.remove('armed'); el.ready.hidden=true; el.power.hidden=true; el.board.classList.remove('touchable','pressing','aiming'); el.palm.classList.remove('show','hit');
   el.startBtn.textContent='▶ 시작';
 }
 el.startBtn.onclick=()=>{
@@ -506,22 +537,39 @@ el.startBtn.onclick=()=>{
   layCoins();
   state.armed=true; sensor.peakT=0; sensor.lastHit=performance.now()-1500;
   el.startBtn.textContent='↻ 다시';
-  if(state.ctrl==='sensor'){ el.ready.hidden=false; el.meter.classList.add('armed'); el.turn.innerHTML='<b>위로 탁!</b> 폰을 들어 올리세요'; }
-  else { el.power.hidden=false; el.board.classList.add('touchable'); el.pwFill.style.width='0%'; el.turn.innerHTML='<b>판을 꾹</b> 누르다 놓으세요'; }
+  state.strike={x:0,y:0}; placePalm(0,0); el.palm.classList.add('show'); el.board.classList.add('aiming');
+  if(state.ctrl==='sensor'){ el.ready.hidden=false; el.meter.classList.add('armed'); el.turn.innerHTML='<b>타점</b>을 끌어 정하고 · 위로 <b>훅!</b>'; }
+  else { el.power.hidden=false; el.board.classList.add('touchable'); el.pwFill.style.width='0%'; el.turn.innerHTML='<b>타점</b>을 꾹 누르다 놓으세요 · 누른 채 끌면 기울기'; }
   vib(20);
 };
 
+function placePalm(x,y){
+  const {pw,ph}=padDims(); const pr=pw*0.42; el.palm.style.setProperty('--pr',pr+'px');
+  // 판 안으로 살짝 여유 두고 제한
+  const hw=pw/2-10, hh=ph/2-10; x=clamp(x,-hw,hw); y=clamp(y,-hh,hh);
+  if(!inShape(x,y,pw,ph,10)){ const m=Math.hypot(x/hw,y/hh)||1; x=x/m*0.98; y=y/m*0.98; if(state.shape==='diamond'){ const k=Math.abs(x)/hw+Math.abs(y)/hh; if(k>1){ x/=k; y/=k; } } }
+  state.strike={x,y}; el.palm.style.transform=`translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+}
+function boardToPad(e){ const r=el.board.getBoundingClientRect(); return {x:e.clientX-(r.left+r.width/2), y:e.clientY-(r.top+r.height/2)}; }
+/* ---- 센서 모드: 손바닥 끌어서 타점 ---- */
+let aim={on:false};
+el.board.addEventListener('pointerdown',(e)=>{ if(state.ctrl!=='sensor'||!state.armed||state.busy) return; e.preventDefault(); try{ el.board.setPointerCapture(e.pointerId); }catch(_){} aim.on=true; const p=boardToPad(e); placePalm(p.x,p.y); S.tick(); });
+el.board.addEventListener('pointermove',(e)=>{ if(!aim.on) return; const p=boardToPad(e); placePalm(p.x,p.y); });
+const aimEnd=()=>{ aim.on=false; };
+el.board.addEventListener('pointerup',aimEnd); el.board.addEventListener('pointercancel',aimEnd);
+
 /* ---- 터치 조작 ---- */
-let pw={on:false,t0:0,raf:0,val:0,x:0,y:0};
+let pw={on:false,t0:0,raf:0,val:0,x:0,y:0,sx:0,sy:0,cx:0,cy:0};
 el.board.addEventListener('pointerdown',(e)=>{
   if(state.ctrl!=='touch'||!state.armed||state.busy) return;
   e.preventDefault(); try{ el.board.setPointerCapture(e.pointerId); }catch(_){}
   S.ctx(); pw.on=true; pw.t0=performance.now(); el.board.classList.add('pressing');
-  const r=el.board.getBoundingClientRect(); pw.x=clamp(((e.clientX-r.left)/r.width-.5)*2,-1,1); pw.y=clamp(((e.clientY-r.top)/r.height-.5)*-2,-1,1);
+  const p=boardToPad(e); placePalm(p.x,p.y); pw.sx=e.clientX; pw.sy=e.clientY; pw.cx=e.clientX; pw.cy=e.clientY;
   const loop=(t)=>{ if(!pw.on) return; const p=((t-pw.t0)%1400)/1400; pw.val=p<.5?p*2:(1-p)*2; el.pwFill.style.width=(pw.val*100).toFixed(1)+'%'; if(Math.floor((t-pw.t0)/90)%2===0) S.tick(); pw.raf=requestAnimationFrame(loop); };
   pw.raf=requestAnimationFrame(loop);
 });
-const pwRelease=()=>{ if(!pw.on) return; pw.on=false; cancelAnimationFrame(pw.raf); el.board.classList.remove('pressing'); if(state.busy||!state.armed) return; hit(clamp(pw.val,0.05,1), pw.x*0.9, pw.y*0.9, pw.x, pw.y); };
+const pwRelease=()=>{ if(!pw.on) return; pw.on=false; cancelAnimationFrame(pw.raf); el.board.classList.remove('pressing'); if(state.busy||!state.armed) return; const {pw:pw_}=padDims(); const tx=clamp((pw.cx-pw.sx)/(pw_*0.35),-1,1), ty=clamp(-(pw.cy-pw.sy)/(pw_*0.35),-1,1); hit(clamp(pw.val,0.05,1), 0, 0, tx, ty); };
+el.board.addEventListener('pointermove',(e)=>{ if(pw.on){ pw.cx=e.clientX; pw.cy=e.clientY; } });
 el.board.addEventListener('pointerup',pwRelease); el.board.addEventListener('pointercancel',pwRelease); el.board.addEventListener('contextmenu',e=>e.preventDefault());
 
 /* ---- 치기 → 물리 ---- */
@@ -538,12 +586,16 @@ async function hit(force,roll,pitch,tiltX,tiltY){
   const {pw:pw_,ph,bw,bh}=padDims(); const sc=pw_/300;
   const hx=pw_/2, hy=ph/2;
   showForceMap(force,roll,pitch); state.lastVert=vert;
+  const sx=state.strike.x, sy=state.strike.y; const R=pw_*0.42;
+  el.palm.classList.remove('hit'); void el.palm.offsetWidth; el.palm.classList.add('hit');
   coinObjs.forEach(c=>{
     c.landed=false; c.out=false; c.final=null; c.bounces=0; c.pw=pw_; c.ph=ph; c.bw=bw; c.bh=bh; c.jumped=false;
     // 동전 위치별로 받는 힘: 전체 세기 + 상하 편차(위쪽 +) + 좌우 편차 + 판 요철 노이즈
+    // 타점 거리 감쇠: 가까울수록 힘을 다 받고 멀수록 급격히 줄어듦
+    const dx=c.x-sx, dy=c.y-sy, d=Math.hypot(dx,dy); const fall=1/(1+Math.pow(d/R,2.2));
     const py=clamp(-c.y/(hy*0.55),-1,1), px=clamp(c.x/(hx*0.55),-1,1);
-    const f=clamp(force*0.95 + pitch*0.7*py + roll*0.6*px + (rnd()-.5)*0.14, 0, 1.4);
-    c.f=f;
+    const f=clamp(force*(0.22+0.95*fall) + pitch*0.35*py + roll*0.3*px + (rnd()-.5)*0.12, 0, 1.4);
+    c.f=f; c.fall=fall; c.rdx=d>1?dx/d:0; c.rdy=d>1?dy/d:0;
     if(f<0.16){ // 안 튐: 살짝 들썩
       c.rattle=true; c.vz=(30+f*120)*sc; c.rotV=(rnd()-.5)*90; c.vx=(rnd()-.5)*20*sc; c.vy=(rnd()-.5)*20*sc; return;
     }
@@ -553,8 +605,10 @@ async function hit(force,roll,pitch,tiltX,tiltY){
     c.rotV=(f*700+rnd()*(520+f*1800))*(rnd()<.5?-1:1);
     // 센 쪽에서 약한 쪽으로 쓸림
     // 옆 이동: 기울기 방향으로 파워^1.6 비례 + 센 쪽→약한 쪽 쓸림 + 파워 비례 흩어짐
-    c.vx=( tiltX*drift -roll*f*90 +(rnd()-.5)*(30+force*140))*sc;
-    c.vy=(-tiltY*drift +pitch*f*90 +(rnd()-.5)*(30+force*120))*sc;
+    // 타점에서 바깥으로 밀림(가까울수록 세게) + 기울기 쓸림 + 파워 비례 흩어짐
+    const push=force*fall*70;
+    c.vx=( c.rdx*push + tiltX*drift -roll*f*60 +(rnd()-.5)*(20+force*70))*sc;
+    c.vy=( c.rdy*push - tiltY*drift +pitch*f*60 +(rnd()-.5)*(20+force*60))*sc;
   });
   await simulate(sc);
   const rawFlips=coinObjs.filter(c=>!c.out&&c.final==='B').length, outs=coinObjs.filter(c=>c.out).length, still=coinObjs.filter(c=>!c.jumped).length;
@@ -614,8 +668,7 @@ function simulate(sc){
             c.final=target===0?'F':'B';
             c.rot=Math.round((c.rot-target)/360)*360+target;
             c.body.style.transition='transform .18s ease-out'; setTimeout(()=>{ c.body.style.transition=''; },220);
-            const hx=c.pw/2-c.r*0.75, hy=c.ph/2-c.r*0.75;
-            if(Math.abs(c.x)>hx||Math.abs(c.y)>hy){ c.out=true; c.el.classList.add('out'); S.drop(); }
+            if(!inShape(c.x,c.y,c.pw,c.ph,c.r*0.45)){ c.out=true; c.el.classList.add('out'); S.drop(); }
             vib(8);
           } else {
             // 튕김: 모서리로 떨어지면 더 구르고, 평평하게 떨어지면 회전이 죽음
