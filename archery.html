@@ -228,9 +228,13 @@
   .landing span{position:absolute;left:14px;top:-8px;font-size:10px;font-weight:900;color:#fff;background:rgba(3,14,10,.7);padding:2px 6px;border-radius:6px;white-space:nowrap;}
   .landing.ok .g{border-color:#6fcf97;background:rgba(111,207,151,.25);}
   .landing.bad .g{border-color:#ff8f85;background:rgba(255,143,133,.25);}
+  .aimpad{position:absolute;left:10px;right:10px;bottom:10px;height:44%;border-radius:18px;border:2px dashed rgba(255,255,255,.28);background:rgba(3,14,10,.14);z-index:4;pointer-events:none;opacity:0;transition:opacity .25s, border-color .2s, background .2s;}
+  .aimpad span{position:absolute;left:50%;top:10px;transform:translateX(-50%);font-size:11px;font-weight:900;color:rgba(255,255,255,.75);letter-spacing:.04em;white-space:nowrap;text-shadow:0 1px 0 rgba(0,0,0,.6);}
+  .aimpad.show{opacity:1;}
+  .aimpad.active{border-color:rgba(255,230,140,.85);background:rgba(233,201,106,.10);}
   .bow{position:absolute;left:50%;bottom:-6%;width:min(70%,300px);transform:translateX(-50%);pointer-events:none;z-index:5;filter:drop-shadow(0 10px 16px rgba(0,0,0,.5));}
   .bow svg{width:100%;height:auto;display:block;overflow:visible;}
-  .draw-hint{position:absolute;left:50%;bottom:22%;transform:translateX(-50%);z-index:7;pointer-events:none;text-align:center;
+  .draw-hint{position:absolute;left:50%;bottom:16%;transform:translateX(-50%);z-index:7;pointer-events:none;text-align:center;
     padding:12px 18px;border-radius:16px;background:rgba(3,14,10,.62);backdrop-filter:blur(4px);box-shadow:0 10px 30px rgba(0,0,0,.5);color:#fff;font-weight:900;font-size:15px;letter-spacing:-.3px;}
   .draw-hint small{display:block;color:var(--muted);font-weight:700;font-size:12px;margin-top:3px;}
   .draw-hint .arrowdown{display:block;font-size:26px;animation:bob 1.2s ease-in-out infinite;}
@@ -317,7 +321,7 @@
       <div class="start-wrap">
         <button class="btn block" id="start">🏹 사격장 입장</button>
       </div>
-      <p class="hint">화면을 <b>누르면</b> 시위가 당겨지고, 손가락을 움직이면 <b>조준경이 천천히 조금씩</b> 따라와요<br>오래 버틀수록 팔이 떨려 조준이 흔들리고, <b>놓으면</b> 조준경 자리에 화살이 박혀요</p>
+      <p class="hint">아래 <b>조준 패드</b>를 누르면 시위가 당겨지고, 손가락을 움직이면 위 과녁의 <b>조준경이 천천히</b> 따라와요<br>오래 버틀수록 팔이 떨려 조준이 흔들리고, <b>놓으면</b> 조준경 자리에 화살이 박혀요</p>
     </div>
     <p class="foot">10점제 과녁 · 정중앙 X · 과녁 밖은 0점(M) · 합산 점수로 등수는 직접 비교</p>
   </section>
@@ -339,7 +343,8 @@
           <div class="target-wrap" id="targetWrap"><div class="stand"></div><svg viewBox="0 0 200 200" id="targetSvg"></svg></div>
           <div id="hits"></div>
           <div class="reticle" id="reticle"><div class="ring"></div><div class="dot"></div></div>
-                    <div class="bow" id="bow">
+                    <div class="aimpad" id="aimpad"><span>조준 패드 · 여기서 손가락 움직이기</span></div>
+          <div class="bow" id="bow">
             <svg viewBox="0 0 300 260" id="bowSvg">
               <defs><linearGradient id="limb" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6b4a2a"/><stop offset=".5" stop-color="#d9a45c"/><stop offset="1" stop-color="#6b4a2a"/></linearGradient></defs>
               <path id="limbPath" d="M30 30 C 20 120, 110 190, 150 200 C 190 190, 280 120, 270 30" fill="none" stroke="url(#limb)" stroke-width="12" stroke-linecap="round"/>
@@ -352,7 +357,7 @@
               </g>
             </svg>
           </div>
-          <div class="draw-hint" id="drawHint" hidden><span class="arrowdown">☝</span>누르면 당김 · 조준경을 끌어와 맞추고 · 놓으면 발사<small>조준경은 손가락보다 천천히 따라오고, 오래 버티면 팔이 떨려요</small></div>
+          <div class="draw-hint" id="drawHint" hidden><span class="arrowdown">☝</span>아래 패드를 누르면 당김 · 움직여 조준 · 놓으면 발사<small>조준경은 위 과녁에서 손가락보다 천천히 따라와요 · 오래 버티면 떨림</small></div>
           <div class="holdmsg" id="holdmsg"></div>
           <div class="gauges"><div class="gauge st"><span class="lbl">팔</span><i id="stFill"></i></div></div>
           <div class="counter" id="counter">화살 <b>0</b> / 3</div>
@@ -392,7 +397,7 @@ const vib=(p)=>{ try{ navigator.vibrate&&navigator.vibrate(p); }catch(e){} };
 const DIST={ near:{td:.74,ty:.36,shake:1.0,label:'근거리',fly:.45}, mid:{td:.54,ty:.33,shake:1.35,label:'중거리',fly:.6}, far:{td:.38,ty:.31,shake:1.8,label:'원거리',fly:.8} };
 const state={ arrows:3, dist:'mid', sound:true, armed:false, busy:false, shot:0, scores:[], history:[] };
 const el={ setup:$('#scr-setup'), game:$('#scr-game'), arrowNum:$('#arrowNum'), range:$('#range'), targetWrap:$('#targetWrap'), targetSvg:$('#targetSvg'), hits:$('#hits'), reticle:$('#reticle'),
-  stringPath:$('#stringPath'), arrowG:$('#arrowG'), bow:$('#bow'), drawHint:$('#drawHint'), holdmsg:$('#holdmsg'), stFill:$('#stFill'), counter:$('#counter'), rpop:$('#rpop'), turn:$('#turn'), history:$('#history'), startBtn:$('#startBtn'), infoPill:$('#infoPill'), toast:$('#toast') };
+  aimpad:$('#aimpad'), stringPath:$('#stringPath'), arrowG:$('#arrowG'), bow:$('#bow'), drawHint:$('#drawHint'), holdmsg:$('#holdmsg'), stFill:$('#stFill'), counter:$('#counter'), rpop:$('#rpop'), turn:$('#turn'), history:$('#history'), startBtn:$('#startBtn'), infoPill:$('#infoPill'), toast:$('#toast') };
 function toast(msg,ms=1700){ el.toast.textContent=msg; el.toast.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>el.toast.classList.remove('show'),ms); }
 function show(scr){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); scr.classList.add('active'); window.scrollTo({top:0}); }
 
@@ -421,11 +426,11 @@ function targetGeom(){ const r=el.targetWrap.getBoundingClientRect(), g=el.range
 function scoreAt(x,y){ const t=targetGeom(); const d=Math.hypot(x-t.cx,y-t.cy); const ring=d/(t.R/10); if(d>t.R) return {s:0,x:false}; const s=Math.max(1,10-Math.floor(ring)); return {s, x:d<t.R/20}; }
 
 /* ---- 시작 / 대기 ---- */
-function setIdle(){ state.armed=false; el.reticle.classList.remove('show'); el.drawHint.hidden=true; el.holdmsg.className='holdmsg'; el.stFill.style.height='100%'; setBow(0,0); el.startBtn.textContent='▶ 시작'; }
+function setIdle(){ state.armed=false; el.aimpad.classList.remove('show','active'); el.reticle.classList.remove('show'); el.drawHint.hidden=true; el.holdmsg.className='holdmsg'; el.stFill.style.height='100%'; setBow(0,0); el.startBtn.textContent='▶ 시작'; }
 el.startBtn.onclick=()=>{
   if(state.busy) return; S.ctx();
   state.shot=0; state.scores=[]; setupRange(); el.rpop.className='rpop';
-  state.armed=true; el.drawHint.hidden=false; el.startBtn.textContent='↻ 다시';
+  state.armed=true; el.drawHint.hidden=false; el.startBtn.textContent='↻ 다시'; el.aimpad.classList.add('show');
   el.turn.innerHTML=`<b>1발째</b> · 누르고 조준 · 놓으면 발사`;
   vib(15);
 };
@@ -445,7 +450,10 @@ let pull={on:false,sx:0,sy:0,x:0,y:0,t0:0,raf:0,draw:0,ax:0,hold:0,ret:{x:0,y:0}
 const AIM_GAIN=0.35, AIM_LAG=0.18; // 손가락 이동의 35%만, 살짝 늦게 따라옴
 el.range.addEventListener('pointerdown',(e)=>{
   if(!state.armed||state.busy||state.shot>=state.arrows) return;
-  e.preventDefault(); try{ el.range.setPointerCapture(e.pointerId); }catch(_){}
+  e.preventDefault();
+  { const r=el.range.getBoundingClientRect(); if(e.clientY < r.top + r.height*0.54){ toast('아래 조준 패드에서 눌러요 · 조준경은 위에서 따라와요'); el.aimpad.classList.add('active'); setTimeout(()=>el.aimpad.classList.remove('active'),600); return; } }
+  try{ el.range.setPointerCapture(e.pointerId); }catch(_){}
+  el.aimpad.classList.add('active');
   S.ctx(); pull.on=true; pull.sx=e.clientX; pull.sy=e.clientY; pull.x=pull.sx; pull.y=pull.sy; pull.t0=performance.now(); pull.draw=0; pull.ax=0; pull.hold=0; pull.lastBeat=0;
   // 조준경은 매번 과녁 밖 랜덤 위치에서 시작 → 손가락으로 끌어와야 함
   { const g=targetGeom(); const ang=rnd()*Math.PI*2, r=g.R*(0.7+rnd()*0.5); pull.off={x:Math.cos(ang)*r, y:Math.sin(ang)*r*0.8}; }
@@ -487,7 +495,7 @@ function updatePull(t){
 }
 const release=async()=>{
   if(!pull.on) return; pull.on=false; cancelAnimationFrame(pull.raf);
-  el.holdmsg.className='holdmsg';
+  el.holdmsg.className='holdmsg'; el.aimpad.classList.remove('active');
   if(pull.draw<0.6){ setBow(0,0); el.reticle.classList.remove('show'); toast('너무 빨리 놓았어요 · 다시'); if(state.armed) el.drawHint.hidden=false; return; }
   await shoot(pull.ret);
 };
@@ -536,6 +544,7 @@ async function shoot(ret){
   await waitHard(900);
   const total=state.scores.reduce((a,b)=>a+b,0);
   if(state.shot>=state.arrows){
+    el.aimpad.classList.remove('show');
     state.history.push({total,n:state.arrows}); renderHistory();
     await waitHard(300);
     el.rpop.innerHTML=`<small>${state.arrows}발 합계 · ${state.scores.join(' + ')}</small>${total}점`; el.rpop.className='rpop show'+(total>=state.arrows*9?' gold':total<=state.arrows*3?' miss':'');
@@ -545,7 +554,7 @@ async function shoot(ret){
   }
   el.rpop.className='rpop';
   el.turn.innerHTML=`<b>${state.shot+1}발째</b> · 현재 ${total}점 · 누르고 조준`;
-  state.busy=false; state.armed=true; el.drawHint.hidden=false;
+  state.busy=false; state.armed=true; el.drawHint.hidden=false; el.aimpad.classList.add('show');
 }
 function spark(x,y){
   for(let i=0;i<12;i++){ const sp=document.createElement('div'); sp.className='spark'; el.range.appendChild(sp);
