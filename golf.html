@@ -163,6 +163,11 @@
   .pt .team{display:inline-block;font-size:9.5px;font-weight:900;padding:3px 7px;border-radius:999px;letter-spacing:.08em;color:#fff;margin-right:6px;vertical-align:2px}
   .pt.tB .team{background:var(--blue)} .pt.tR .team{background:var(--red)} .pt.tJ .team{background:#16a34a}
   .near{display:flex;align-items:center;gap:8px;margin-top:10px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:9px 12px}
+  .near .nlsel{display:flex;gap:4px;flex:none}
+  .near .nlsel button{padding:7px 11px;border-radius:999px;font-size:12px;font-weight:800;background:var(--chip);color:var(--mut)}
+  .near .nlsel button.on{background:var(--acc);color:var(--accink)}
+  .near .amt{font-weight:900;font-size:13px;background:var(--chip);padding:7px 10px;border-radius:10px}
+  .pt .sc b.bd{color:var(--blue)} .pt .sc b.bg{color:var(--red)}
   .near b{font-size:13px;flex:none} .near small{color:var(--mut);font-size:11px;font-weight:700}
   .near .who{display:flex;gap:6px;margin-left:auto}
   .near .who button{width:34px;height:34px;border-radius:50%;font-size:12px;font-weight:800;background:var(--chip);border:1.5px solid transparent;color:var(--ink)}
@@ -379,13 +384,6 @@ const RULES={
         {k:'dp', t:'양파', d:'더블파 홀아웃 시', sw:true, amt:true, def:true, defAmt:2000},
       ]},
     ]},
-  nl:{ name:'니어 · 롱기', desc:'홀에서 사람 찍으면 나머지가 그 금액씩 줌', icon:'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>',
-    groups:[
-      {t:'항목 · 금액', items:[
-        {k:'near', t:'니어리스트', d:'파3 홀', sw:true, amt:true, def:true, defAmt:5000},
-        {k:'long', t:'롱기스트', d:'파5 홀', sw:true, amt:true, def:true, defAmt:5000},
-      ]},
-    ]},
   dp:{ name:'양파 룰', desc:'더블파에서 홀아웃 · 그 이상은 더블파로 계산', icon:'<svg class="i" viewBox="0 0 24 24"><path d="M4 18V6M20 18V6M4 12h16"/></svg>', groups:[] },
 };
 function defaultRules(){ const r={}; for(const k in RULES){ r[k]={on:true}; RULES[k].groups.forEach(g=>g.items.forEach(it=>{ if(it.sw) r[k][it.k]=!!it.def; if(it.amt) r[k][it.k+'Amt']=it.defAmt!=null?it.defAmt:it.def; })); } r.dbl.stack=false; return r; }
@@ -400,25 +398,26 @@ function newRound(){
   r.holes=defaultPars(18).map(par=>blankHole(par,r.players.length));
   return r;
 }
-function blankHole(par,n){ return {par, s:Array(n).fill(null), ob:Array(n).fill(0), haz:Array(n).fill(0), p3:Array(n).fill(0), near:null, long:null, team:null, done:false}; }
-function resizeRound(r){ const n=r.players.length; r.holes.forEach(h=>{ ['s','ob','haz','p3'].forEach(k=>{ const def=k==='s'?null:0; while(h[k].length<n) h[k].push(def); h[k].length=n; }); if(h.near!=null&&h.near>=n) h.near=null; if(h.long!=null&&h.long>=n) h.long=null; if(h.team&&h.team.length!==n) h.team=null; }); while(r.holes.length<r.holesN) r.holes.push(blankHole(defaultPars(18)[r.holes.length]||4,n)); }
+function blankHole(par,n){ return {par, s:Array(n).fill(null), ob:Array(n).fill(0), haz:Array(n).fill(0), p3:Array(n).fill(0), nl:null, team:null, done:false}; }
+function resizeRound(r){ const n=r.players.length; r.holes.forEach(h=>{ ['s','ob','haz','p3'].forEach(k=>{ const def=k==='s'?null:0; while(h[k].length<n) h[k].push(def); h[k].length=n; }); if(h.nl&&h.nl.winner!=null&&h.nl.winner>=n) h.nl.winner=null; if(h.team&&h.team.length!==n) h.team=null; }); while(r.holes.length<r.holesN) r.holes.push(blankHole(defaultPars(18)[r.holes.length]||4,n)); }
 function cap(r,h,sc){ if(sc==null) return null; return r.rules.dp.on?Math.min(sc,h.par*2):sc; }
 function scoreLabel(par,sc){ if(sc==null) return ''; const d=sc-par; if(sc===1) return '홀인원'; if(d<=-3) return '알바트로스'; if(d===-2) return '이글'; if(d===-1) return '버디'; if(d===0) return '파'; if(d===1) return '보기'; if(d===2) return '더블'; if(d===3) return '트리플'; if(sc>=par*2) return '양파'; return '+'+d; }
+function rel(par,sc){ if(sc==null) return ''; const d=sc-par; return d>0?'+'+d:String(d); }
 function labelCls(par,sc){ if(sc==null) return ''; const d=sc-par; if(d<0) return 'b'; if(d===0) return 'p'; if(d>=2) return 'o'; return ''; }
 
 /* ---- 정산 계산 (순차) ---- */
 function compute(r){
   const n=r.players.length, R=r.rules, holes=[]; let carry=0, mult=1; const totals=Array(n).fill(0), fines=Array(n).fill(0), fineCnt={ob:0,haz:0,p3:0,dp:0};
   for(let i=0;i<r.holesN;i++){
-    const h=r.holes[i]; const net=Array(n).fill(0), fine=Array(n).fill(0); const info={i,mult,net,fine,done:h.done,reason:'',nextMult:1,nextReason:'',skinsPot:0,skinsWinner:null,vegas:null,nl:[]};
+    const h=r.holes[i]; const net=Array(n).fill(0), fine=Array(n).fill(0); const flows=[]; const info={i,mult,net,fine,flows,done:h.done,reason:'',nextMult:1,nextReason:'',skinsPot:0,skinsWinner:null,vegas:null,nl:[]};
     if(!h.done||h.s.some(x=>x==null)){ info.done=false; holes.push(info); mult=1; continue; } // 미입력 홀 이후엔 배판 끊김
     const sc=h.s.map(x=>cap(r,h,x));
     // 경기 종류
-    if(r.mode==='stroke'){ for(let a=0;a<n;a++) for(let b=a+1;b<n;b++){ const d=sc[a]-sc[b]; if(d>0){ net[a]-=d*r.unit*mult; net[b]+=d*r.unit*mult; } else if(d<0){ net[b]-=(-d)*r.unit*mult; net[a]+=(-d)*r.unit*mult; } } }
-    else if(r.mode==='skins'){ const stake=r.unit*mult; let pot=carry; for(let a=0;a<n;a++){ net[a]-=stake; pot+=stake; } const mn=Math.min(...sc); const ws=sc.map((v,k)=>v===mn?k:-1).filter(k=>k>=0); info.skinsPot=pot; if(ws.length===1){ net[ws[0]]+=pot; carry=0; info.skinsWinner=ws[0]; } else { carry=pot; info.skinsWinner=null; } }
-    else if(r.mode==='vegas'){ if(h.team&&n===4){ const eff=sc.map((v,k)=>h.team[k]==='J'?h.par:v); const A=[],B=[]; h.team.forEach((t,k)=>{ (t==='B'?A:B).push(k); }); const sa=A.reduce((x,k)=>x+eff[k],0), sb=B.reduce((x,k)=>x+eff[k],0); const stake=r.unit*mult; let win=null; if(sa<sb) win='B'; else if(sb<sa) win='R'; if(win){ const W=win==='B'?A:B, L=win==='B'?B:A; W.forEach(k=>net[k]+=stake); L.forEach(k=>net[k]-=stake); } info.vegas={sa,sb,win,eff,A,B,stake}; } }
+    if(r.mode==='stroke'){ for(let a=0;a<n;a++) for(let b=a+1;b<n;b++){ const d=sc[a]-sc[b]; if(d>0){ net[a]-=d*r.unit*mult; net[b]+=d*r.unit*mult; flows.push({from:a,to:b,v:d*r.unit*mult,why:`${d}타`}); } else if(d<0){ net[b]-=(-d)*r.unit*mult; net[a]+=(-d)*r.unit*mult; flows.push({from:b,to:a,v:(-d)*r.unit*mult,why:`${-d}타`}); } } }
+    else if(r.mode==='skins'){ const stake=r.unit*mult; let pot=carry; for(let a=0;a<n;a++){ net[a]-=stake; pot+=stake; } const mn=Math.min(...sc); const ws=sc.map((v,k)=>v===mn?k:-1).filter(k=>k>=0); info.skinsPot=pot; if(ws.length===1){ net[ws[0]]+=pot; carry=0; info.skinsWinner=ws[0]; const w=ws[0]; const per=Math.round(pot/n); for(let a=0;a<n;a++) if(a!==w) flows.push({from:a,to:w,v:per,why:'스킨'}); } else { carry=pot; info.skinsWinner=null; } }
+    else if(r.mode==='vegas'){ if(h.team&&n===4){ const eff=sc.map((v,k)=>h.team[k]==='J'?h.par:v); const A=[],B=[]; h.team.forEach((t,k)=>{ (t==='B'?A:B).push(k); }); const sa=A.reduce((x,k)=>x+eff[k],0), sb=B.reduce((x,k)=>x+eff[k],0); const stake=r.unit*mult; let win=null; if(sa<sb) win='B'; else if(sb<sa) win='R'; if(win){ const W=win==='B'?A:B, L=win==='B'?B:A; W.forEach(k=>net[k]+=stake); L.forEach(k=>net[k]-=stake); L.forEach((k,j)=>flows.push({from:k,to:W[j%W.length],v:stake,why:'뽑기'})); } info.vegas={sa,sb,win,eff,A,B,stake}; } }
     // 니어 · 롱기
-    if(R.nl.on){ if(h.par===3&&R.nl.near&&h.near!=null){ const w=h.near; for(let a=0;a<n;a++) if(a!==w){ net[a]-=R.nl.nearAmt; net[w]+=R.nl.nearAmt; } info.nl.push(['니어',w]); } if(h.par===5&&R.nl.long&&h.long!=null){ const w=h.long; for(let a=0;a<n;a++) if(a!==w){ net[a]-=R.nl.longAmt; net[w]+=R.nl.longAmt; } info.nl.push(['롱기',w]); } }
+    if(h.nl&&h.nl.winner!=null){ const w=h.nl.winner, amt=h.nl.amt||0, lab=h.nl.type==='near'?'니어':'롱기'; for(let a=0;a<n;a++) if(a!==w){ net[a]-=amt; net[w]+=amt; flows.push({from:a,to:w,v:amt,why:lab}); } info.nl.push([lab,w]); }
     // 벌금
     if(R.fine.on){ for(let a=0;a<n;a++){ if(R.fine.ob&&h.ob[a]){ fine[a]+=h.ob[a]*R.fine.obAmt; fineCnt.ob+=h.ob[a]; } if(R.fine.haz&&h.haz[a]){ fine[a]+=h.haz[a]*R.fine.hazAmt; fineCnt.haz+=h.haz[a]; } if(R.fine.p3&&h.p3[a]){ fine[a]+=h.p3[a]*R.fine.p3Amt; fineCnt.p3+=h.p3[a]; } if(R.fine.dp&&R.dp.on&&h.s[a]>=h.par*2){ fine[a]+=R.fine.dpAmt; fineCnt.dp++; } } }
     // 다음 홀 배판
@@ -468,7 +467,7 @@ function renderSetup(){
     if(R.groups.length) b.onclick=()=>{ if(!r.rules[k].on){ r.rules[k].on=true; } openRule(k); };
     rl.appendChild(b); }
 }
-function ruleSummary(k){ const r=cur.rules[k]; if(k==='dbl'){ const a=[]; if(r.tie3) a.push('동타'); if(r.birdie) a.push('버디'); if(r.triple) a.push('트리플'); if(r.stack) a.push('배배판 '+(r.maxMultAmt||4)+'배'); return a.length?a.join(' · '):'조건 없음'; } if(k==='fine'){ const a=[]; if(r.ob) a.push('OB'); if(r.haz) a.push('해저드'); if(r.p3) a.push('3퍼트'); if(r.dp) a.push('양파'); return a.length?a.join(' · '):'항목 없음'; } if(k==='nl'){ const a=[]; if(r.near) a.push('니어 '+fmt(r.nearAmt)); if(r.long) a.push('롱기 '+fmt(r.longAmt)); return a.length?a.join(' · '):'항목 없음'; } return RULES[k].desc; }
+function ruleSummary(k){ const r=cur.rules[k]; if(k==='dbl'){ const a=[]; if(r.tie3) a.push('동타'); if(r.birdie) a.push('버디'); if(r.triple) a.push('트리플'); if(r.stack) a.push('배배판 '+(r.maxMultAmt||4)+'배'); return a.length?a.join(' · '):'조건 없음'; } if(k==='fine'){ const a=[]; if(r.ob) a.push('OB'); if(r.haz) a.push('해저드'); if(r.p3) a.push('3퍼트'); if(r.dp) a.push('양파'); return a.length?a.join(' · '):'항목 없음'; } return RULES[k].desc; }
 function editPlayer(i){ const p=cur.players[i]; sheet(`<h4>${i+1}번 플레이어</h4><input class="inp" id="pn" placeholder="이름" maxlength="8" value="${esc(p.name)}"><div class="chips" id="nameChips"></div><div class="row"><button class="btn ghost sm" id="pdel" ${cur.players.length<=2?'disabled':''}>빼기</button><button class="btn sm" id="pok">확인</button></div>`);
   const used=new Set(cur.players.map(x=>x.name)); const chips=$('#nameChips'); (DB.names||[]).filter(n=>!used.has(n)).slice(0,8).forEach(n=>{ const b=document.createElement('button'); b.textContent=n; b.onclick=()=>{ $('#pn').value=n; }; chips.appendChild(b); });
   const inp=$('#pn'); setTimeout(()=>{ inp.focus(); inp.select(); },50);
@@ -515,20 +514,25 @@ function renderHole(){
   for(let k=0;k<r.holesN;k++){ const hh=r.holes[k]; const b=document.createElement('button'); b.className=(hh.done?'f ':'')+(k===i?'cur ':'')+(k>0&&r.holes[k-1].done&&c.holes[k-1].nextMult>1?'dbl':''); b.innerHTML=`${k+1}<small>P${hh.par}</small>`; b.onclick=()=>{ r.cur=k; save(); renderHole(); }; strip.appendChild(b); }
   setTimeout(()=>{ const el=strip.children[i]; if(el) strip.scrollTo({left:el.offsetLeft-strip.clientWidth/2+el.offsetWidth/2}); },10);
   $('#holeNo').textContent=i+1;
-  $$('#parSel button').forEach(b=>{ b.classList.toggle('on',+b.dataset.p===h.par); b.onclick=()=>{ const old=h.par; h.par=+b.dataset.p; h.s=h.s.map(v=>v==null?null:v); if(old!==h.par){ h.near=null; h.long=null; } save(); vib(6); renderHole(); }; });
+  $$('#parSel button').forEach(b=>{ b.classList.toggle('on',+b.dataset.p===h.par); b.onclick=()=>{ const old=h.par; h.par=+b.dataset.p; h.s=h.s.map(v=>v==null?null:Math.max(1,v+(h.par-old))); save(); vib(6); renderHole(); }; }); // 파 바꿔도 ± 유지
   $('#dblNow').innerHTML=mult>1?`<div class="dblnow"><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>배판 ×${mult}${reason?' · '+esc(reason):''}</div>`:'';
   const pt=$('#ptiles'); pt.className='ptiles n'+n; pt.innerHTML='';
   const holeNet=info.done?info.net:null;
   r.players.forEach((p,k)=>{ const sc=h.s[k]; const d=document.createElement('div'); d.className='pt'+(h.team?' t'+h.team[k]:''); const teamLab=h.team?{B:'BLUE',R:'RED',J:'JOKER'}[h.team[k]]:'';
     const fl=[]; if(r.rules.fine.on){ if(r.rules.fine.ob) fl.push(['ob','OB']); if(r.rules.fine.haz) fl.push(['haz','해저드']); if(r.rules.fine.p3) fl.push(['p3','3퍼트']); }
-    d.innerHTML=`<div class="hd"><b>${h.team?`<span class="team">${teamLab}</span>`:''}${esc(p.name)}</b><small class="${c.totals[k]>0?'up':(c.totals[k]<0?'dn':'mut')}">${fmtS(c.totals[k])}</small></div><div class="sc"><button data-d="-1">−</button><b>${sc==null?'<span class="mut" style="font-size:22px">입력</span>':sc}</b><button data-d="1">+</button></div><div class="res"><em class="${labelCls(h.par,sc)}">${sc==null?'탭해서 파':scoreLabel(h.par,sc)}${h.team&&h.team[k]==='J'?' → 파':''}</em><span class="${holeNet?(holeNet[k]>0?'up':(holeNet[k]<0?'dn':'mut')):'mut'}">${holeNet?fmtS(holeNet[k]):''}</span></div>${fl.length?`<div class="fl">${fl.map(([key,lab])=>`<button data-f="${key}" class="${h[key][k]?'on':''}">${lab}${h[key][k]>1?' ×'+h[key][k]:''}</button>`).join('')}</div>`:''}`;
-    d.querySelectorAll('.sc button').forEach(b=>b.onclick=()=>{ const dd=+b.dataset.d; if(h.s[k]==null) h.s[k]=h.par; else h.s[k]=Math.max(1,Math.min(15,h.s[k]+dd)); touch(h); vib(5); renderHole(); });
+    d.innerHTML=`<div class="hd"><b>${h.team?`<span class="team">${teamLab}</span>`:''}${esc(p.name)}</b><small class="${c.totals[k]>0?'up':(c.totals[k]<0?'dn':'mut')}">${fmtS(c.totals[k])}</small></div><div class="sc"><button data-d="-1">−</button><b class="${sc==null?'':(sc<h.par?'bd':(sc>h.par?'bg':''))}">${sc==null?'<span class="mut" style="font-size:20px">탭</span>':rel(h.par,sc)}</b><button data-d="1">+</button></div><div class="res"><em class="${labelCls(h.par,sc)}">${sc==null?'파부터':scoreLabel(h.par,sc)+' · '+sc+'타'}${h.team&&h.team[k]==='J'?' → 파':''}</em><span class="${holeNet?(holeNet[k]>0?'up':(holeNet[k]<0?'dn':'mut')):'mut'}">${holeNet?fmtS(holeNet[k]):''}</span></div>${fl.length?`<div class="fl">${fl.map(([key,lab])=>`<button data-f="${key}" class="${h[key][k]?'on':''}">${lab}${h[key][k]>1?' ×'+h[key][k]:''}</button>`).join('')}</div>`:''}`;
+    d.querySelectorAll('.sc button').forEach(b=>b.onclick=()=>{ const dd=+b.dataset.d; if(h.s[k]==null) h.s[k]=h.par; else h.s[k]=Math.max(1,Math.min(h.par+9,h.s[k]+dd)); touch(h); vib(5); renderHole(); });
     d.querySelector('.sc b').onclick=()=>{ if(h.s[k]==null){ h.s[k]=h.par; touch(h); vib(5); renderHole(); } };
     d.querySelectorAll('.fl button').forEach(b=>b.onclick=()=>{ const key=b.dataset.f; h[key][k]=(h[key][k]+1)%4; vib(5); save(); renderHole(); });
     pt.appendChild(d); });
-  // 니어 · 롱기
+  // 니어 · 롱기 (홀에서 결정)
   const nr=$('#nearRow'); nr.innerHTML='';
-  if(r.rules.nl.on&&((h.par===3&&r.rules.nl.near)||(h.par===5&&r.rules.nl.long))){ const isN=h.par===3; const key=isN?'near':'long'; const amt=isN?r.rules.nl.nearAmt:r.rules.nl.longAmt; const d=document.createElement('div'); d.className='near'; d.innerHTML=`<b>${isN?'니어리스트':'롱기스트'}</b><small>${fmt(amt)}</small><div class="who">${r.players.map((p,k)=>`<button class="${h[key]===k?'on':''}" data-k="${k}">${esc(p.name.slice(0,1))}</button>`).join('')}</div>`; d.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const k=+b.dataset.k; h[key]=h[key]===k?null:k; vib(6); save(); renderHole(); }); nr.appendChild(d); }
+  { const nl=h.nl; const d=document.createElement('div'); d.className='near';
+    d.innerHTML=`<div class="nlsel"><button data-t="near" class="${nl&&nl.type==='near'?'on':''}">니어</button><button data-t="long" class="${nl&&nl.type==='long'?'on':''}">롱기</button></div>${nl?`<button class="amt" id="nlAmt">${fmt(nl.amt)}</button><div class="who">${r.players.map((p,k)=>`<button class="${nl.winner===k?'on':''}" data-k="${k}">${esc(p.name.slice(0,1))}</button>`).join('')}</div>`:`<small>이번 홀 니어·롱기 걸기</small>`}`;
+    d.querySelectorAll('.nlsel button').forEach(b=>b.onclick=()=>{ const t=b.dataset.t; if(nl&&nl.type===t){ h.nl=null; } else { h.nl={type:t,amt:(nl&&nl.amt)||DB.nlAmt||5000,winner:nl?nl.winner:null}; } vib(6); save(); renderHole(); });
+    const am=d.querySelector('#nlAmt'); if(am) am.onclick=()=>amountSheet(nl.type==='near'?'니어리스트 금액':'롱기스트 금액',nl.amt,[1000,2000,3000,5000,10000,20000],v=>{ nl.amt=v; DB.nlAmt=v; save(); renderHole(); });
+    d.querySelectorAll('.who button').forEach(b=>b.onclick=()=>{ const k=+b.dataset.k; nl.winner=nl.winner===k?null:k; vib(6); save(); renderHole(); });
+    nr.appendChild(d); }
   // 안내
   const hi=$('#holeInfo'); hi.innerHTML='';
   const allIn=h.s.every(x=>x!=null);
@@ -537,7 +541,9 @@ function renderHole(){
     if(r.mode==='skins'){ bits.push(info.skinsWinner!=null?`${esc(r.players[info.skinsWinner].name)} 스킨 ${fmt(info.skinsPot)}`:`동타 · ${fmt(info.skinsPot)} 이월`); }
     if(r.mode==='vegas'&&info.vegas){ const v=info.vegas; bits.push(v.win?`${v.win==='B'?'블루':'레드'} 승 ${v.sa}:${v.sb} · 1인 ${fmt(v.stake)}`:`동점 ${v.sa}:${v.sb} · 돈 없음`); }
     info.nl.forEach(([t,w])=>bits.push(`${t} ${esc(r.players[w].name)}`));
-    if(bits.length) hi.innerHTML+=`<div class="ticker"><span class="dot"></span>${bits.join(' · ')}</div>`; }
+    if(bits.length) hi.innerHTML+=`<div class="ticker"><span class="dot"></span>${bits.join(' · ')}</div>`;
+    if(h.nl&&h.nl.winner==null) hi.innerHTML+=`<div class="ticker warn"><span class="dot"></span>${h.nl.type==='near'?'니어':'롱기'} ${fmt(h.nl.amt)} · 누가 먹었는지 찍기</div>`;
+    hi.innerHTML+=`<div class="lbl" style="margin-top:12px">이 홀 송금</div><div class="flow">${info.flows.length?info.flows.map(f=>`<div class="r"><span class="av">${esc(r.players[f.from].name.slice(0,1))}</span>${esc(r.players[f.from].name)}<span class="ln"></span>${esc(r.players[f.to].name)}<span class="av">${esc(r.players[f.to].name.slice(0,1))}</span><span class="amt">${fmt(f.v)}<small class="mut" style="display:block;font-size:10px;font-weight:700">${f.why}</small></span></div>`).join(''):'<div class="none">이 홀은 주고받을 돈 없음</div>'}</div>`; }
   else if(!allIn){ hi.innerHTML=`<div class="ticker"><span class="dot" style="background:var(--mut);box-shadow:none"></span>타수 입력 · 숫자 자리 누르면 파로 시작</div>`; }
   // 네비
   $('#prevHole').disabled=i===0; $('#prevLab').textContent=i>0?`${i}홀`:'이전';
@@ -607,9 +613,9 @@ function renderResult(){
   const fineTot=c.fines.reduce((a,b)=>a+b,0); $('#jar').innerHTML=`<div><b>${fmt(fineTot)}</b><small>벌금통</small></div><div class="list">${r.players.map((p,i)=>`${esc(p.name)} ${fmt(c.fines[i])}`).join(' · ')}<br>OB ${c.fineCnt.ob} · 해저드 ${c.fineCnt.haz} · 3퍼트 ${c.fineCnt.p3} · 양파 ${c.fineCnt.dp}</div>`;
   // 스코어카드
   const t=$('#sctable'); let html=`<tr><th>홀</th><th>파</th>${r.players.map(p=>`<th>${esc(p.name)}</th>`).join('')}<th>배</th></tr>`;
-  for(let i=0;i<r.holesN;i++){ const h=r.holes[i], hi=c.holes[i]; html+=`<tr><td class="h">${i+1}</td><td class="mut">${h.par}</td>${r.players.map((p,k)=>{ const s=h.s[k]; const cl=s==null?'':(s<h.par?'bd':(s>=h.par+2?'bg':'')); return `<td class="${cl}">${s==null?'·':s}${h.team&&h.team[k]==='J'?'<small>J</small>':''}</td>`; }).join('')}<td class="d">${hi.mult>1?'×'+hi.mult:''}</td></tr>`; }
-  const tot=r.players.map((p,k)=>r.holes.slice(0,r.holesN).filter(h=>h.done).reduce((s,h)=>s+(h.s[k]||0),0));
-  html+=`<tr><td class="h">계</td><td></td>${tot.map(v=>`<td class="h">${v||''}</td>`).join('')}<td></td></tr><tr><td class="h">±</td><td></td>${c.totals.map(v=>`<td class="${v>0?'up':(v<0?'dn':'')}" style="font-weight:900">${fmtS(v)}</td>`).join('')}<td></td></tr>`;
+  for(let i=0;i<r.holesN;i++){ const h=r.holes[i], hi=c.holes[i]; html+=`<tr><td class="h">${i+1}</td><td class="mut">${h.par}</td>${r.players.map((p,k)=>{ const s=h.s[k]; const cl=s==null?'':(s<h.par?'bd':(s>=h.par+2?'bg':'')); return `<td class="${cl}">${s==null?'·':rel(h.par,s)}${h.team&&h.team[k]==='J'?'<small>J</small>':''}</td>`; }).join('')}<td class="d">${hi.mult>1?'×'+hi.mult:''}</td></tr>`; }
+  const tot=r.players.map((p,k)=>r.holes.slice(0,r.holesN).filter(h=>h.done).reduce((s,h)=>s+((h.s[k]||h.par)-h.par),0));
+  html+=`<tr><td class="h">계</td><td></td>${tot.map(v=>`<td class="h">${v>0?'+'+v:v}</td>`).join('')}<td></td></tr><tr><td class="h">±</td><td></td>${c.totals.map(v=>`<td class="${v>0?'up':(v<0?'dn':'')}" style="font-weight:900">${fmtS(v)}</td>`).join('')}<td></td></tr>`;
   t.innerHTML=html;
   $('#resEdit').onclick=()=>{ if(r.done){ r.done=false; } r.cur=Math.min(r.cur,r.holesN-1); save(); renderHole(); };
   $('#resHome').onclick=()=>{ save(); renderList(); show('#s-list'); };
