@@ -29,6 +29,10 @@
     {
       "source": "/race",
       "destination": "/race.html"
+    },
+    {
+      "source": "/golf",
+      "destination": "/golf.html"
     }
   ]
 }
