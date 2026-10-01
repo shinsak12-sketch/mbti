@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>골프 내기 · 디자인 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Inter','Noto Sans KR',-apple-system,system-ui,sans-serif;background:#e9ebef;color:#111;padding:28px 18px 60px;-webkit-font-smoothing:antialiased}
+  h1{font-size:26px;font-weight:900;letter-spacing:-.6px}
+  .sub{color:#667;font-size:14px;margin-top:6px}
+  .dir{margin-top:34px}
+  .dir h2{font-size:18px;font-weight:800;display:flex;align-items:center;gap:10px;letter-spacing:-.3px}
+  .dir h2 span{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:#111;color:#fff}
+  .dir p{color:#667;font-size:13px;margin-top:4px}
+  .row{display:flex;gap:22px;overflow-x:auto;padding:22px 4px 10px;scroll-snap-type:x mandatory}
+  .phone{flex:none;width:300px;height:640px;border-radius:38px;padding:10px;background:#0b0b0d;box-shadow:0 30px 60px -20px rgba(0,0,0,.45),0 0 0 2px #2a2a2e inset;scroll-snap-align:start;position:relative}
+  .phone::before{content:'';position:absolute;left:50%;top:18px;transform:translateX(-50%);width:84px;height:24px;border-radius:14px;background:#000;z-index:5}
+  .scr{width:100%;height:100%;border-radius:30px;overflow:hidden;position:relative;font-size:13px}
+  .cap{font-size:12px;font-weight:700;color:#556;text-align:center;margin-top:10px}
+
+  /* ===== THEME A : 라이트 미니멀 ===== */
+  .A{--bg:#f4f5f7;--card:#ffffff;--ink:#0f1115;--mut:#7a808c;--line:#e6e8ec;--acc:#17b26a;--acc2:#0f9a58;--red:#ef4444;--blue:#2563eb;--chip:#f0f2f5}
+  /* ===== THEME B : 다크 볼드 ===== */
+  .B{--bg:#0f1115;--card:#181b22;--ink:#f3f4f6;--mut:#8b919e;--line:#262a33;--acc:#c6ff3d;--acc2:#a8e02a;--red:#ff5d5d;--blue:#6aa3ff;--chip:#22262f}
+  .scr{background:var(--bg);color:var(--ink)}
+  .pad{padding:52px 16px 16px}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .top h3{font-size:22px;font-weight:900;letter-spacing:-.6px}
+  .top .ic{width:34px;height:34px;border-radius:12px;background:var(--card);display:grid;place-items:center;font-size:16px;box-shadow:0 1px 2px rgba(0,0,0,.08);border:1px solid var(--line)}
+  .B .top .ic{box-shadow:none}
+  .card{background:var(--card);border-radius:18px;padding:14px;border:1px solid var(--line);box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px -16px rgba(0,0,0,.25);margin-bottom:10px;position:relative}
+  .B .card{box-shadow:0 10px 30px -18px rgba(0,0,0,.8)}
+  .pill{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:800;padding:4px 8px;border-radius:999px;background:var(--chip);color:var(--mut)}
+  .pill.live{background:rgba(23,178,106,.14);color:var(--acc2)}
+  .B .pill.live{background:rgba(198,255,61,.14);color:var(--acc)}
+  .pill.done{background:var(--chip)}
+  .btn{display:flex;align-items:center;justify-content:center;gap:6px;height:48px;border-radius:14px;font-weight:800;font-size:14px;background:var(--ink);color:var(--bg);box-shadow:0 10px 20px -10px rgba(0,0,0,.5)}
+  .B .btn{background:var(--acc);color:#0f1115;box-shadow:0 12px 24px -10px rgba(198,255,61,.45)}
+  .btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:none}
+  .btn.sm{height:40px;font-size:13px;border-radius:12px}
+  .mut{color:var(--mut)}
+  .lbl{font-size:11px;font-weight:800;color:var(--mut);letter-spacing:.06em;margin:14px 2px 8px;text-transform:uppercase}
+  .fab{position:absolute;right:16px;bottom:22px;width:54px;height:54px;border-radius:18px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-size:26px;font-weight:300;box-shadow:0 14px 26px -10px rgba(0,0,0,.6)}
+  .B .fab{background:var(--acc);color:#0f1115;box-shadow:0 14px 26px -8px rgba(198,255,61,.5)}
+
+  /* 리스트 */
+  .rc .t{display:flex;justify-content:space-between;align-items:center}
+  .rc .t b{font-size:15px;letter-spacing:-.3px}
+  .rc .d{font-size:11px;color:var(--mut);margin-top:3px}
+  .rc .pl{display:flex;gap:4px;margin-top:10px}
+  .rc .pl i{font-style:normal;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:800;background:var(--chip);color:var(--ink);border:2px solid var(--card);margin-left:-6px}
+  .rc .pl i:first-child{margin-left:0}
+  .rc .ld{margin-left:auto;font-size:12px;font-weight:800}
+  .rc .ld.up{color:var(--acc2)} .B .rc .ld.up{color:var(--acc)}
+  .rc .bar{height:4px;border-radius:4px;background:var(--chip);margin-top:12px;overflow:hidden}
+  .rc .bar i{display:block;height:100%;width:61%;background:var(--acc);border-radius:4px}
+
+  /* 설정 */
+  .seg{display:flex;background:var(--chip);border-radius:12px;padding:3px}
+  .seg span{flex:1;text-align:center;padding:8px 0;border-radius:10px;font-weight:700;font-size:12px;color:var(--mut)}
+  .seg span.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .B .seg span.on{background:#2a2f3a;color:var(--acc)}
+  .inp{display:flex;align-items:center;gap:10px;height:46px;border-radius:12px;background:var(--card);border:1px solid var(--line);padding:0 12px;font-size:14px;font-weight:600;margin-bottom:8px}
+  .inp i{font-style:normal;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-size:11px;font-weight:800}
+  .B .inp i{background:var(--acc);color:#0f1115}
+  .inp .x{margin-left:auto;color:var(--mut);font-size:12px}
+  .modes{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .mode{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 10px;font-size:12px;font-weight:800;text-align:center}
+  .mode em{display:block;font-style:normal;font-size:20px;margin-bottom:6px}
+  .mode small{display:block;font-weight:600;color:var(--mut);font-size:10px;margin-top:2px}
+  .mode.on{border-color:var(--acc);background:rgba(23,178,106,.06)}
+  .B .mode.on{background:rgba(198,255,61,.08)}
+  .money{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px}
+  .money b{font-size:13px}
+  .money .v{font-size:18px;font-weight:900;letter-spacing:-.5px}
+  .money .v small{font-size:11px;color:var(--mut);font-weight:700;margin-left:2px}
+  .opt{display:flex;align-items:center;justify-content:space-between;padding:10px 2px;border-bottom:1px solid var(--line);font-size:13px;font-weight:700}
+  .opt small{display:block;font-weight:500;color:var(--mut);font-size:11px}
+  .sw{width:40px;height:24px;border-radius:999px;background:var(--chip);position:relative;flex:none}
+  .sw::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+  .sw.on{background:var(--acc)}
+  .sw.on::after{left:19px}
+  .B .sw.on::after{background:#0f1115}
+
+  /* 홀 입력 */
+  .hole-hd{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:12px}
+  .hole-hd .n{font-size:54px;font-weight:900;letter-spacing:-3px;line-height:1}
+  .hole-hd .n small{font-size:14px;letter-spacing:0;color:var(--mut);font-weight:700;margin-left:4px}
+  .hole-hd .par{display:flex;gap:4px}
+  .hole-hd .par span{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-weight:800;background:var(--card);border:1px solid var(--line);font-size:12px}
+  .hole-hd .par span.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .B .hole-hd .par span.on{background:var(--acc);color:#0f1115;border-color:var(--acc)}
+  .dbl{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:900;color:#fff;background:linear-gradient(90deg,#ff7a1a,#ff3d6e);padding:5px 10px;border-radius:999px;margin-bottom:10px;box-shadow:0 6px 14px -6px rgba(255,61,110,.6)}
+  .tot{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+  .tot div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 4px;text-align:center}
+  .tot div b{display:block;font-size:11px;color:var(--mut);font-weight:700}
+  .tot div em{font-style:normal;font-weight:900;font-size:13px;letter-spacing:-.3px}
+  .tot .up em{color:var(--acc2)} .B .tot .up em{color:var(--acc)}
+  .tot .dn em{color:var(--red)}
+  .pr{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 10px;margin-bottom:8px}
+  .pr .nm{width:52px;font-weight:800;font-size:13px;letter-spacing:-.3px}
+  .pr .nm small{display:block;font-size:10px;color:var(--mut);font-weight:700}
+  .pr .st{display:flex;align-items:center;gap:6px;margin-left:auto}
+  .pr .st span{width:34px;height:34px;border-radius:11px;background:var(--chip);display:grid;place-items:center;font-size:18px;font-weight:600;color:var(--ink)}
+  .pr .st b{width:40px;text-align:center;font-size:24px;font-weight:900;letter-spacing:-1px}
+  .pr .tag{font-size:10px;font-weight:800;padding:3px 7px;border-radius:999px;background:var(--chip);color:var(--mut)}
+  .pr .tag.b{background:rgba(37,99,235,.12);color:var(--blue)}
+  .pr .tag.bo{background:rgba(239,68,68,.12);color:var(--red)}
+  .pr .tag.pa{background:rgba(23,178,106,.12);color:var(--acc2)} .B .pr .tag.pa{color:var(--acc);background:rgba(198,255,61,.12)}
+  .flags{display:flex;gap:6px;margin:-2px 0 10px 62px}
+  .flags span{font-size:10px;font-weight:800;padding:4px 8px;border-radius:999px;border:1px solid var(--line);color:var(--mut);background:var(--card)}
+  .flags span.on{background:var(--red);color:#fff;border-color:var(--red)}
+  .flags span.star{color:#b7791f} .flags span.star.on{background:#f5b301;color:#111;border-color:#f5b301}
+  .hsum{background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:10px 12px;font-size:12px;display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+  .hsum b.up{color:var(--acc2)} .B .hsum b.up{color:var(--acc)}
+  .hsum b.dn{color:var(--red)}
+  .nav{display:flex;gap:8px;margin-top:12px}
+  .nav .btn{flex:1}
+  .teams{display:flex;gap:8px;margin-bottom:10px}
+  .teams div{flex:1;border-radius:14px;padding:10px;font-weight:800;font-size:12px;text-align:center;border:1px solid var(--line);background:var(--card)}
+  .teams div b{display:block;font-size:10px;letter-spacing:.08em;color:var(--mut);margin-bottom:4px}
+  .teams .t1{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+  .teams .t2{border-color:var(--red);box-shadow:inset 0 0 0 1px var(--red)}
+
+  /* 정산 */
+  .win{background:var(--ink);color:var(--bg);border-radius:20px;padding:16px;margin-bottom:10px;position:relative;overflow:hidden}
+  .B .win{background:linear-gradient(135deg,#1d2230,#0f1115);color:var(--ink);border:1px solid var(--line)}
+  .win small{font-size:10px;letter-spacing:.12em;font-weight:800;opacity:.7}
+  .win b{display:block;font-size:22px;font-weight:900;letter-spacing:-.5px;margin-top:2px}
+  .win .amt{position:absolute;right:16px;top:16px;font-size:22px;font-weight:900;color:var(--acc)}
+  .win::after{content:'🏆';position:absolute;right:-6px;bottom:-14px;font-size:70px;opacity:.12}
+  .rk{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:6px}
+  .rk i{font-style:normal;width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-size:11px;font-weight:900;background:var(--chip)}
+  .rk b{font-size:14px}
+  .rk small{color:var(--mut);font-size:10.5px;display:block;font-weight:600}
+  .rk .v{margin-left:auto;font-weight:900;font-size:15px;letter-spacing:-.3px}
+  .rk .v.up{color:var(--acc2)} .B .rk .v.up{color:var(--acc)} .rk .v.dn{color:var(--red)}
+  .tr{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:6px;font-size:13px;font-weight:700}
+  .tr .arrow{color:var(--mut)}
+  .tr .v{margin-left:auto;font-weight:900}
+  .fine{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:12px;background:var(--chip);font-size:12px;font-weight:700;margin-top:8px}
+  .fine b{font-size:14px}
+
+  .choose{margin-top:40px;background:#fff;border-radius:18px;padding:18px 20px;box-shadow:0 10px 30px -20px rgba(0,0,0,.3)}
+  .choose h3{font-size:16px;font-weight:900;margin-bottom:8px}
+  .choose li{margin-left:18px;font-size:14px;color:#334;line-height:1.7}
+</style>
+</head>
+<body>
+<h1>⛳ 골프 내기 · 디자인 시안</h1>
+<div class="sub">초록 펠트 버림. 모던 2방향 · 화면 4개(경기 리스트 → 설정 → 홀 입력 → 정산). 옆으로 스크롤.</div>
+
+<!-- =============== A =============== -->
+<section class="dir">
+  <h2><span>A</span> 라이트 미니멀</h2>
+  <p>흰 카드 + 연회색 배경, 포인트 그린 1색. 토스·애플 느낌. 필드에서 햇빛 아래 잘 보임.</p>
+  <div class="row" id="rowA"></div>
+</section>
+
+<!-- =============== B =============== -->
+<section class="dir">
+  <h2><span>B</span> 다크 볼드</h2>
+  <p>차콜 배경 + 라임 네온 포인트. 숫자 크고 굵게, 스포츠 앱 느낌. 밤 회식 자리에서 간지.</p>
+  <div class="row" id="rowB"></div>
+</section>
+
+<div class="choose">
+  <h3>정해줄 것</h3>
+  <ul>
+    <li>방향 A / B (또는 A 레이아웃에 B 색, 이런 조합도 가능)</li>
+    <li>포인트 컬러: 그린 / 라임 / 블루 / 오렌지</li>
+    <li>홀 입력 화면: 지금처럼 한 홀에 전원 세로 나열 vs 한 명씩 크게 넘기기</li>
+  </ul>
+</div>
+
+<template id="tpl">
+<!-- 1. 리스트 -->
+<div class="phone"><div class="scr X">
+  <div class="pad">
+    <div class="top"><h3>골프 내기</h3><div class="ic">⚙️</div></div>
+    <div class="card rc">
+      <div class="t"><b>레이크사이드 · 동코스</b><span class="pill live">● 진행중 11H</span></div>
+      <div class="d">10.01 (수) · 스트로크 · 1타 1,000</div>
+      <div class="pl"><i>민</i><i>준</i><i>현</i><i>석</i><span class="ld up">▲ 준호 +18,000</span></div>
+      <div class="bar"><i></i></div>
+    </div>
+    <div class="card rc">
+      <div class="t"><b>9/24 스킨스</b><span class="pill done">완료</span></div>
+      <div class="d">09.24 (수) · 스킨스 · 홀당 2,000</div>
+      <div class="pl"><i>민</i><i>준</i><i>현</i><span class="ld up">▲ 민수 +31,000</span></div>
+    </div>
+    <div class="card rc">
+      <div class="t"><b>남서울 뽑기</b><span class="pill done">완료</span></div>
+      <div class="d">09.10 (수) · 뽑기 · 1타 2,000</div>
+      <div class="pl"><i>민</i><i>준</i><i>현</i><i>석</i><span class="ld up">▲ 현우 +24,000</span></div>
+    </div>
+    <div class="card rc" style="opacity:.6">
+      <div class="t"><b>8/30 라운드</b><span class="pill done">완료</span></div>
+      <div class="d">08.30 (토) · 스트로크 · 1타 1,000</div>
+    </div>
+  </div>
+  <div class="fab">+</div>
+</div></div>
+
+<!-- 2. 설정 -->
+<div class="phone"><div class="scr X">
+  <div class="pad">
+    <div class="top"><h3>새 경기</h3><div class="ic">✕</div></div>
+    <div class="lbl">인원</div>
+    <div class="seg"><span>2</span><span>3</span><span class="on">4</span></div>
+    <div class="lbl">플레이어</div>
+    <div class="inp"><i>1</i>민수<span class="x">✎</span></div>
+    <div class="inp"><i>2</i>준호<span class="x">✎</span></div>
+    <div class="inp"><i>3</i>현우<span class="x">✎</span></div>
+    <div class="inp"><i>4</i>석진<span class="x">✎</span></div>
+    <div class="lbl">경기 종류</div>
+    <div class="modes">
+      <div class="mode on"><em>🏌️</em>스트로크<small>타당 정산</small></div>
+      <div class="mode"><em>💰</em>스킨스<small>홀 상금</small></div>
+      <div class="mode"><em>🎲</em>뽑기<small>팀 2:2</small></div>
+    </div>
+    <div class="lbl">금액 · 옵션</div>
+    <div class="money"><b>1타당</b><span class="v">1,000<small>원</small></span></div>
+    <div class="opt"><div>배판<small>파3 · 마지막홀 · 버디</small></div><div class="sw on"></div></div>
+    <div class="opt"><div>양파 룰<small>더블파에서 홀아웃</small></div><div class="sw on"></div></div>
+    <div class="opt"><div>벌금<small>OB · 해저드 · 3퍼트 각 1,000</small></div><div class="sw on"></div></div>
+    <div style="height:10px"></div>
+    <div class="btn">1홀 시작 →</div>
+  </div>
+</div></div>
+
+<!-- 3. 홀 입력 -->
+<div class="phone"><div class="scr X">
+  <div class="pad">
+    <div class="hole-hd">
+      <div><div class="n">7<small>/ 18</small></div></div>
+      <div class="par"><span>P3</span><span class="on">P4</span><span>P5</span></div>
+    </div>
+    <div class="dbl">🔥 배판 ×2 · 전 홀 버디</div>
+    <div class="tot">
+      <div class="up"><b>민수</b><em>+6,000</em></div>
+      <div class="dn"><b>준호</b><em>-9,000</em></div>
+      <div class="up"><b>현우</b><em>+5,000</em></div>
+      <div class="dn"><b>석진</b><em>-2,000</em></div>
+    </div>
+    <div class="pr"><div class="nm">민수<small>+6,000</small></div><span class="tag pa">파</span><div class="st"><span>−</span><b>4</b><span>+</span></div></div>
+    <div class="flags"><span>OB</span><span>해저드</span><span class="on">3퍼트</span></div>
+    <div class="pr"><div class="nm">준호<small>-9,000</small></div><span class="tag b">버디</span><div class="st"><span>−</span><b>3</b><span>+</span></div></div>
+    <div class="flags"><span>OB</span><span>해저드</span><span>3퍼트</span></div>
+    <div class="pr"><div class="nm">현우<small>+5,000</small></div><span class="tag bo">더블</span><div class="st"><span>−</span><b>6</b><span>+</span></div></div>
+    <div class="flags"><span class="on">OB</span><span>해저드</span><span>3퍼트</span></div>
+    <div class="pr"><div class="nm">석진<small>-2,000</small></div><span class="tag">보기</span><div class="st"><span>−</span><b>5</b><span>+</span></div></div>
+    <div class="flags"><span>OB</span><span>해저드</span><span>3퍼트</span></div>
+    <div class="hsum"><span>이 홀</span><span><b class="up">준호 +12,000</b> · <b class="dn">현우 −8,000</b></span></div>
+    <div class="nav"><div class="btn ghost sm">← 6홀</div><div class="btn sm">8홀 →</div></div>
+  </div>
+</div></div>
+
+<!-- 4. 정산 -->
+<div class="phone"><div class="scr X">
+  <div class="pad">
+    <div class="top"><h3>정산</h3><div class="ic">↗</div></div>
+    <div class="win"><small>오늘의 승자</small><b>준호</b><span class="amt">+34,000</span></div>
+    <div class="rk"><i>1</i><div><b>준호</b><small>78타 · 버디 2</small></div><span class="v up">+34,000</span></div>
+    <div class="rk"><i>2</i><div><b>민수</b><small>84타</small></div><span class="v up">+6,000</span></div>
+    <div class="rk"><i>3</i><div><b>석진</b><small>89타 · OB 2</small></div><span class="v dn">−15,000</span></div>
+    <div class="rk"><i>4</i><div><b>현우</b><small>93타 · 양파 1</small></div><span class="v dn">−25,000</span></div>
+    <div class="lbl">송금 정리</div>
+    <div class="tr">현우 <span class="arrow">→</span> 준호 <span class="v">25,000</span></div>
+    <div class="tr">석진 <span class="arrow">→</span> 준호 <span class="v">9,000</span></div>
+    <div class="tr">석진 <span class="arrow">→</span> 민수 <span class="v">6,000</span></div>
+    <div class="fine"><span>벌금통 (OB·해저드·3퍼트)</span><b>14,000</b></div>
+    <div class="nav"><div class="btn ghost sm">홀별 보기</div><div class="btn sm">공유</div></div>
+  </div>
+</div></div>
+</template>
+
+<script>
+  const tpl=document.getElementById('tpl').innerHTML;
+  const caps=['① 경기 리스트','② 설정','③ 홀 입력','④ 정산'];
+  for(const k of ['A','B']){
+    const row=document.getElementById('row'+k);
+    const wrap=document.createElement('div'); wrap.innerHTML=tpl.replace(/class="scr X"/g,`class="scr ${k}"`);
+    const phones=[...wrap.querySelectorAll('.phone')];
+    phones.forEach((p,i)=>{ const box=document.createElement('div'); box.style.flex='none'; box.appendChild(p); const c=document.createElement('div'); c.className='cap'; c.textContent=caps[i]; box.appendChild(c); row.appendChild(box); });
+  }
+</script>
+</body>
+</html>
