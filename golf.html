@@ -237,6 +237,22 @@
   .flow .r .ln{flex:1;height:2px;background:linear-gradient(90deg,var(--red),var(--acc));border-radius:2px;position:relative;min-width:30px}
   .flow .r .ln::after{content:'';position:absolute;right:-1px;top:-4px;border:5px solid transparent;border-left:7px solid var(--acc)}
   .flow .r .amt{font-size:14px;font-weight:900;min-width:64px;text-align:right}
+  /* 송금: 내는 사람 기준 묶음, 가지치기 */
+  .pay{display:flex;gap:10px;align-items:stretch;padding:10px 0;border-bottom:1px solid var(--line)}
+  .pay:last-child{border:none}
+  .pay .payer{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:72px;flex:none;border-radius:14px;background:var(--reds);padding:8px 4px}
+  .pay .payer .av{width:36px;height:36px;font-size:13px;border-color:transparent;background:var(--red);color:#fff}
+  .pay .payer b{font-size:13px;letter-spacing:-.3px;max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pay .payer small{font-size:11px;font-weight:900;color:var(--red)}
+  .pay .tos{flex:1;display:flex;flex-direction:column;justify-content:center;position:relative;padding-left:18px}
+  .pay .tos::before{content:'';position:absolute;left:6px;top:14px;bottom:14px;width:2px;background:var(--line);border-radius:2px}
+  .pay .tos.one::before{display:none}
+  .pay .to{display:flex;align-items:center;gap:8px;padding:5px 0;position:relative;font-size:13px;font-weight:800}
+  .pay .to::before{content:'';position:absolute;left:-12px;top:50%;width:14px;height:2px;background:linear-gradient(90deg,var(--line),var(--acc))}
+  .pay .to::after{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);border:4px solid transparent;border-left:6px solid var(--acc)}
+  .pay .to .av{width:28px;height:28px;font-size:11px;margin-left:8px;background:var(--accs);color:var(--acc);border-color:transparent}
+  .pay .to .amt{margin-left:auto;font-size:14px;font-weight:900;text-align:right}
+  .pay .to .amt small{display:block;font-size:10px;font-weight:700;color:var(--mut)}
   .flow .none{padding:12px;text-align:center;color:var(--mut);font-weight:700;font-size:13px}
   .heat{display:grid;grid-template-columns:repeat(18,1fr);gap:3px;margin-top:8px} .heat.h9{grid-template-columns:repeat(9,1fr)}
   .heat i{height:16px;border-radius:4px;background:var(--chip)} .heat i.w{background:var(--acc)} .heat i.l{background:var(--red);opacity:.8}
@@ -430,6 +446,12 @@ function compute(r){
   }
   return {holes,totals,fines,fineCnt,carry,multNext:mult};
 }
+function flowsHTML(flows,players){
+  if(!flows.length) return '';
+  const by={}; flows.forEach(f=>{ (by[f.from]=by[f.from]||[]).push(f); });
+  return Object.keys(by).map(from=>{ const list=by[from]; const tot=list.reduce((a,f)=>a+f.v,0); const p=players[from];
+    return `<div class="pay"><div class="payer"><span class="av">${esc(p.name.slice(0,1))}</span><b>${esc(p.name)}</b><small>−${fmt(tot)}</small></div><div class="tos ${list.length===1?'one':''}">${list.map(f=>`<div class="to"><span class="av">${esc(players[f.to].name.slice(0,1))}</span>${esc(players[f.to].name)}<span class="amt">${fmt(f.v)}${f.why?`<small>${esc(f.why)}</small>`:''}</span></div>`).join('')}</div></div>`; }).join('');
+}
 function transfers(totals,names){ const cr=[],db=[]; totals.forEach((v,i)=>{ if(v>0.5) cr.push({i,v}); else if(v<-0.5) db.push({i,v:-v}); }); cr.sort((a,b)=>b.v-a.v); db.sort((a,b)=>b.v-a.v); const out=[]; let a=0,b=0; while(a<cr.length&&b<db.length){ const m=Math.min(cr[a].v,db[b].v); out.push({from:db[b].i,to:cr[a].i,v:m}); cr[a].v-=m; db[b].v-=m; if(cr[a].v<0.5) a++; if(db[b].v<0.5) b++; } return out; }
 
 /* =================== ① 리스트 =================== */
@@ -543,7 +565,7 @@ function renderHole(){
     info.nl.forEach(([t,w])=>bits.push(`${t} ${esc(r.players[w].name)}`));
     if(bits.length) hi.innerHTML+=`<div class="ticker"><span class="dot"></span>${bits.join(' · ')}</div>`;
     if(h.nl&&h.nl.winner==null) hi.innerHTML+=`<div class="ticker warn"><span class="dot"></span>${h.nl.type==='near'?'니어':'롱기'} ${fmt(h.nl.amt)} · 누가 먹었는지 찍기</div>`;
-    hi.innerHTML+=`<div class="lbl" style="margin-top:12px">이 홀 송금</div><div class="flow">${info.flows.length?info.flows.map(f=>`<div class="r"><span class="av">${esc(r.players[f.from].name.slice(0,1))}</span>${esc(r.players[f.from].name)}<span class="ln"></span>${esc(r.players[f.to].name)}<span class="av">${esc(r.players[f.to].name.slice(0,1))}</span><span class="amt">${fmt(f.v)}<small class="mut" style="display:block;font-size:10px;font-weight:700">${f.why}</small></span></div>`).join(''):'<div class="none">이 홀은 주고받을 돈 없음</div>'}</div>`; }
+    hi.innerHTML+=`<div class="lbl" style="margin-top:12px">이 홀 송금 · 내는 사람 기준</div><div class="flow">${info.flows.length?flowsHTML(info.flows,r.players):'<div class="none">이 홀은 주고받을 돈 없음</div>'}</div>`; }
   else if(!allIn){ hi.innerHTML=`<div class="ticker"><span class="dot" style="background:var(--mut);box-shadow:none"></span>타수 입력 · 숫자 자리 누르면 파로 시작</div>`; }
   // 네비
   $('#prevHole').disabled=i===0; $('#prevLab').textContent=i>0?`${i}홀`:'이전';
@@ -606,7 +628,7 @@ function renderResult(){
   const order=c.totals.map((v,i)=>({v,i})).sort((a,b)=>b.v-a.v);
   const pod=$('#podium'); pod.innerHTML=''; const slots=n===2?[0,1]:(n===3?[1,0,2]:[1,0,2,3]);
   slots.forEach(rank=>{ const o=order[rank]; const p=r.players[o.i]; const strokes=r.holes.slice(0,r.holesN).filter(h=>h.done).reduce((s,h)=>s+(h.s[o.i]||0),0); const d=document.createElement('div'); d.className='pod p'+(rank+1); d.innerHTML=`<span class="av">${esc(p.name.slice(0,1))}</span><span class="nm">${esc(p.name)}<small class="${o.v>0?'up':(o.v<0?'dn':'mut')}">${fmtS(o.v)}</small></span><div class="bar">${rank+1}</div>`; d.title=strokes+'타'; pod.appendChild(d); });
-  const tr=transfers(c.totals); const fl=$('#flow'); fl.innerHTML=tr.length?tr.map(t=>`<div class="r"><span class="av">${esc(r.players[t.from].name.slice(0,1))}</span>${esc(r.players[t.from].name)}<span class="ln"></span>${esc(r.players[t.to].name)}<span class="av">${esc(r.players[t.to].name.slice(0,1))}</span><span class="amt">${fmt(t.v)}</span></div>`).join(''):`<div class="none">주고받을 돈 없음</div>`;
+  const tr=transfers(c.totals); const fl=$('#flow'); fl.innerHTML=tr.length?flowsHTML(tr,r.players):`<div class="none">주고받을 돈 없음</div>`;
   const sp=$('#selp'); sp.innerHTML=r.players.map((p,i)=>`<button class="${heatSel===i?'on':''}" data-i="${i}">${esc(p.name)}</button>`).join(''); sp.querySelectorAll('button').forEach(b=>b.onclick=()=>{ heatSel=+b.dataset.i; renderResult(); });
   if(heatSel>=n) heatSel=0;
   $('#heat').className='heat'+(r.holesN===9?' h9':''); $('#heat').innerHTML=c.holes.map(h=>`<i class="${h.done?(h.net[heatSel]>0?'w':(h.net[heatSel]<0?'l':'')):''}"></i>`).join('');
