@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>골프 내기 · 디자인 시안 v2</title>
+<title>골프 내기 · 디자인 시안 v3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -156,26 +156,74 @@
   .jar .seg{display:flex;gap:3px;flex:1;margin:0 12px;height:8px;border-radius:4px;overflow:hidden}
   .jar .seg i{display:block;background:var(--red)} .jar .seg i:nth-child(2){background:var(--blue)} .jar .seg i:nth-child(3){background:var(--acc)}
 
+
+  /* 설정 v3 : 대분류 스위치 리스트 */
+  .sw{width:44px;height:26px;border-radius:999px;background:var(--chip);position:relative;flex:none;border:1px solid var(--line)}
+  .sw::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+  .sw.on{background:var(--acc);border-color:var(--acc)} .sw.on::after{left:22px} .B .sw.on::after{background:#0e1014}
+  .rule{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 12px;margin-bottom:8px}
+  .rule .ico{width:36px;height:36px;border-radius:12px;background:var(--chip);display:grid;place-items:center}
+  .rule.on .ico{background:var(--accs);color:var(--acc)}
+  .rule b{display:block;font-size:14px;letter-spacing:-.3px}
+  .rule small{display:block;font-size:10.5px;color:var(--mut);font-weight:600;margin-top:1px}
+  .rule .chev{color:var(--mut);margin-left:auto}
+  .rule.off{opacity:.55}
+  .sub{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:10px}
+  .sub .it{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);font-size:13px;font-weight:700}
+  .sub .it:last-child{border:none}
+  .sub .it small{display:block;font-size:10.5px;color:var(--mut);font-weight:600}
+  .sub .it .amt{margin-left:auto;font-weight:900;font-size:13px;background:var(--chip);padding:5px 9px;border-radius:9px}
+  .sub .it .sw{margin-left:auto}
+  .sub .it .amt+.sw{margin-left:8px}
+  .back{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:var(--mut);margin-bottom:10px}
+  .hdr-sw{display:flex;align-items:center;justify-content:space-between;background:var(--hero);color:var(--heroink);border-radius:18px;padding:14px;margin-bottom:12px}
+  .hdr-sw b{font-size:16px;display:block} .hdr-sw small{font-size:11px;opacity:.75;font-weight:600}
+  .hdr-sw .sw{border-color:transparent;background:rgba(255,255,255,.25)} .hdr-sw .sw.on{background:var(--acc)} .A .hdr-sw .sw.on::after{background:#fff}
+  /* 홀 화면 추가: 니어/롱기 · 다음홀 배판 */
+  .near{display:flex;align-items:center;gap:8px;margin-top:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 10px}
+  .near b{font-size:12px;flex:none}
+  .near .who{display:flex;gap:6px;margin-left:auto}
+  .near .who span{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;background:var(--chip);border:1.5px solid transparent}
+  .near .who span.on{background:var(--acc);color:var(--bg);border-color:var(--acc)} .B .near .who span.on{color:#0e1014}
+  .nextd{margin-top:10px;border-radius:14px;padding:9px 12px;white-space:nowrap;background:linear-gradient(90deg,#ff7a1a,#ff3d6e);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;gap:8px}
+  .nextd span{margin-left:auto;background:rgba(0,0,0,.25);padding:3px 8px;border-radius:999px;font-size:11px}
+  .pt.par5 .res em.e{background:rgba(47,111,237,.14);color:var(--blue)}
+  /* 뽑기 화면 */
+  .draw{position:absolute;inset:0;display:grid;grid-template-rows:auto 1fr auto;padding:50px 12px 16px;background:var(--bg)}
+  .draw .t{text-align:center;margin-bottom:10px}
+  .draw .t b{font-size:18px;font-weight:900;letter-spacing:-.4px;display:block}
+  .draw .t small{color:var(--mut);font-size:11.5px;font-weight:700}
+  .cards{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:10px}
+  .cd{border-radius:22px;position:relative;display:grid;place-items:center;font-weight:900;overflow:hidden;border:1px solid var(--line);background:var(--card)}
+  .cd.back{background:repeating-linear-gradient(135deg,var(--card) 0 10px,var(--chip) 10px 20px);margin:0}
+  .cd.back::after{content:'';width:56px;height:56px;border-radius:50%;border:3px solid var(--line)}
+  .cd .nm{position:absolute;left:12px;top:12px;font-size:12px;font-weight:800;background:var(--card);padding:4px 9px;border-radius:999px;border:1px solid var(--line)}
+  .cd.blue{background:#2f6fed;color:#fff;border-color:#2f6fed} .cd.red{background:#e5484d;color:#fff;border-color:#e5484d} .cd.green{background:#16a34a;color:#fff;border-color:#16a34a}
+  .cd.blue .nm,.cd.red .nm,.cd.green .nm{background:rgba(0,0,0,.28);color:#fff;border-color:transparent}
+  .cd .big{font-size:46px;letter-spacing:-2px;line-height:1}
+  .cd .lab{position:absolute;bottom:12px;font-size:11px;letter-spacing:.14em;opacity:.85}
+  .cd .sc{position:absolute;right:12px;top:12px;font-size:13px;background:rgba(0,0,0,.28);padding:4px 9px;border-radius:999px}
+  .cd .sc s{opacity:.7;margin-right:4px}
+  .draw .foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px;font-size:12px;font-weight:800}
+  .draw .foot .turn{display:flex;align-items:center;gap:6px}
+  .draw .foot .turn i{width:8px;height:8px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 4px var(--accs)}
+  .dial .seg{display:flex;background:var(--chip);border-radius:12px;padding:3px}
+  .dial .seg span{flex:1;text-align:center;padding:8px 0;border-radius:10px;font-weight:700;font-size:11px;color:var(--mut)}
+  .dial .seg span.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .B .dial .seg span.on{background:#2a2f3a;color:var(--acc)}
   .choose{margin-top:40px;background:#fff;border-radius:18px;padding:18px 20px}
   .choose h3{font-size:16px;font-weight:900;margin-bottom:8px}
   .choose li{margin-left:18px;font-size:14px;color:#334;line-height:1.7}
 </style>
 </head>
 <body>
-<h1>골프 내기 · 디자인 시안 v2</h1>
-<div class="sub">이모지 없음 · 선 아이콘만. 화면마다 레이아웃 다름: 히어로+타일 / 아바타+스와이프 / 홀 스트립+2×2 / 포디움+흐름도.</div>
+<h1>골프 내기 · 디자인 시안 v3</h1>
+<div class="sub">룰은 전부 스위치(대분류 → 하위), 니어·롱기는 홀에서 선택, 뽑기는 타수 입력 후 4칸 뒤집기, 배판은 다음 홀 적용.</div>
 
 <section class="dir"><h2><span>A</span> 라이트</h2><p>연회색 바닥, 흰 카드, 검정 히어로, 그린 포인트.</p><div class="row" id="rowA"></div></section>
 <section class="dir"><h2><span>B</span> 다크</h2><p>차콜 바닥, 라임 히어로·포인트.</p><div class="row" id="rowB"></div></section>
 
-<div class="choose">
-  <h3>정해줄 것</h3>
-  <ul>
-    <li>A / B / 섞기</li>
-    <li>포인트 컬러: 그린 / 라임 / 블루 / 오렌지</li>
-    <li>홀 입력: 2×2 타일(지금) / 세로 리스트 / 한 명씩 넘기기</li>
-  </ul>
-</div>
+<div class="choose"><h3>정해줄 것</h3><ul><li>A / B / 섞기 · 포인트 컬러</li><li>뽑기 돈 계산 (팀 구성 · 조커 처리)</li><li>뒤집은 카드 바로 공개 vs 4장 다 뒤집고 한 번에 공개</li></ul></div>
 
 <template id="tpl">
 <!-- ① 리스트 -->
@@ -198,9 +246,7 @@
 
 <!-- ② 설정 -->
 <div class="phone"><div class="scr X"><div class="pad">
-  <div class="top"><div><h3>새 경기</h3><div class="sm">1 / 3 · 플레이어</div></div><div class="ic"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div></div>
-  <div class="steps"><i class="on"></i><i class="on"></i><i></i></div>
-  <div class="lbl">플레이어 · 눌러서 이름</div>
+  <div class="top"><div><h3>새 경기</h3><div class="sm">플레이어 · 종류 · 룰</div></div><div class="ic"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div></div>
   <div class="pavs">
     <div class="pav"><span class="av">민</span><span>민수</span></div>
     <div class="pav"><span class="av">준</span><span>준호</span></div>
@@ -208,35 +254,71 @@
     <div class="pav"><span class="av">석</span><span>석진</span></div>
     <div class="pav"><span class="av add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span><span class="n">추가</span></div>
   </div>
-  <div class="lbl">경기 종류 · 옆으로</div>
-  <div class="kinds">
-    <div class="kind on"><span class="ck"><svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke-width:3"><path d="M5 12l4 4L19 7"/></svg></span><svg viewBox="0 0 24 24"><path d="M4 20h16M7 20V8l8-4v8"/></svg><b>스트로크</b><small>홀마다 타수 차이 × 금액. 가장 기본.</small></div>
-    <div class="kind"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10.5h3.5a1.5 1.5 0 0 1 0 3H11a1.5 1.5 0 0 0 0 3h3.5"/></svg><b>스킨스</b><small>홀 상금, 동타면 다음 홀로 이월.</small></div>
-    <div class="kind"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="9" cy="9" r="1.2"/><circle cx="15" cy="15" r="1.2"/><circle cx="15" cy="9" r="1.2"/><circle cx="9" cy="15" r="1.2"/></svg><b>뽑기</b><small>홀마다 2:2 팀 뽑기.</small></div>
+  <div class="lbl">경기 종류 · 1타당</div>
+  <div class="dial" style="margin-bottom:8px"><div class="seg" style="flex:1;margin-right:10px"><span>스트로크</span><span>스킨스</span><span class="on">뽑기</span></div><span class="v" style="font-size:18px">1,000<small> 원</small></span></div>
+  <div class="lbl">룰 · 켜고 들어가서 세부 설정</div>
+  <div class="rule on"><span class="ico"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></span><div><b>배판</b><small>동타 · 버디 · 트리플 · 배배판</small></div><span class="sw on"></span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
+  <div class="rule on"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg></span><div><b>벌금</b><small>OB · 해저드 · 3퍼트 · 양파</small></div><span class="sw on"></span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
+  <div class="rule off"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></span><div><b>니어 · 롱기</b><small>파3 니어리스트 · 파5 롱기스트</small></div><span class="sw"></span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
+  <div class="rule on"><span class="ico"><svg viewBox="0 0 24 24"><path d="M4 18V6M20 18V6M4 12h16"/></svg></span><div><b>양파 룰</b><small>더블파에서 홀아웃</small></div><span class="sw on"></span></div>
+  <div style="height:8px"></div>
+  <div class="btn">1홀 시작</div>
+</div></div></div>
+
+<!-- ②-b 배판 상세 -->
+<div class="phone"><div class="scr X"><div class="pad">
+  <div class="back"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>설정</div>
+  <div class="hdr-sw"><div><b>배판</b><small>조건 나온 홀의 다음 홀이 배판</small></div><span class="sw on"></span></div>
+  <div class="lbl">조건</div>
+  <div class="sub">
+    <div class="it"><div>3명 이상 동타<small>양파로 잘린 타수 기준</small></div><span class="sw on"></span></div>
+    <div class="it"><div>버디 이상<small>이글 · 홀인원 포함</small></div><span class="sw on"></span></div>
+    <div class="it"><div>트리플 보기 이상<small>파+3 · 양파 포함</small></div><span class="sw on"></span></div>
   </div>
-  <div class="lbl">1타당</div>
-  <div class="dial"><span class="b">−</span><span class="v">1,000<small> 원</small></span><span class="b">+</span></div>
-  <div class="lbl">옵션 · 켜진 것만 적용</div>
-  <div class="chips"><span class="chip on">파3 배판</span><span class="chip on">마지막홀 배판</span><span class="chip on">버디 배판</span><span class="chip on">양파</span><span class="chip">OB 벌금</span><span class="chip on">3퍼트 벌금</span><span class="chip">니어리스트</span><span class="chip">롱기스트</span></div>
-  <div style="height:12px"></div>
-  <div class="btn">다음 · 금액 확인</div>
+  <div class="lbl">중첩</div>
+  <div class="sub">
+    <div class="it"><div>배배판<small>배판 홀에서 또 나오면 4배 · 8배</small></div><span class="sw"></span></div>
+    <div class="it"><div>최대 배수<small>배배판 켰을 때</small></div><span class="amt">4배</span></div>
+  </div>
+  <div class="lbl">벌금 상세는 이런 식</div>
+  <div class="sub">
+    <div class="it"><div>OB</div><span class="amt">1,000</span><span class="sw on"></span></div>
+    <div class="it"><div>해저드</div><span class="amt">1,000</span><span class="sw"></span></div>
+    <div class="it"><div>3퍼트</div><span class="amt">1,000</span><span class="sw on"></span></div>
+    <div class="it"><div>양파</div><span class="amt">2,000</span><span class="sw on"></span></div>
+  </div>
 </div></div></div>
 
 <!-- ③ 홀 입력 -->
 <div class="phone"><div class="scr X"><div class="pad">
   <div class="hstrip">
-    <div class="f">4<small>P4</small></div><div class="f">5<small>P3</small></div><div class="f">6<small>P5</small></div><div class="cur">7<small>P4</small></div><div>8<small>P4</small></div><div>9<small>P3</small></div><div>10<small>P4</small></div><div>11<small>P5</small></div>
+    <div class="f">4<small>P4</small></div><div class="f">5<small>P3</small></div><div class="f">6<small>P5</small></div><div class="cur">7<small>P3</small></div><div>8<small>P4</small></div><div>9<small>P3</small></div><div>10<small>P4</small></div><div>11<small>P5</small></div>
   </div>
-  <div class="hhead"><div class="n">7<small>번 홀</small></div><div class="par"><span>P3</span><span class="on">P4</span><span>P5</span></div></div>
+  <div class="hhead"><div class="n">7<small>번 홀</small></div><div class="par"><span class="on">P3</span><span>P4</span><span>P5</span></div></div>
   <div class="ptiles">
-    <div class="pt dbl"><div class="hd"><b>민수</b><small class="up">+6,000</small></div><div class="sc"><span>−</span><b>4</b><span>+</span></div><div class="res"><em class="p">파</em><span>±0</span></div><div class="fl"><i>OB</i><i>해저드</i><i class="on">3퍼트</i></div></div>
-    <div class="pt dbl"><div class="hd"><b>준호</b><small class="dn">−9,000</small></div><div class="sc"><span>−</span><b>3</b><span>+</span></div><div class="res"><em class="b">버디</em><span class="up">+12,000</span></div><div class="fl"><i>OB</i><i>해저드</i><i>3퍼트</i></div></div>
-    <div class="pt dbl"><div class="hd"><b>현우</b><small class="up">+5,000</small></div><div class="sc"><span>−</span><b>6</b><span>+</span></div><div class="res"><em class="o">더블</em><span class="dn">−8,000</span></div><div class="fl"><i class="on">OB</i><i>해저드</i><i>3퍼트</i></div></div>
-    <div class="pt dbl"><div class="hd"><b>석진</b><small class="dn">−2,000</small></div><div class="sc"><span>−</span><b>5</b><span>+</span></div><div class="res"><em>보기</em><span class="dn">−4,000</span></div><div class="fl"><i>OB</i><i>해저드</i><i>3퍼트</i></div></div>
+    <div class="pt"><div class="hd"><b>민수</b><small class="up">+6,000</small></div><div class="sc"><span>−</span><b>3</b><span>+</span></div><div class="res"><em class="p">파</em></div><div class="fl"><i>OB</i><i>해저드</i><i class="on">3퍼트</i></div></div>
+    <div class="pt"><div class="hd"><b>준호</b><small class="dn">−9,000</small></div><div class="sc"><span>−</span><b>2</b><span>+</span></div><div class="res"><em class="b">버디</em></div><div class="fl"><i>OB</i><i>해저드</i><i>3퍼트</i></div></div>
+    <div class="pt"><div class="hd"><b>현우</b><small class="up">+5,000</small></div><div class="sc"><span>−</span><b>6</b><span>+</span></div><div class="res"><em class="o">양파</em></div><div class="fl"><i class="on">OB</i><i>해저드</i><i>3퍼트</i></div></div>
+    <div class="pt"><div class="hd"><b>석진</b><small class="dn">−2,000</small></div><div class="sc"><span>−</span><b>4</b><span>+</span></div><div class="res"><em>보기</em></div><div class="fl"><i>OB</i><i>해저드</i><i>3퍼트</i></div></div>
   </div>
-  <div class="ticker"><span class="dot"></span>배판 적용 · 전 홀 버디 (준호)</div>
-  <div class="hnav"><div class="btn ghost sm"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>6홀</div><div class="btn sm">8홀<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></div>
+  <div class="near"><b>니어리스트</b><small class="mut">파3 · 5,000</small><div class="who"><span>민</span><span class="on">준</span><span>현</span><span>석</span></div></div>
+  <div class="nextd"><svg viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>다음 8홀 배판<span>버디 · 양파</span></div>
+  <div class="hnav"><div class="btn ghost sm"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>6홀</div><div class="btn sm">뽑기<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></div>
 </div></div></div>
+
+<!-- ③-b 뽑기 -->
+<div class="phone"><div class="scr X">
+  <div class="draw">
+    <div class="t"><b>7번 홀 · 뽑기</b><small>한 명씩 눌러서 뒤집기 · 파랑 2 · 빨강 1 · 조커 1</small></div>
+    <div class="cards">
+      <div class="cd blue"><span class="nm">민수</span><span class="sc">3</span><span class="big">B</span><span class="lab">BLUE</span></div>
+      <div class="cd back"><span class="nm">준호</span></div>
+      <div class="cd green"><span class="nm">현우</span><span class="sc"><s>6</s>3</span><span class="big">J</span><span class="lab">JOKER · 파</span></div>
+      <div class="cd back"><span class="nm">석진</span></div>
+    </div>
+    <div class="foot"><div class="turn"><i></i>준호 차례</div><div class="mut">2 / 4</div></div>
+  </div>
+</div></div>
 
 <!-- ④ 정산 -->
 <div class="phone"><div class="scr X"><div class="pad">
@@ -261,7 +343,7 @@
 
 <script>
   const tpl=document.getElementById('tpl').innerHTML;
-  const caps=['① 경기 리스트','② 설정','③ 홀 입력','④ 정산'];
+  const caps=['① 경기 리스트','② 설정 · 대분류 스위치','②-b 룰 상세 · 하위 스위치','③ 홀 입력 · 니어 · 다음홀 배판','③-b 뽑기 · 4칸 뒤집기','④ 정산'];
   for(const k of ['A','B']){
     const row=document.getElementById('row'+k);
     const wrap=document.createElement('div'); wrap.innerHTML=tpl.replace(/class="scr X"/g,`class="scr ${k}"`);
