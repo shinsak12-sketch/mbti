@@ -209,6 +209,7 @@
     background:linear-gradient(180deg,#f3d98a,var(--gold-2));box-shadow:0 3px 0 var(--gold-3);}
   .game.pan .ic{background:linear-gradient(160deg,#3f2a1c,#5b3f2c);}
   .game.arch .ic{background:linear-gradient(160deg,#2a4a7a,#4d8a3f);}
+  .game.lotto .ic{background:linear-gradient(160deg,#0a2e22,#1d6a50);}
   .game.race .ic{background:linear-gradient(160deg,#5f9750,#8fc7e8);}
   .game .tag2{position:absolute;right:14px;top:-1px;font-size:10px;font-weight:900;letter-spacing:.12em;color:#2a1d05;background:linear-gradient(180deg,#f3d98a,var(--gold-2));padding:3px 8px;border-radius:0 0 8px 8px;}
   .rule{margin-top:22px;padding:14px 16px;font-size:13px;color:var(--muted);font-weight:600;line-height:1.7;word-break:keep-all;}
@@ -225,14 +226,19 @@
         <p>오늘 점심 누가 쏘나 · 게임 골라서 시작</p>
       </div>
       <div class="games">
+        <a class="game lotto" href="lotto.html">
+          <span class="tag2">NEW</span>
+          <span class="ic"><img src="icons/lotto-192.png" alt="" onerror="this.replaceWith(document.createTextNode('🎱'))"></span>
+          <span><b>로또</b><small>추첨기 돌려 6개 + 보너스<br>적게 맞춘 사람 쏨 · 공 탈출</small></span>
+          <span class="go">›</span>
+        </a>
         <a class="game" href="seotda.html">
           <span class="ic"><img src="icons/seotda-192.png" alt="" onerror="this.replaceWith(document.createTextNode('🎴'))"></span>
           <span><b>섯다</b><small>화투 2장 · 손가락 쪼기<br>낮은 패 or 높은 패 걸림 · 3장 버리기 모드</small></span>
           <span class="go">›</span>
         </a>
         <a class="game race" href="race.html">
-          <span class="tag2">NEW</span>
-          <span class="ic">🏁</span>
+                    <span class="ic">🏁</span>
           <span><b>점심 경주</b><small>16종 웃긴 캐릭터 랜덤 출전<br>넘어짐·카톡·비둘기 사고 · 사진 판정</small></span>
           <span class="go">›</span>
         </a>

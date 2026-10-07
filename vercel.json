@@ -33,6 +33,10 @@
     {
       "source": "/golf",
       "destination": "/golf.html"
+    },
+    {
+      "source": "/lotto",
+      "destination": "/lotto.html"
     }
   ]
 }
