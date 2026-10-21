@@ -52,7 +52,7 @@ public class MainActivity extends Activity {
       if (pendingJs != null) { wv.evaluateJavascript(pendingJs, null); pendingJs = null; }
     } }));
     wv.setWebChromeClient(new WebChromeClient());
-    wv.addJavascriptInterface(new GolfBridge(this), "GolfNative");
+    wv.addJavascriptInterface(new GolfBridge(this, wv), "GolfNative");
     setContentView(wv);
     wv.loadUrl("https://app.local/index.html");
     handleIntent(getIntent());

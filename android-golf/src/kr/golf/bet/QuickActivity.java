@@ -30,7 +30,7 @@ public class QuickActivity extends Activity {
     wv.setOverScrollMode(View.OVER_SCROLL_NEVER);
     wv.setWebViewClient(new AppWebClient(this, null));
     wv.setWebChromeClient(new WebChromeClient());
-    wv.addJavascriptInterface(new GolfBridge(this), "GolfNative");
+    wv.addJavascriptInterface(new GolfBridge(this, wv), "GolfNative");
     setContentView(wv);
     load(getIntent());
   }

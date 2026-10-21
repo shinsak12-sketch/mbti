@@ -1,20 +1,41 @@
 package kr.golf.bet;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebView;
+import android.widget.DatePicker;
 
-/** 웹 → 네이티브: 위젯용 기록 요약 저장 · 위젯 갱신 · 팝업 닫기 */
+/** 웹 → 네이티브: 위젯용 기록 요약 저장 · 위젯 갱신 · 팝업 닫기 · 폰 기본 날짜 선택 창 */
 public class GolfBridge {
   private final Context ctx;
   private final Activity act;
-  GolfBridge(Activity a) { ctx = a.getApplicationContext(); act = a; }
+  private final WebView wv;
+  GolfBridge(Activity a, WebView w) { ctx = a.getApplicationContext(); act = a; wv = w; }
 
   @JavascriptInterface public void saveSummary(String json) {
     ctx.getSharedPreferences("golf", Context.MODE_PRIVATE).edit().putString("sum", json == null ? "{}" : json).commit();
     GolfWidget.refreshAll(ctx);
   }
+
   @JavascriptInterface public void close() {
     if (act instanceof QuickActivity) act.runOnUiThread(new Runnable() { @Override public void run() { act.finish(); } });
+  }
+
+  /** cur = "2026-11-06" · 고르면 window.onNativeDate("2026-11-06") 호출 */
+  @JavascriptInterface public void pickDate(final String cur) {
+    act.runOnUiThread(new Runnable() { @Override public void run() {
+      int y, m, d;
+      try { y = Integer.parseInt(cur.substring(0, 4)); m = Integer.parseInt(cur.substring(5, 7)) - 1; d = Integer.parseInt(cur.substring(8, 10)); }
+      catch (Exception e) { java.util.Calendar c = java.util.Calendar.getInstance(); y = c.get(java.util.Calendar.YEAR); m = c.get(java.util.Calendar.MONTH); d = c.get(java.util.Calendar.DAY_OF_MONTH); }
+      DatePickerDialog dlg = new DatePickerDialog(act, android.R.style.Theme_DeviceDefault_Dialog_Alert, new DatePickerDialog.OnDateSetListener() {
+        @Override public void onDateSet(DatePicker view, int yy, int mm, int dd) {
+          final String ds = yy + "-" + (mm + 1 < 10 ? "0" : "") + (mm + 1) + "-" + (dd < 10 ? "0" : "") + dd;
+          wv.evaluateJavascript("window.onNativeDate&&window.onNativeDate('" + ds + "')", null);
+        }
+      }, y, m, d);
+      dlg.show();
+    } });
   }
 }

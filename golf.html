@@ -489,6 +489,10 @@
   .dp .dc.cur span{background:var(--ink)!important;color:var(--bg)!important;box-shadow:none!important}
   .dp .acts{display:flex;gap:8px;margin-top:10px}
   .dp .acts .btn{flex:1}
+  .dp .pkgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;min-height:252px;align-content:start;padding-top:6px}
+  .dp .pk{height:48px;border-radius:14px;background:var(--chip);font-size:15px;font-weight:800}
+  .dp .pk.on{background:var(--acc);color:var(--accink)}
+  .dp .gd{min-height:252px}
   /* 타수 버튼 · 타수 시트 */
   .rec .rs .sbtn{display:inline-flex;align-items:center;gap:4px;padding:8px 11px;border-radius:12px;background:var(--accs);color:var(--acc);font-size:13px;font-weight:900;border:1px solid var(--acc)}
   .rec .rs .sbtn svg{width:14px;height:14px}
@@ -1113,15 +1117,25 @@ function renderNext(){
   box.innerHTML=`<button class="nextl" id="nextOpen"><div class="t"><small>${dd===0?'오늘 라운드 · 다녀와서 눌러 기록':`다음 라운드 · ${+nx.date.slice(5,7)}/${+nx.date.slice(8,10)} (${dowOf(nx.date)})${nx.tee?' '+nx.tee:''}`}</small><b>${esc(sub)}</b></div><em>${dd===0?'기록':dd===1?'내일':'D-'+dd}</em></button>`;
   const b=$('#nextOpen'); b.onclick=()=>{ openRecForm(nx); if(dd===0){ F.plan=false; renderFormBits(); toast('타수 넣고 저장하면 끝'); } }; longPress(b,()=>recMenu(nx));
 }
-function datePicker(cur,onPick){ let y=+cur.slice(0,4), m=+cur.slice(5,7);
-  const draw=dx=>{ const t=new Date(); const pre=`${y}-${pad(m)}-`; const by={}; DB.records.filter(r=>r.date.startsWith(pre)).forEach(r=>{ const d=+r.date.slice(8,10); by[d]=by[d]||{p:0,l:0}; if(r.plan) by[d].l++; else by[d].p++; });
-    const first=new Date(y,m-1,1).getDay(), dim=new Date(y,m,0).getDate(); let cells=''; for(let i=0;i<first;i++) cells+='<div></div>';
-    for(let d=1;d<=dim;d++){ const b=by[d]||{p:0,l:0}; const ds=pre+pad(d); const col=(first+d-1)%7; cells+=`<div class="${['dc',b.p?'pl':'',b.l?'pn':'',ds===today()?'td':'',col===0?'sun':'',ds===cur?'cur':''].join(' ')}" data-d="${d}"><span>${d}</span></div>`; }
-    sheet(`<div class="cal dp" style="box-shadow:none;margin:0"><div class="ch"><button class="nb" id="dpP">${SV.left}</button><b>${y}년 ${m}월</b><button class="nb" id="dpN">${SV.right}</button><div class="sum"><em>다녀옴</em><br><i>예정</i></div></div><div class="wk">${'일월화수목금토'.split('').map(x=>`<span>${x}</span>`).join('')}</div><div class="gd ${dx?'slide':''}" style="--dx:${dx||0}px">${cells}</div><div class="acts"><button class="btn ghost sm" id="dpT">오늘</button><button class="btn ghost sm" id="dpX">닫기</button></div></div>`);
-    const go=n=>{ m+=n; if(m<1){ m=12; y--; } if(m>12){ m=1; y++; } vib(5); draw(n>0?40:-40); };
+function datePicker(cur,onPick){
+  // 앱(APK): 폰 기본 날짜 선택 창
+  if(window.GolfNative&&GolfNative.pickDate){ window.onNativeDate=ds=>{ window.onNativeDate=null; vib(6); onPick(ds); }; GolfNative.pickDate(cur||today()); return; }
+  // 웹: 같은 동작의 달력 (크기 고정 · 연도/월 바로 고르기)
+  let y=+cur.slice(0,4), m=+cur.slice(5,7), mode='day';
+  const draw=dx=>{ let inner='';
+    if(mode==='year'){ let ys=''; for(let k=y-9;k<=y+5;k++) ys+=`<button class="pk ${k===y?'on':''}" data-y="${k}">${k}</button>`; inner=`<div class="pkgrid">${ys}</div>`; }
+    else if(mode==='month'){ let ms=''; for(let k=1;k<=12;k++) ms+=`<button class="pk ${k===m?'on':''}" data-m="${k}">${k}월</button>`; inner=`<div class="pkgrid">${ms}</div>`; }
+    else { const pre=`${y}-${pad(m)}-`; const by={}; DB.records.filter(r=>r.date.startsWith(pre)).forEach(r=>{ const d=+r.date.slice(8,10); by[d]=by[d]||{p:0,l:0}; if(r.plan) by[d].l++; else by[d].p++; });
+      const first=new Date(y,m-1,1).getDay(), dim=new Date(y,m,0).getDate(); let cells='';
+      for(let i=0;i<42;i++){ const d=i-first+1; if(d<1||d>dim){ cells+='<div class="dc"></div>'; continue; } const b=by[d]||{p:0,l:0}; const ds=pre+pad(d); cells+=`<div class="${['dc',b.p?'pl':'',b.l?'pn':'',ds===today()?'td':'',i%7===0?'sun':'',ds===cur?'cur':''].join(' ')}" data-d="${d}"><span>${d}</span></div>`; }
+      inner=`<div class="wk">${'일월화수목금토'.split('').map(x=>`<span>${x}</span>`).join('')}</div><div class="gd ${dx?'slide':''}" style="--dx:${dx||0}px">${cells}</div>`; }
+    sheet(`<div class="cal dp" style="box-shadow:none;margin:0"><div class="ch"><button class="nb" id="dpP">${SV.left}</button><b id="dpTitle" style="cursor:pointer">${mode==='year'?'연도 선택':(mode==='month'?y+'년':`${y}년 ${m}월`)} ▾</b><button class="nb" id="dpN">${SV.right}</button></div>${inner}<div class="acts"><button class="btn ghost sm" id="dpT">오늘</button><button class="btn ghost sm" id="dpX">닫기</button></div></div>`);
+    const go=n=>{ if(mode==='year') y+=n*15; else if(mode==='month') y+=n; else { m+=n; if(m<1){ m=12; y--; } if(m>12){ m=1; y++; } } vib(5); draw(n>0?40:-40); };
     $('#dpP').onclick=()=>go(-1); $('#dpN').onclick=()=>go(1); $('#dpX').onclick=()=>closeSheet(); $('#dpT').onclick=()=>{ closeSheet(); onPick(today()); };
+    $('#dpTitle').onclick=()=>{ mode=mode==='day'?'year':(mode==='year'?'month':'day'); vib(5); draw(); };
+    $('#sheet').querySelectorAll('.pk').forEach(b=>b.onclick=()=>{ if(b.dataset.y){ y=+b.dataset.y; mode='month'; } else { m=+b.dataset.m; mode='day'; } vib(5); draw(); });
     const box=$('#sheet .dp'); let sx=null,sy=0,moved=false; box.addEventListener('pointerdown',e=>{ sx=e.clientX; sy=e.clientY; moved=false; }); box.addEventListener('pointerup',e=>{ if(sx==null) return; const a=e.clientX-sx, b=e.clientY-sy; sx=null; if(Math.abs(a)>50&&Math.abs(a)>Math.abs(b)*1.3){ moved=true; go(a<0?1:-1); } });
-    box.querySelectorAll('.dc').forEach(c=>c.onclick=()=>{ if(moved) return; vib(6); closeSheet(); onPick(`${y}-${pad(m)}-${pad(+c.dataset.d)}`); }); };
+    box.querySelectorAll('.dc[data-d]').forEach(c=>c.onclick=()=>{ if(moved) return; vib(6); closeSheet(); onPick(`${y}-${pad(m)}-${pad(+c.dataset.d)}`); }); };
   draw(); }
 function scoreSheet(r){ let v=r.score?String(r.score):''; const par=72;
   const draw=()=>{ const n=+v||0; const h=$('#sheet .hint'); const b=$('#sheet .big b'); b.textContent=v||'타수'; b.classList.toggle('ph',!v); h.textContent=n?`18홀 파 72 기준 ${n-par>0?'+':''}${n-par}`:((r.holes||18)!==18?`${r.holes}홀 라운드 · 잘 친 18홀 타수`:'18홀 · 파 72'); $('#ssOk').disabled=!n; };
