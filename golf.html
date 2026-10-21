@@ -507,6 +507,7 @@
   /* 동행자 관리 */
   .mlist .r{cursor:pointer}
   .mlist .r:active{opacity:.7}
+  .sugg button.on{background:var(--acc);color:var(--accink)} .sugg button.on small{color:var(--accink);opacity:.7}
   .toast.top{top:calc(18px + env(safe-area-inset-top))!important;bottom:auto!important}
 </style>
 </head>
@@ -1161,15 +1162,16 @@ function renderFormBits(){
   $('#countryWrap').hidden=!F.abroad; renderSuggCountry();
   renderSuggRegion(); renderSuggCourse(); renderMates(); scoreHint();
 }
-function renderSuggCountry(){ const q=$('#fCountry').value.trim(); const cnt=new Map(countBy(DB.records.filter(r=>r.abroad),r=>r.country)); COUNTRIES.forEach(c=>{ if(!cnt.has(c)) cnt.set(c,0); }); const items=[...cnt.entries()].sort((a,b)=>b[1]-a[1]).filter(([k])=>k!==q&&(!q||k.includes(q))).slice(0,10);
-  const box=$('#sCountry'); box.innerHTML=items.map(([k,c])=>`<button data-k="${esc(k)}">${esc(k)}${c?`<small>${c}</small>`:''}</button>`).join('');
+function suggPick(entries,q,cap){ const exact=entries.some(([k])=>k===q); let list=(!q||exact)?entries:entries.filter(([k])=>k.includes(q)); if(!list.length) list=entries; return list.slice(0,cap); }
+function renderSuggCountry(){ const q=$('#fCountry').value.trim(); const cnt=new Map(countBy(DB.records.filter(r=>r.abroad),r=>r.country)); COUNTRIES.forEach(c=>{ if(!cnt.has(c)) cnt.set(c,0); }); const all0=[...cnt.entries()].sort((a,b)=>b[1]-a[1]); const items=suggPick(all0,q,20);
+  const box=$('#sCountry'); box.innerHTML=items.map(([k,c])=>`<button data-k="${esc(k)}" class="${k===q?'on':''}">${esc(k)}${c?`<small>${c}</small>`:''}</button>`).join('');
   box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ $('#fCountry').value=b.dataset.k; F.country=b.dataset.k; vib(5); renderSuggCountry(); renderSuggRegion(); renderSuggCourse(); }); }
-function renderSuggRegion(){ const q=$('#fRegion').value.trim(), ct=F.abroad?$('#fCountry').value.trim():''; const items=countBy(DB.records.filter(r=>!!r.abroad===!!F.abroad&&(!ct||r.country===ct)),r=>r.region).filter(([k])=>k!==q&&(!q||k.includes(q))).slice(0,10);
-  const box=$('#sRegion'); box.innerHTML=items.map(([k,c])=>`<button data-k="${esc(k)}">${esc(k)}<small>${c}</small></button>`).join('');
+function renderSuggRegion(){ const q=$('#fRegion').value.trim(), ct=F.abroad?$('#fCountry').value.trim():''; const all0r=countBy(DB.records.filter(r=>!!r.abroad===!!F.abroad&&(!ct||r.country===ct)),r=>r.region); const items=suggPick(all0r,q,40);
+  const box=$('#sRegion'); box.innerHTML=items.map(([k,c])=>`<button data-k="${esc(k)}" class="${k===q?'on':''}">${esc(k)}<small>${c}</small></button>`).join('');
   box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ $('#fRegion').value=b.dataset.k; F.region=b.dataset.k; if(F.abroad&&!$('#fCountry').value.trim()){ const ref=DB.records.find(r=>r.region===b.dataset.k&&r.country); const c=ref?ref.country:(COUNTRY_OF[b.dataset.k]||''); if(c){ $('#fCountry').value=c; F.country=c; renderSuggCountry(); } } vib(5); renderSuggRegion(); renderSuggCourse(); }); }
 function renderSuggCourse(){ const q=$('#fCourse').value.trim(), rg=$('#fRegion').value.trim(); let pool=DB.records.filter(r=>!!r.abroad===!!F.abroad); if(rg) pool=pool.filter(r=>r.region===rg);
-  const items=countBy(pool,r=>r.course).filter(([k])=>k!==q&&(!q||k.includes(q))).slice(0,10);
-  const box=$('#sCourse'); box.innerHTML=items.map(([k,c])=>`<button data-k="${esc(k)}">${esc(k)}<small>${c}</small></button>`).join('');
+  const items=suggPick(countBy(pool,r=>r.course),q,rg?40:14);
+  const box=$('#sCourse'); box.innerHTML=items.map(([k,c])=>`<button data-k="${esc(k)}" class="${k===q?'on':''}">${esc(k)}<small>${c}</small></button>`).join('');
   box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const k=b.dataset.k; $('#fCourse').value=k; F.course=k; const ref=DB.records.filter(r=>r.course===k).sort(recSort)[0]; if(ref){ if(!$('#fRegion').value.trim()&&ref.region){ $('#fRegion').value=ref.region; F.region=ref.region; } if(ref.holes) F.holes=ref.holes; F.abroad=!!ref.abroad; if(ref.country&&!$('#fCountry').value.trim()){ $('#fCountry').value=ref.country; F.country=ref.country; } } vib(5); renderFormBits(); }); }
 function renderMates(){ const box=$('#mates'); box.innerHTML=F.mates.map((m,i)=>`<span>${esc(m)}<button data-i="${i}" aria-label="빼기">${ICX}</button></span>`).join('');
   box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ F.mates.splice(+b.dataset.i,1); vib(5); renderMates(); });
@@ -1183,7 +1185,7 @@ function setDateField(){ $('#fDateTxt').textContent=`${F.date.replace(/-/g,'. ')
 $('#fDate').onclick=()=>datePicker(F.date,ds=>{ F.date=ds; setDateField(); if(!editRec&&!F._kindTouched){ F.plan=dday(F.date)>0; renderFormBits(); } });
 function fmtTee(v){ const d=String(v||'').replace(/\D/g,'').slice(0,4); if(d.length<=2) return d; if(d.length===3) return '0'+d[0]+':'+d.slice(1); return d.slice(0,2)+':'+d.slice(2); }
 function normTee(v){ const f=fmtTee(v); const m=f.match(/^(\d{2}):(\d{2})$/); if(!m) return ''; const h=+m[1], mi=+m[2]; return (h<24&&mi<60)?f:''; }
-$('#fTee').oninput=e=>{ const raw=e.target.value; const d=raw.replace(/\D/g,''); e.target.value=d.length>=3?fmtTee(d):d; };
+$('#fTee').oninput=e=>{ const d=e.target.value.replace(/\D/g,'').slice(0,4); e.target.value=d.length<=2?d:d.slice(0,2)+':'+d.slice(2); };
 $('#fTee').onblur=e=>{ const n=normTee(e.target.value); if(e.target.value&&!n) toast('티 시간은 0712처럼'); e.target.value=n||e.target.value; };
 $$('#fAbroad button').forEach(b=>b.onclick=()=>{ F.abroad=b.dataset.v==='1'; vib(6); renderFormBits(); });
 $$('#fCaddie button').forEach(b=>b.onclick=()=>{ F.caddie=b.dataset.v==='1'; vib(6); renderFormBits(); });
