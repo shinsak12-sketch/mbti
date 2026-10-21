@@ -6,139 +6,228 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.view.View;
 import android.widget.RemoteViews;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
- * 홈 화면 골프 위젯
- *  - 위: 올해 누적(회·홀) · [+ 오늘 기록] 버튼 (오늘 예정이 있으면 그 예정을 다녀옴으로 전환)
- *  - 가운데: 다음 라운드 카드 (D-day · 골프장 · 동행자) · 없으면 [+ 예정]
- *  - 아래: 이번 달 달력 · 다녀옴(채운 원) 예정(테두리) · 날짜 누르면 앱에서 그 날 열기
+ * 홈 화면 골프 위젯 (4x7)
+ *  - 올해 누적 · [+ 예정] [+ 기록] → 홈 화면 위 팝업에서 입력
+ *  - 다음 라운드 한 줄 → 팝업 메뉴
+ *  - 달력: ‹ › 로 위젯 안에서 달 넘김, 월 이름 누르면 이번 달, 날짜 누르면 선택(리스트 필터) · 다시 누르면 해제
+ *  - 리스트: 보고 있는 달(또는 선택한 날)의 라운드 · 줄 누르면 팝업 메뉴(수정 · 다녀옴 · 삭제)
  */
 public class GolfWidget extends AppWidgetProvider {
+  static final String A_PREV = "kr.golf.bet.W_PREV", A_NEXT = "kr.golf.bet.W_NEXT", A_TODAY = "kr.golf.bet.W_TODAY", A_SEL = "kr.golf.bet.W_SEL";
   static final String[] DOW = {"일", "월", "화", "수", "목", "금", "토"};
 
   @Override public void onUpdate(Context c, AppWidgetManager m, int[] ids) { for (int id : ids) update(c, m, id); }
 
-  static void updateAll(Context c) {
+  @Override public void onReceive(Context c, Intent i) {
+    super.onReceive(c, i);
+    String act = i.getAction();
+    if (act == null || !act.startsWith("kr.golf.bet.W_")) return;
+    int wid = i.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+    if (wid < 0) return;
+    SharedPreferences sp = prefs(c);
+    int[] ym = ym(c, wid); int sel = sp.getInt("sel_" + wid, 0);
+    if (A_PREV.equals(act)) { ym[1]--; if (ym[1] < 1) { ym[1] = 12; ym[0]--; } sel = 0; }
+    else if (A_NEXT.equals(act)) { ym[1]++; if (ym[1] > 12) { ym[1] = 1; ym[0]++; } sel = 0; }
+    else if (A_TODAY.equals(act)) { Calendar n = Calendar.getInstance(); ym[0] = n.get(Calendar.YEAR); ym[1] = n.get(Calendar.MONTH) + 1; sel = 0; }
+    else if (A_SEL.equals(act)) { int d = i.getIntExtra("day", 0); sel = (sel == d) ? 0 : d; }
+    sp.edit().putString("ym_" + wid, ym[0] + "-" + two(ym[1])).putInt("sel_" + wid, sel).commit();
+    AppWidgetManager m = AppWidgetManager.getInstance(c);
+    update(c, m, wid);
+    m.notifyAppWidgetViewDataChanged(wid, rid(c, "wlist", "id"));
+  }
+
+  @Override public void onDeleted(Context c, int[] ids) {
+    SharedPreferences.Editor e = prefs(c).edit();
+    for (int id : ids) { e.remove("ym_" + id); e.remove("sel_" + id); }
+    e.apply();
+  }
+
+  /** 데이터가 바뀌었을 때 모든 위젯 다시 그림 */
+  static void refreshAll(Context c) {
     try {
       AppWidgetManager m = AppWidgetManager.getInstance(c);
       int[] ids = m.getAppWidgetIds(new ComponentName(c, GolfWidget.class));
       for (int id : ids) update(c, m, id);
+      if (ids.length > 0) m.notifyAppWidgetViewDataChanged(ids, rid(c, "wlist", "id"));
     } catch (Exception ignored) {}
   }
 
+  static SharedPreferences prefs(Context c) { return c.getSharedPreferences("golf", Context.MODE_PRIVATE); }
   static int rid(Context c, String name, String type) { return c.getResources().getIdentifier(name, type, c.getPackageName()); }
   static String two(int n) { return (n < 10 ? "0" : "") + n; }
+  static String todayStr() { Calendar n = Calendar.getInstance(); return n.get(Calendar.YEAR) + "-" + two(n.get(Calendar.MONTH) + 1) + "-" + two(n.get(Calendar.DAY_OF_MONTH)); }
 
-  static PendingIntent pi(Context c, String a, String d, String id, int req) {
-    Intent it = new Intent(c, MainActivity.class);
-    it.setAction(Intent.ACTION_VIEW);
-    it.setData(Uri.parse("golf://w?a=" + a + "&d=" + d + "&id=" + id + "&r=" + req));
-    it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-    return PendingIntent.getActivity(c, req, it, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+  static int[] ym(Context c, int wid) {
+    String s = prefs(c).getString("ym_" + wid, null);
+    Calendar n = Calendar.getInstance();
+    int[] r = {n.get(Calendar.YEAR), n.get(Calendar.MONTH) + 1};
+    if (s != null && s.length() == 7) { try { r[0] = Integer.parseInt(s.substring(0, 4)); r[1] = Integer.parseInt(s.substring(5, 7)); } catch (Exception ignored) {} }
+    return r;
   }
 
   static long dayNum(String ds) {
     try {
       Calendar k = Calendar.getInstance(); k.clear();
       k.set(Integer.parseInt(ds.substring(0, 4)), Integer.parseInt(ds.substring(5, 7)) - 1, Integer.parseInt(ds.substring(8, 10)));
-      return k.getTimeInMillis() / 86400000L;
+      return Math.round(k.getTimeInMillis() / 86400000.0);
     } catch (Exception e) { return Long.MIN_VALUE; }
+  }
+  static String dow(String ds) {
+    try { Calendar k = Calendar.getInstance(); k.clear(); k.set(Integer.parseInt(ds.substring(0, 4)), Integer.parseInt(ds.substring(5, 7)) - 1, Integer.parseInt(ds.substring(8, 10))); return DOW[k.get(Calendar.DAY_OF_WEEK) - 1]; }
+    catch (Exception e) { return ""; }
+  }
+
+  static List<JSONObject> records(Context c) {
+    List<JSONObject> out = new ArrayList<>();
+    try {
+      JSONArray a = new JSONObject(prefs(c).getString("sum", "{}")).optJSONArray("records");
+      if (a != null) for (int i = 0; i < a.length(); i++) { JSONObject o = a.optJSONObject(i); if (o != null && o.optString("d").length() == 10) out.add(o); }
+    } catch (Exception ignored) {}
+    return out;
+  }
+
+  static final Comparator<JSONObject> BY_DATE = new Comparator<JSONObject>() {
+    @Override public int compare(JSONObject a, JSONObject b) {
+      int x = a.optString("d").compareTo(b.optString("d"));
+      return x != 0 ? x : Long.compare(a.optLong("o"), b.optLong("o"));
+    }
+  };
+
+  /** 리스트에 보일 줄: 보고 있는 달 (선택한 날이 있으면 그 날만) */
+  static List<JSONObject> rowsFor(Context c, int wid) {
+    int[] ym = ym(c, wid); int sel = prefs(c).getInt("sel_" + wid, 0);
+    String pre = ym[0] + "-" + two(ym[1]) + "-"; String day = sel > 0 ? pre + two(sel) : null;
+    List<JSONObject> out = new ArrayList<>();
+    for (JSONObject o : records(c)) { String d = o.optString("d"); if (day != null ? d.equals(day) : d.startsWith(pre)) out.add(o); }
+    Collections.sort(out, BY_DATE);
+    return out;
+  }
+
+  static PendingIntent bc(Context c, int wid, String act, int day) {
+    Intent i = new Intent(c, GolfWidget.class);
+    i.setAction(act);
+    i.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, wid);
+    i.putExtra("day", day);
+    i.setData(Uri.parse("golfw://" + wid + "/" + act + "/" + day));
+    return PendingIntent.getBroadcast(c, wid * 1000 + day * 10 + act.length() % 10, i, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+  }
+  static PendingIntent quick(Context c, String a, String d, String id, int req) {
+    Intent i = new Intent(c, QuickActivity.class);
+    i.setData(Uri.parse("golfq://q?a=" + a + "&d=" + d + "&id=" + id + "&r=" + req));
+    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    return PendingIntent.getActivity(c, req, i, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+  }
+  static PendingIntent app(Context c, String a, int req) {
+    Intent i = new Intent(c, MainActivity.class);
+    i.setAction(Intent.ACTION_VIEW);
+    i.setData(Uri.parse("golf://w?a=" + a + "&d=&id=&r=" + req));
+    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    return PendingIntent.getActivity(c, req, i, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
   }
 
   static void update(Context c, AppWidgetManager m, int wid) {
-    JSONObject o;
-    try { o = new JSONObject(c.getSharedPreferences("golf", Context.MODE_PRIVATE).getString("sum", "{}")); } catch (Exception e) { o = new JSONObject(); }
-    RemoteViews v = new RemoteViews(c.getPackageName(), rid(c, "golf_widget", "layout"));
+    String pkg = c.getPackageName();
+    RemoteViews v = new RemoteViews(pkg, rid(c, "golf_widget", "layout"));
+    List<JSONObject> all = records(c);
     Calendar now = Calendar.getInstance();
-    int y = now.get(Calendar.YEAR), mo = now.get(Calendar.MONTH) + 1, td = now.get(Calendar.DAY_OF_MONTH);
-    String today = y + "-" + two(mo) + "-" + two(td);
-    long todayN = dayNum(today);
+    int ty = now.get(Calendar.YEAR); String today = todayStr(); long todayN = dayNum(today);
 
     // 올해 누적
-    int n = o.optInt("y") == y ? o.optInt("n") : 0, h = o.optInt("y") == y ? o.optInt("h") : 0;
-    v.setTextViewText(rid(c, "wyear", "id"), y + "년 골프");
+    int n = 0, h = 0; JSONObject todayPlan = null, next = null;
+    List<JSONObject> sorted = new ArrayList<>(all); Collections.sort(sorted, BY_DATE);
+    for (JSONObject o : sorted) {
+      String d = o.optString("d"); boolean plan = o.optInt("p") == 1;
+      if (!plan && d.startsWith(ty + "-")) { n++; h += o.optInt("h", 18); }
+      if (plan) { long dn = dayNum(d); if (dn == todayN && todayPlan == null) todayPlan = o; if (dn >= todayN && next == null) next = o; }
+    }
+    v.setTextViewText(rid(c, "wyear", "id"), ty + "년 골프");
     v.setTextViewText(rid(c, "wstat", "id"), n + "회 · " + String.format("%,d", h) + "홀");
-    v.setOnClickPendingIntent(rid(c, "wyearbox", "id"), pi(c, "stats", "", "", 1));
+    v.setOnClickPendingIntent(rid(c, "wyearbox", "id"), app(c, "stats", 11));
 
-    // 다음 라운드
-    JSONObject todayPlan = null, next = null;
-    JSONArray plans = o.optJSONArray("plans");
-    if (plans != null) for (int i = 0; i < plans.length(); i++) {
-      JSONObject p = plans.optJSONObject(i); if (p == null) continue;
-      long dn = dayNum(p.optString("date"));
-      if (dn == todayN && todayPlan == null) todayPlan = p;
-      if (dn >= todayN && next == null) next = p;
-    }
-    int tTitle = rid(c, "wnexttitle", "id"), tName = rid(c, "wnextname", "id"), tD = rid(c, "wnextd", "id"), box = rid(c, "wnext", "id");
-    if (todayPlan != null) {
-      v.setTextViewText(tTitle, "오늘 라운드 · 다녀와서 눌러 기록");
-      v.setTextViewText(tName, label(todayPlan));
-      v.setTextViewText(tD, "기록 ›"); v.setTextColor(tD, Color.parseColor("#c6ff3d"));
-      v.setOnClickPendingIntent(box, pi(c, "done", "", todayPlan.optString("id"), 2));
-    } else if (next != null) {
-      String ds = next.optString("date");
-      Calendar k = Calendar.getInstance(); k.clear();
-      k.set(Integer.parseInt(ds.substring(0, 4)), Integer.parseInt(ds.substring(5, 7)) - 1, Integer.parseInt(ds.substring(8, 10)));
-      long dd = dayNum(ds) - todayN;
-      v.setTextViewText(tTitle, "다음 라운드 · " + Integer.parseInt(ds.substring(5, 7)) + "/" + Integer.parseInt(ds.substring(8, 10)) + " (" + DOW[k.get(Calendar.DAY_OF_WEEK) - 1] + ")");
-      v.setTextViewText(tName, label(next));
-      v.setTextViewText(tD, dd == 1 ? "내일" : "D-" + dd); v.setTextColor(tD, Color.parseColor("#5b94ff"));
-      v.setOnClickPendingIntent(box, pi(c, "open", "", next.optString("id"), 2));
+    // 버튼 (홈 화면 위 팝업)
+    int[] ym = ym(c, wid); int sel = prefs(c).getInt("sel_" + wid, 0);
+    String selDate = sel > 0 ? ym[0] + "-" + two(ym[1]) + "-" + two(sel) : "";
+    if (todayPlan != null) v.setOnClickPendingIntent(rid(c, "wadd", "id"), quick(c, "done", "", todayPlan.optString("i"), wid * 10 + 1));
+    else v.setOnClickPendingIntent(rid(c, "wadd", "id"), quick(c, "add", (sel > 0 && dayNum(selDate) <= todayN) ? selDate : today, "", wid * 10 + 1));
+    v.setOnClickPendingIntent(rid(c, "wplan", "id"), quick(c, "plan", (sel > 0 && dayNum(selDate) > todayN) ? selDate : "", "", wid * 10 + 2));
+
+    // 다음 라운드 한 줄
+    int nn = rid(c, "wnextname", "id"), nd = rid(c, "wnextd", "id"), nb = rid(c, "wnext", "id");
+    if (next != null) {
+      String d = next.optString("d"); long dd = dayNum(d) - todayN;
+      String who = next.optString("m");
+      v.setTextViewText(nn, Integer.parseInt(d.substring(5, 7)) + "/" + Integer.parseInt(d.substring(8, 10)) + " (" + dow(d) + ")  " + next.optString("c") + (who.length() > 0 ? " · " + who : ""));
+      v.setTextViewText(nd, dd == 0 ? "오늘" : dd == 1 ? "내일" : "D-" + dd);
+      v.setOnClickPendingIntent(nb, quick(c, dd == 0 ? "done" : "menu", "", next.optString("i"), wid * 10 + 3));
     } else {
-      v.setTextViewText(tTitle, "다음 라운드");
-      v.setTextViewText(tName, "예정 없음 · 눌러서 추가");
-      v.setTextViewText(tD, "+ 예정"); v.setTextColor(tD, Color.parseColor("#5b94ff"));
-      v.setOnClickPendingIntent(box, pi(c, "plan", "", "", 2));
+      v.setTextViewText(nn, "다음 예정 없음");
+      v.setTextViewText(nd, "+");
+      v.setOnClickPendingIntent(nb, quick(c, "plan", "", "", wid * 10 + 3));
     }
 
-    // + 오늘 기록 (오늘 예정이 있으면 그걸 다녀옴으로)
-    int add = rid(c, "wadd", "id");
-    v.setOnClickPendingIntent(add, todayPlan != null ? pi(c, "done", "", todayPlan.optString("id"), 3) : pi(c, "add", today, "", 3));
-
-    // 이번 달 달력
-    String prefix = y + "-" + two(mo) + "-";
-    HashMap<Integer, Integer> played = new HashMap<>(), plan = new HashMap<>();
-    int nP = 0, nL = 0;
-    JSONArray days = o.optJSONArray("days");
-    if (days != null) for (int i = 0; i < days.length(); i++) {
-      String s = days.optString(i);
-      if (!s.startsWith(prefix) || s.length() < 12) continue;
-      try {
-        int d = Integer.parseInt(s.substring(8, 10)); boolean isPlan = s.endsWith(":1");
-        HashMap<Integer, Integer> mp = isPlan ? plan : played; Integer cur = mp.get(d); mp.put(d, cur == null ? 1 : cur + 1);
-        if (isPlan) nL++; else nP++;
-      } catch (Exception ignored) {}
+    // 달력
+    String pre = ym[0] + "-" + two(ym[1]) + "-";
+    HashMap<Integer, Integer> played = new HashMap<>(), plan = new HashMap<>(); int nP = 0, nL = 0;
+    for (JSONObject o : all) {
+      String d = o.optString("d"); if (!d.startsWith(pre)) continue;
+      int day = Integer.parseInt(d.substring(8, 10)); boolean isPlan = o.optInt("p") == 1;
+      HashMap<Integer, Integer> mp = isPlan ? plan : played; Integer cur = mp.get(day); mp.put(day, cur == null ? 1 : cur + 1);
+      if (isPlan) nL++; else nP++;
     }
-    v.setTextViewText(rid(c, "wmonth", "id"), mo + "월");
+    boolean isCur = ym[0] == ty && ym[1] == now.get(Calendar.MONTH) + 1; int td = now.get(Calendar.DAY_OF_MONTH);
+    v.setTextViewText(rid(c, "wmonth", "id"), ym[0] + "년 " + ym[1] + "월");
     v.setTextViewText(rid(c, "wmsum", "id"), "다녀옴 " + nP + " · 예정 " + nL);
-    Calendar first = Calendar.getInstance(); first.clear(); first.set(y, mo - 1, 1);
+    v.setOnClickPendingIntent(rid(c, "wprev", "id"), bc(c, wid, A_PREV, 0));
+    v.setOnClickPendingIntent(rid(c, "wnextm", "id"), bc(c, wid, A_NEXT, 0));
+    v.setOnClickPendingIntent(rid(c, "wmonth", "id"), bc(c, wid, A_TODAY, 0));
+    Calendar first = Calendar.getInstance(); first.clear(); first.set(ym[0], ym[1] - 1, 1);
     int start = first.get(Calendar.DAY_OF_WEEK) - 1, dim = first.getActualMaximum(Calendar.DAY_OF_MONTH);
     int rows = (start + dim + 6) / 7;
     for (int r = 0; r < 6; r++) v.setViewVisibility(rid(c, "r" + r, "id"), r < rows ? View.VISIBLE : View.GONE);
-    int dNone = rid(c, "c_none", "drawable"), dFill = rid(c, "c_fill", "drawable"), dRing = rid(c, "c_ring", "drawable"), dBoth = rid(c, "c_both", "drawable"), dToday = rid(c, "c_today", "drawable");
+    int dNone = rid(c, "c_none", "drawable"), dFill = rid(c, "c_fill", "drawable"), dRing = rid(c, "c_ring", "drawable"), dBoth = rid(c, "c_both", "drawable"),
+        dToday = rid(c, "c_today", "drawable"), dSel = rid(c, "c_sel", "drawable"), dFillSel = rid(c, "c_fill_sel", "drawable");
     for (int i = 0; i < 42; i++) {
       int cell = rid(c, "d" + i, "id"); int d = i - start + 1;
       if (d < 1 || d > dim) { v.setTextViewText(cell, ""); v.setInt(cell, "setBackgroundResource", dNone); continue; }
-      boolean hp = played.containsKey(d), hl = plan.containsKey(d); int col = i % 7;
+      boolean hp = played.containsKey(d), hl = plan.containsKey(d), hs = d == sel; int col = i % 7;
       v.setTextViewText(cell, String.valueOf(d));
-      v.setInt(cell, "setBackgroundResource", hp && hl ? dBoth : hp ? dFill : hl ? dRing : d == td ? dToday : dNone);
+      int bg = hs ? (hp ? dFillSel : dSel) : hp && hl ? dBoth : hp ? dFill : hl ? dRing : (isCur && d == td) ? dToday : dNone;
+      v.setInt(cell, "setBackgroundResource", bg);
       v.setTextColor(cell, Color.parseColor(hp ? "#0e1014" : hl ? "#8fb6ff" : col == 0 ? "#ff8a8a" : "#d7d9de"));
-      v.setOnClickPendingIntent(cell, pi(c, "day", prefix + two(d), "", 100 + d));
+      v.setOnClickPendingIntent(cell, bc(c, wid, A_SEL, d));
     }
-    v.setOnClickPendingIntent(rid(c, "wroot", "id"), pi(c, "home", "", "", 4));
-    m.updateAppWidget(wid, v);
-  }
 
-  static String label(JSONObject p) {
-    String s = p.optString("course"); String mt = p.optString("mates");
-    return mt.length() > 0 ? s + " · " + mt : s;
+    // 리스트
+    int cnt = rowsFor(c, wid).size();
+    v.setTextViewText(rid(c, "wlisthead", "id"), sel > 0
+        ? ym[1] + "/" + sel + " (" + dow(selDate) + ") " + cnt + "개 · 날짜 다시 누르면 " + ym[1] + "월 전체"
+        : ym[1] + "월 라운드 " + cnt + "개");
+    v.setTextViewText(rid(c, "wempty", "id"), all.isEmpty() ? "앱을 한 번 열면 기록이 들어와" : sel > 0 ? "이 날 기록 없음 · 위 + 버튼으로 추가" : "이 달 기록 없음");
+    Intent svc = new Intent(c, GolfListService.class);
+    svc.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, wid);
+    svc.setData(Uri.parse(svc.toUri(Intent.URI_INTENT_SCHEME)));
+    int list = rid(c, "wlist", "id");
+    v.setRemoteAdapter(list, svc);
+    v.setEmptyView(list, rid(c, "wempty", "id"));
+    Intent tpl = new Intent(c, QuickActivity.class);
+    tpl.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    v.setPendingIntentTemplate(list, PendingIntent.getActivity(c, 90000 + wid, tpl, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT));
+
+    m.updateAppWidget(wid, v);
   }
 }

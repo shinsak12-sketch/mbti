@@ -1,171 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/wroot"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/w_bg"
-    android:orientation="vertical"
-    android:padding="12dp">
+    android:id="@+id/wroot" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/w_bg" android:orientation="vertical" android:padding="12dp">
 
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
         <LinearLayout android:id="@+id/wyearbox" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-            <TextView android:id="@+id/wyear" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="2026년 골프" android:textSize="11sp" android:textStyle="bold" android:textColor="#8b919e"/>
-            <TextView android:id="@+id/wstat" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0회 · 0홀" android:textSize="20sp" android:textStyle="bold" android:textColor="#f3f4f6"/>
+            <TextView android:id="@+id/wyear" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="11sp" android:textStyle="bold" android:textColor="#8b919e"/>
+            <TextView android:id="@+id/wstat" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="19sp" android:textStyle="bold" android:textColor="#f3f4f6"/>
         </LinearLayout>
-        <TextView android:id="@+id/wadd" android:layout_width="wrap_content" android:layout_height="36dp" android:paddingLeft="12dp" android:paddingRight="12dp" android:gravity="center" android:background="@drawable/w_btn_acc" android:text="+ 오늘 기록" android:textSize="13sp" android:textStyle="bold" android:textColor="#0e1014"/>
+        <TextView android:id="@+id/wplan" android:layout_width="wrap_content" android:layout_height="34dp" android:layout_marginRight="6dp" android:paddingLeft="11dp" android:paddingRight="11dp" android:gravity="center" android:background="@drawable/w_btn_plan" android:text="+ 예정" android:textSize="13sp" android:textStyle="bold" android:textColor="#8fb6ff"/>
+        <TextView android:id="@+id/wadd" android:layout_width="wrap_content" android:layout_height="34dp" android:paddingLeft="11dp" android:paddingRight="11dp" android:gravity="center" android:background="@drawable/w_btn_acc" android:text="+ 기록" android:textSize="13sp" android:textStyle="bold" android:textColor="#0e1014"/>
     </LinearLayout>
 
-    <LinearLayout android:id="@+id/wnext" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:background="@drawable/w_next" android:orientation="horizontal" android:gravity="center_vertical" android:paddingLeft="12dp" android:paddingRight="12dp" android:paddingTop="8dp" android:paddingBottom="8dp">
-        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-            <TextView android:id="@+id/wnexttitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="다음 라운드" android:textSize="10.5sp" android:textStyle="bold" android:textColor="#8fb6ff" android:singleLine="true"/>
-            <TextView android:id="@+id/wnextname" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="예정 없음" android:textSize="14sp" android:textStyle="bold" android:textColor="#f3f4f6" android:singleLine="true" android:ellipsize="end"/>
-        </LinearLayout>
-        <TextView android:id="@+id/wnextd" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="+ 예정" android:textSize="18sp" android:textStyle="bold" android:textColor="#5b94ff"/>
+    <LinearLayout android:id="@+id/wnext" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:background="@drawable/w_next" android:orientation="horizontal" android:gravity="center_vertical" android:paddingLeft="12dp" android:paddingRight="12dp" android:paddingTop="7dp" android:paddingBottom="7dp">
+        <TextView android:id="@+id/wnextname" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:textSize="12.5sp" android:textStyle="bold" android:textColor="#f3f4f6" android:singleLine="true" android:ellipsize="end"/>
+        <TextView android:id="@+id/wnextd" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="8dp" android:textSize="15sp" android:textStyle="bold" android:textColor="#5b94ff"/>
     </LinearLayout>
 
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:orientation="horizontal" android:gravity="center_vertical">
-        <TextView android:id="@+id/wmonth" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="10월" android:textSize="13sp" android:textStyle="bold" android:textColor="#f3f4f6"/>
-        <TextView android:id="@+id/wmsum" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" android:textSize="11sp" android:textStyle="bold" android:textColor="#8b919e"/>
+        <TextView android:id="@+id/wprev" android:layout_width="34dp" android:layout_height="30dp" android:gravity="center" android:background="@drawable/w_nav" android:text="‹" android:textSize="18sp" android:textStyle="bold" android:textColor="#f3f4f6"/>
+        <TextView android:id="@+id/wmonth" android:layout_width="wrap_content" android:layout_height="30dp" android:minWidth="104dp" android:gravity="center" android:textSize="14sp" android:textStyle="bold" android:textColor="#f3f4f6"/>
+        <TextView android:id="@+id/wnextm" android:layout_width="34dp" android:layout_height="30dp" android:gravity="center" android:background="@drawable/w_nav" android:text="›" android:textSize="18sp" android:textStyle="bold" android:textColor="#f3f4f6"/>
+        <TextView android:id="@+id/wmsum" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="right" android:textSize="11sp" android:textStyle="bold" android:textColor="#8b919e"/>
     </LinearLayout>
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:orientation="horizontal"><TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="일" android:textSize="10sp" android:textStyle="bold" android:textColor="#ff7a7a"/><TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="월" android:textSize="10sp" android:textStyle="bold" android:textColor="#8b919e"/><TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="화" android:textSize="10sp" android:textStyle="bold" android:textColor="#8b919e"/><TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="수" android:textSize="10sp" android:textStyle="bold" android:textColor="#8b919e"/><TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="목" android:textSize="10sp" android:textStyle="bold" android:textColor="#8b919e"/><TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="금" android:textSize="10sp" android:textStyle="bold" android:textColor="#8b919e"/><TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="토" android:textSize="10sp" android:textStyle="bold" android:textColor="#8b919e"/></LinearLayout>
-    <LinearLayout android:id="@+id/wgrid" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="vertical">
-        <LinearLayout android:id="@+id/r0" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:minHeight="28dp" android:orientation="horizontal">
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d0" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d1" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d2" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d3" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d4" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d5" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d6" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:orientation="horizontal"><TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="일" android:textSize="10sp" android:textStyle="bold" android:textColor="#ff7a7a"/><TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="월" android:textSize="10sp" android:textStyle="bold" android:textColor="#8b919e"/><TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="화" android:textSize="10sp" android:textStyle="bold" android:textColor="#8b919e"/><TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="수" android:textSize="10sp" android:textStyle="bold" android:textColor="#8b919e"/><TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="목" android:textSize="10sp" android:textStyle="bold" android:textColor="#8b919e"/><TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="금" android:textSize="10sp" android:textStyle="bold" android:textColor="#8b919e"/><TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="토" android:textSize="10sp" android:textStyle="bold" android:textColor="#8b919e"/></LinearLayout>
+        <LinearLayout android:id="@+id/r0" android:layout_width="match_parent" android:layout_height="30dp" android:orientation="horizontal">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d0" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d1" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d2" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d3" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d4" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d5" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d6" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
         </LinearLayout>
-        <LinearLayout android:id="@+id/r1" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:minHeight="28dp" android:orientation="horizontal">
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d7" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d8" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d9" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d10" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d11" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d12" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d13" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
+        <LinearLayout android:id="@+id/r1" android:layout_width="match_parent" android:layout_height="30dp" android:orientation="horizontal">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d7" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d8" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d9" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d10" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d11" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d12" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d13" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
         </LinearLayout>
-        <LinearLayout android:id="@+id/r2" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:minHeight="28dp" android:orientation="horizontal">
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d14" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d15" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d16" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d17" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d18" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d19" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d20" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
+        <LinearLayout android:id="@+id/r2" android:layout_width="match_parent" android:layout_height="30dp" android:orientation="horizontal">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d14" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d15" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d16" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d17" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d18" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d19" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d20" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
         </LinearLayout>
-        <LinearLayout android:id="@+id/r3" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:minHeight="28dp" android:orientation="horizontal">
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d21" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d22" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d23" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d24" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d25" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d26" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d27" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
+        <LinearLayout android:id="@+id/r3" android:layout_width="match_parent" android:layout_height="30dp" android:orientation="horizontal">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d21" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d22" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d23" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d24" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d25" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d26" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d27" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
         </LinearLayout>
-        <LinearLayout android:id="@+id/r4" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:minHeight="28dp" android:orientation="horizontal">
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d28" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d29" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d30" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d31" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d32" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d33" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d34" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
+        <LinearLayout android:id="@+id/r4" android:layout_width="match_parent" android:layout_height="30dp" android:orientation="horizontal">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d28" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d29" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d30" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d31" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d32" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d33" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d34" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
         </LinearLayout>
-        <LinearLayout android:id="@+id/r5" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:minHeight="28dp" android:orientation="horizontal">
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d35" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d36" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d37" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d38" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d39" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d40" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
-                <TextView android:id="@+id/d41" android:layout_width="27dp" android:layout_height="27dp" android:layout_gravity="center" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/>
-            </FrameLayout>
+        <LinearLayout android:id="@+id/r5" android:layout_width="match_parent" android:layout_height="30dp" android:orientation="horizontal">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d35" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d36" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d37" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d38" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d39" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d40" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"><TextView android:id="@+id/d41" android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:gravity="center" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#d7d9de" android:background="@drawable/c_none"/></FrameLayout>
         </LinearLayout>
-    </LinearLayout>
+
+    <TextView android:id="@+id/wlisthead" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:layout_marginBottom="4dp" android:textSize="11.5sp" android:textStyle="bold" android:textColor="#8b919e"/>
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <ListView android:id="@+id/wlist" android:layout_width="match_parent" android:layout_height="match_parent" android:divider="@android:color/transparent" android:dividerHeight="5dp" android:scrollbars="none"/>
+        <TextView android:id="@+id/wempty" android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#8b919e" android:text="기록 없음 · 위 + 버튼으로 추가"/>
+    </FrameLayout>
 </LinearLayout>

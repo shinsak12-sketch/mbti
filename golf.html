@@ -460,6 +460,27 @@
   .amenu button.ai:active{transform:scale(.98)}
   .dsheet .rec{box-shadow:none}
   .sheet{max-height:86vh;overflow:auto}
+
+  .cal .dc.sel span{box-shadow:0 0 0 2.5px var(--ink)!important}
+  .cal .dc.sel.pn span{box-shadow:inset 0 0 0 2px var(--blue),0 0 0 2.5px var(--ink)!important}
+  .nextl{display:flex;align-items:center;gap:12px;width:100%;text-align:left;margin-bottom:12px;padding:11px 14px;border-radius:18px;background:linear-gradient(135deg,var(--blues) 0%,transparent 85%),var(--card);border:1.5px dashed var(--blue);box-shadow:var(--sh)}
+  .nextl .t{flex:1;min-width:0}
+  .nextl small{display:block;font-size:11px;font-weight:800;color:var(--blue)}
+  .nextl b{display:block;font-size:15px;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nextl em{font-style:normal;font-size:20px;font-weight:900;color:var(--blue);letter-spacing:-.5px}
+  .nextl.none{border-style:dashed;background:var(--card)} .nextl.none b{color:var(--mut);font-size:13.5px}
+  .mhd .lk{font-size:11.5px;font-weight:800;color:var(--acc);padding:4px 8px;border-radius:999px;background:var(--accs)}
+  .dayadd{display:flex;gap:8px;margin-top:10px}
+  .dayadd .btn{flex:1}
+  .yhero{cursor:pointer}
+  /* 위젯 팝업 모드 */
+  .pbg{display:none}
+  html.popup,html.popup body{background:transparent!important}
+  body.popup .tabbar,body.popup .fab{display:none!important}
+  body.popup .pbg{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:0;animation:fadeIn .2s}
+  body.popup .app{position:fixed;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;max-height:92vh;overflow-y:auto;background:var(--bg);border-radius:26px 26px 0 0;padding:20px 16px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -20px 50px rgba(0,0,0,.55);z-index:1;animation:up .3s cubic-bezier(.2,.9,.3,1)}
+  body.popup.menu .app{display:none}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 </style>
 </head>
 <body>
@@ -553,10 +574,12 @@
   </div>
   <div class="yrchips" id="recYears"></div>
   <div id="recHero"></div>
+  <div id="recNext"></div>
   <div id="recCal"></div>
-  <div id="recPlans"></div>
-  <div class="seg" id="recFilter"><button data-f="all">전체</button><button data-f="dom">국내</button><button data-f="abroad">해외</button></div>
-  <div id="recList"></div>
+  <div class="seg" id="recView" style="margin-bottom:4px"><button data-v="month">이 달</button><button data-v="year">연도 전체</button></div>
+  <div id="recMonth"></div>
+  <div id="recYearBox"><div class="seg" id="recFilter" style="margin-top:12px"><button data-f="all">전체</button><button data-f="dom">국내</button><button data-f="abroad">해외</button></div>
+  <div id="recList"></div></div>
 </section>
 
 <!-- ⓑ 기록 입력 -->
@@ -625,17 +648,21 @@
 <nav class="tabbar" id="tabbar"><div class="in"><button data-t="rec"><svg class="i" viewBox="0 0 24 24"><path d="M7 3h10a2 2 0 0 1 2 2v16l-7-4-7 4V5a2 2 0 0 1 2-2z"/></svg>기록</button><button data-t="stats"><svg class="i" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>통계</button><button data-t="bet"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9v.01M18 15v.01"/></svg>내기</button></div></nav>
 <button class="fab" id="recFab" aria-label="새 기록"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
 <div class="toast" id="toast"></div>
+<div class="pbg" id="pbg"></div>
 <div class="sheet-bg" id="sheetBg"><div class="sheet" id="sheet"></div></div>
 
 <script>
+/* =================== 위젯 팝업 모드 =================== */
+const QS=new URLSearchParams(location.search); const POPUP=QS.get('popup')==='1';
+if(POPUP){ document.documentElement.classList.add('popup'); document.body.classList.add('popup'); }
+function popupClose(){ try{ syncNative(); }catch(e){} setTimeout(()=>{ try{ if(window.GolfNative&&GolfNative.close){ GolfNative.close(); return; } }catch(e){} document.body.classList.add('menu'); document.querySelector('.pbg').style.display='none'; },80); }
 /* =================== 저장 =================== */
 const KEY='golfbet.v1';
 const DB=(()=>{ try{ return JSON.parse(localStorage.getItem(KEY))||{rounds:[],theme:'dark',names:[]}; }catch(e){ return {rounds:[],theme:'dark',names:[]}; } })();
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){} clearTimeout(save._n); save._n=setTimeout(syncNative,600); }
-function syncNative(){ try{ if(!(window.GolfNative&&GolfNative.saveSummary)) return; const recs=DB.records||[]; const y=new Date().getFullYear();
-  const played=recs.filter(r=>!r.plan&&+r.date.slice(0,4)===y);
-  const plans=recs.filter(r=>r.plan&&dday(r.date)>=0).sort((a,b)=>a.date<b.date?-1:(a.date>b.date?1:0)).slice(0,10).map(r=>({id:r.id,date:r.date,course:r.course||r.region||'',mates:(r.mates||[]).join(', ')}));
-  GolfNative.saveSummary(JSON.stringify({y,n:played.length,h:played.reduce((a,r)=>a+(r.holes||0),0),days:recs.map(r=>r.date+':'+(r.plan?1:0)),plans})); }catch(e){} }
+function syncNative(){ try{ if(!(window.GolfNative&&GolfNative.saveSummary)) return;
+  const recs=(DB.records||[]).map(r=>({i:r.id,d:r.date,p:r.plan?1:0,c:r.course||r.region||'',g:r.abroad?[r.country,r.region].filter(Boolean).join(' '):(r.region||''),m:(r.mates||[]).join(', '),k:r.caddie?1:0,h:r.holes||18,s:r.score||0,o:r.created||0}));
+  GolfNative.saveSummary(JSON.stringify({v:3,records:recs})); }catch(e){} }
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const fmt=n=>{ const a=Math.abs(Math.round(n)); return (n<0?'−':'')+a.toLocaleString('ko-KR'); };
 const fmtS=n=>n>0?'+'+fmt(n):(n<0?fmt(n):'0');
@@ -769,7 +796,7 @@ function editPlayer(i){ const p=cur.players[i]; sheet(`<h4>${i+1}번 플레이�
   $('#pok').onclick=ok; inp.onkeydown=e=>{ if(e.key==='Enter') ok(); };
   $('#pdel').onclick=()=>{ if(cur.players.length<=2) return; cur.players.splice(i,1); resizeRound(cur); if(cur.mode==='vegas'&&cur.players.length!==4) cur.mode='stroke'; closeSheet(); renderSetup(); }; }
 function sheet(html){ $('#sheet').innerHTML=html; $('#sheetBg').classList.add('show'); }
-function closeSheet(){ $('#sheetBg').classList.remove('show'); }
+function closeSheet(){ $('#sheetBg').classList.remove('show'); if(POPUP) setTimeout(()=>{ if(!$('#sheetBg').classList.contains('show')&&!$('#s-recform').classList.contains('active')) popupClose(); },60); }
 $('#sheetBg').onclick=e=>{ if(e.target===$('#sheetBg')) closeSheet(); };
 $$('#modeSeg button').forEach(b=>b.onclick=()=>{ if(b.disabled){ toast('뽑기는 4명일 때만'); return; } const prev=cur.mode; cur.mode=b.dataset.m; if(cur.unit===MODES[prev].def) cur.unit=MODES[cur.mode].def; vib(8); renderSetup(); });
 $('#unitMinus').onclick=()=>{ const st=MODES[cur.mode].step; cur.unit=Math.max(st,cur.unit-st); vib(6); renderSetup(); };
@@ -966,39 +993,65 @@ function recMenu(r){ const title=esc(r.course||r.region||'라운드'); const sub
   items.push({label:'같은 곳 새로 추가',icon:SV.copy,fn:()=>{ closeSheet(); openRecForm(null,{abroad:r.abroad,country:r.country||'',region:r.region,course:r.course,caddie:r.caddie,holes:r.holes,mates:(r.mates||[]).slice()}); }});
   items.push({label:'삭제',icon:SV.del,cls:'danger',fn:()=>confirmSheet('이 기록 삭제할까?',sub+' '+title,'삭제',()=>{ DB.records=DB.records.filter(x=>x!==r); save(); vib(20); toast('삭제됨'); renderRecords(); })});
   actionSheet(title,sub,items); }
-let calY=null, calM=null;
+let calY=null, calM=null, selDay=null, recView='month';
 function renderCal(dx){
   const t=new Date(); if(calY==null){ calY=t.getFullYear(); calM=t.getMonth()+1; }
   const pre=`${calY}-${pad(calM)}-`; const items=DB.records.filter(r=>r.date.startsWith(pre));
   const by={}; items.forEach(r=>{ const d=+r.date.slice(8,10); by[d]=by[d]||{p:0,l:0}; if(r.plan) by[d].l++; else by[d].p++; });
   const nP=items.filter(r=>!r.plan).length, nL=items.filter(r=>r.plan).length;
   const first=new Date(calY,calM-1,1).getDay(), dim=new Date(calY,calM,0).getDate(); const isCur=calY===t.getFullYear()&&calM===t.getMonth()+1;
+  if(selDay&&selDay>dim) selDay=null;
   let cells=''; for(let i=0;i<first;i++) cells+='<div></div>';
-  for(let d=1;d<=dim;d++){ const b=by[d]||{p:0,l:0}; const col=(first+d-1)%7; const cls=['dc',b.p?'pl':'',b.l?'pn':'',isCur&&d===t.getDate()?'td':'',col===0?'sun':''].join(' '); cells+=`<div class="${cls}" data-d="${d}"><span>${d}</span>${b.p>1?`<i>×${b.p}</i>`:''}</div>`; }
-  $('#recCal').innerHTML=`<div class="cal"><div class="ch"><button class="nb" id="calPrev" aria-label="이전 달">${SV.left}</button><b>${calY}년 ${calM}월</b><button class="nb" id="calNext" aria-label="다음 달">${SV.right}</button>${isCur?'':'<button class="tdy" id="calToday">오늘</button>'}<div class="sum"><em>다녀옴 ${nP}</em><br><i>예정 ${nL}</i></div></div><div class="wk">${'일월화수목금토'.split('').map(x=>`<span>${x}</span>`).join('')}</div><div class="gd ${dx?'slide':''}" style="--dx:${dx||0}px">${cells}</div><div class="lgd"><span>다녀옴</span><span class="p">예정</span></div></div>`;
-  const go=n=>{ calM+=n; if(calM<1){ calM=12; calY--; } if(calM>12){ calM=1; calY++; } vib(6); renderCal(n>0?40:-40); };
-  $('#calPrev').onclick=()=>go(-1); $('#calNext').onclick=()=>go(1); const td=$('#calToday'); if(td) td.onclick=()=>{ calY=t.getFullYear(); calM=t.getMonth()+1; renderCal(); };
-  const gd=$('#recCal .gd'); let sx=null,sy=0,moved=false;
-  gd.addEventListener('pointerdown',e=>{ sx=e.clientX; sy=e.clientY; moved=false; });
-  gd.addEventListener('pointerup',e=>{ if(sx==null) return; const dxp=e.clientX-sx, dyp=e.clientY-sy; sx=null; if(Math.abs(dxp)>50&&Math.abs(dxp)>Math.abs(dyp)*1.3){ moved=true; go(dxp<0?1:-1); } });
-  gd.querySelectorAll('.dc').forEach(c=>c.onclick=()=>{ if(moved) return; dayTap(`${calY}-${pad(calM)}-${pad(+c.dataset.d)}`); });
+  for(let d=1;d<=dim;d++){ const b=by[d]||{p:0,l:0}; const col=(first+d-1)%7; const cls=['dc',b.p?'pl':'',b.l?'pn':'',isCur&&d===t.getDate()?'td':'',col===0?'sun':'',selDay===d?'sel':''].join(' '); cells+=`<div class="${cls}" data-d="${d}"><span>${d}</span>${b.p>1?`<i>×${b.p}</i>`:''}</div>`; }
+  $('#recCal').innerHTML=`<div class="cal"><div class="ch"><button class="nb" id="calPrev" aria-label="이전 달">${SV.left}</button><b id="calTitle">${calY}년 ${calM}월</b><button class="nb" id="calNext" aria-label="다음 달">${SV.right}</button>${isCur?'':'<button class="tdy" id="calToday">오늘</button>'}<div class="sum"><em>다녀옴 ${nP}</em><br><i>예정 ${nL}</i></div></div><div class="wk">${'일월화수목금토'.split('').map(x=>`<span>${x}</span>`).join('')}</div><div class="gd ${dx?'slide':''}" style="--dx:${dx||0}px">${cells}</div><div class="lgd"><span>다녀옴</span><span class="p">예정</span></div></div>`;
+  const go=n=>{ calM+=n; if(calM<1){ calM=12; calY--; } if(calM>12){ calM=1; calY++; } selDay=null; vib(6); renderCal(n>0?40:-40); renderMonthList(); };
+  const toToday=()=>{ calY=t.getFullYear(); calM=t.getMonth()+1; selDay=null; vib(6); renderCal(); renderMonthList(); };
+  $('#calPrev').onclick=()=>go(-1); $('#calNext').onclick=()=>go(1); $('#calTitle').onclick=toToday; const td=$('#calToday'); if(td) td.onclick=toToday;
+  const cal=$('#recCal .cal'); let sx=null,sy=0,moved=false;
+  cal.addEventListener('pointerdown',e=>{ sx=e.clientX; sy=e.clientY; moved=false; });
+  cal.addEventListener('pointerup',e=>{ if(sx==null) return; const dxp=e.clientX-sx, dyp=e.clientY-sy; sx=null; if(Math.abs(dxp)>50&&Math.abs(dxp)>Math.abs(dyp)*1.3){ moved=true; go(dxp<0?1:-1); } });
+  cal.querySelectorAll('.dc').forEach(c=>c.onclick=()=>{ if(moved) return; const d=+c.dataset.d; selDay=selDay===d?null:d; vib(5); if(recView!=='month'){ recView='month'; renderRecords(); return; } renderCal(); renderMonthList(); });
 }
-function dayTap(ds){ const list=DB.records.filter(r=>r.date===ds).sort((a,b)=>(a.created||0)-(b.created||0)); const future=dday(ds)>0;
-  if(!list.length){ openRecForm(null,{date:ds,plan:future}); return; }
-  sheet(`<div class="amenu dsheet"><div class="ah"><b>${+ds.slice(5,7)}월 ${+ds.slice(8,10)}일 (${dowOf(ds)})</b><small>${list.length}개 · 눌러서 수정 · 길게 눌러서 메뉴</small></div><div id="dayList">${list.map(recCard).join('')}</div><button class="ai" id="dayAdd">${SV.plus}이 날 ${future?'예정':'기록'} 추가</button><button class="ai" id="dayClose" style="justify-content:center;color:var(--mut)">닫기</button></div>`);
-  bindRecCards($('#dayList'),closeSheet); $('#dayAdd').onclick=()=>{ closeSheet(); openRecForm(null,{date:ds,plan:future}); }; $('#dayClose').onclick=closeSheet; }
+function renderMonthList(){
+  const box=$('#recMonth'); if(recView!=='month'){ box.innerHTML=''; return; }
+  const pre=`${calY}-${pad(calM)}-`; const sel=selDay?pre+pad(selDay):null;
+  let list=DB.records.filter(r=>r.date.startsWith(pre)); if(sel) list=list.filter(r=>r.date===sel);
+  list.sort((a,b)=>a.date<b.date?-1:(a.date>b.date?1:(a.created||0)-(b.created||0)));
+  const gp=list.filter(r=>!r.plan), gl=list.filter(r=>r.plan); const gh=gp.reduce((a,r)=>a+(r.holes||0),0);
+  let head;
+  if(sel) head=`<div class="mhd"><span>${calM}월 ${selDay}일 (${dowOf(sel)})</span><button class="lk" id="selClear">${calM}월 전체</button></div>`;
+  else head=`<div class="mhd"><span>${calM}월 라운드</span><small>다녀옴 ${gp.length} · 예정 ${gl.length}${gh?` · ${gh}홀`:''}</small></div>`;
+  let body='';
+  if(list.length) body=list.map(recCard).join('');
+  else body=`<div class="emptyc">${sel?'이 날은 기록 없음':`${calM}월은 아직 기록 없음`}</div>`;
+  let add='';
+  if(sel){ const dd=dday(sel); add=`<div class="dayadd">${dd<=0?`<button class="btn ghost sm" data-add="0">${SV.plus}이 날 기록</button>`:''}${dd>=0?`<button class="btn ghost sm" data-add="1">${SV.plus}이 날 예정</button>`:''}</div>`; }
+  box.innerHTML=head+body+add; bindRecCards(box);
+  const sc=$('#selClear'); if(sc) sc.onclick=()=>{ selDay=null; vib(5); renderCal(); renderMonthList(); };
+  box.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>openRecForm(null,{date:sel,plan:b.dataset.add==='1'}));
+}
+function renderNext(){
+  const box=$('#recNext'); const t0=today();
+  const nx=DB.records.filter(r=>r.plan&&r.date>=t0).sort((a,b)=>a.date<b.date?-1:(a.date>b.date?1:0))[0];
+  if(!nx){ box.innerHTML=`<button class="nextl none" id="nextAdd"><div class="t"><small>다음 라운드</small><b>예정 없음 · 눌러서 추가</b></div><em>+</em></button>`; $('#nextAdd').onclick=()=>{ const t=new Date(); t.setDate(t.getDate()+1); openRecForm(null,{date:`${t.getFullYear()}-${pad(t.getMonth()+1)}-${pad(t.getDate())}`,plan:true}); }; return; }
+  const dd=dday(nx.date); const sub=[nx.course||nx.region,(nx.mates||[]).join(', ')].filter(Boolean).join(' · ');
+  box.innerHTML=`<button class="nextl" id="nextOpen"><div class="t"><small>${dd===0?'오늘 라운드 · 다녀와서 눌러 기록':`다음 라운드 · ${+nx.date.slice(5,7)}/${+nx.date.slice(8,10)} (${dowOf(nx.date)})`}</small><b>${esc(sub)}</b></div><em>${dd===0?'기록':dd===1?'내일':'D-'+dd}</em></button>`;
+  const b=$('#nextOpen'); b.onclick=()=>{ openRecForm(nx); if(dd===0){ F.plan=false; renderFormBits(); toast('타수 넣고 저장하면 끝'); } }; longPress(b,()=>recMenu(nx));
+}
 function renderRecords(){
   const ys=recYears();
   if(recYear==null||(recYear!=='all'&&!ys.includes(recYear))) recYear=ys[0]||new Date().getFullYear();
-  yearChips($('#recYears'),recYear,v=>{ recYear=v; renderRecords(); });
+  yearChips($('#recYears'),recYear,v=>{ recYear=v; if(v!=='all'){ const t=new Date(); calY=v; selDay=null; if(v===t.getFullYear()) calM=t.getMonth()+1; else { const ms=DB.records.filter(r=>yearOf(r)===v).map(r=>+r.date.slice(5,7)); calM=ms.length?Math.max(...ms):12; } } renderRecords(); });
   const played=DB.records.filter(r=>!r.plan); const upcoming=DB.records.filter(r=>r.plan&&dday(r.date)>=0).sort((a,b)=>a.date<b.date?-1:(a.date>b.date?1:0));
   const inYear=played.filter(r=>recYear==='all'||yearOf(r)===recYear);
   const holes=inYear.reduce((a,r)=>a+(r.holes||0),0); const cad=inYear.filter(r=>r.caddie).length; const abr=inYear.filter(r=>r.abroad).length;
   const sc=inYear.map(eq18).filter(v=>v!=null); const avg=sc.length?Math.round(sc.reduce((a,b)=>a+b,0)/sc.length*10)/10:null;
   $('#recSub').textContent=DB.records.length?`전체 ${played.length}회 기록${upcoming.length?` · 예정 ${upcoming.length}`:''}`:'다녀온 라운드를 남겨두자';
   $('#recHero').innerHTML=`<div class="yhero"><div class="ring"></div><div class="y">${recYear==='all'?'전체 기간':recYear+'년'} 골프</div><div class="big"><b>${inYear.length}<small>회</small></b><b>${holes.toLocaleString('ko-KR')}<small>홀</small></b></div><div class="chips"><span>캐디 ${cad}</span><span>노캐디 ${inYear.length-cad}</span><span>해외 ${abr}</span>${avg!=null?`<span>평균 ${avg}타</span>`:''}</div></div>`;
-  renderCal();
-  const pb=$('#recPlans'); pb.innerHTML=upcoming.length?`<div class="mhd pl"><span>다가오는 예정</span><small>${upcoming.length}개</small></div>${upcoming.map(recCard).join('')}`:''; bindRecCards(pb);
+  $('#recHero .yhero').onclick=()=>{ recView=recView==='year'?'month':'year'; vib(6); renderRecords(); if(recView==='year') setTimeout(()=>$('#recView').scrollIntoView({behavior:'smooth',block:'start'}),50); };
+  renderNext(); renderCal();
+  $$('#recView button').forEach(b=>{ b.classList.toggle('on',b.dataset.v===recView); b.textContent=b.dataset.v==='month'?`${calM}월`:`${recYear==='all'?'전체 기간':recYear+'년'} 전체`; b.onclick=()=>{ recView=b.dataset.v; vib(6); renderRecords(); }; });
+  $('#recYearBox').hidden=recView!=='year'; renderMonthList();
   $$('#recFilter button').forEach(b=>{ b.classList.toggle('on',b.dataset.f===recFilter); b.onclick=()=>{ recFilter=b.dataset.f; vib(6); renderRecords(); }; });
   const pastPlans=DB.records.filter(r=>r.plan&&dday(r.date)<0&&(recYear==='all'||yearOf(r)===recYear));
   const list=inYear.concat(pastPlans).filter(r=>recFilter==='all'||(recFilter==='abroad')===!!r.abroad).sort(recSort);
@@ -1014,6 +1067,7 @@ function renderRecords(){
 
 /* ---------- ⓑ 기록 입력 ---------- */
 function openRecForm(rec,preset){
+  if(POPUP) document.body.classList.remove('menu');
   editRec=rec||null;
   if(rec) F=JSON.parse(JSON.stringify(rec));
   else { const last=DB.records.slice().sort(recSort)[0]; F=Object.assign({id:uid(),created:Date.now(),date:today(),plan:false,abroad:false,country:'',region:'',course:'',caddie:last?last.caddie:true,holes:18,mates:[],score:null,memo:''},preset||{}); }
@@ -1062,14 +1116,14 @@ $('#mateAdd').onclick=addMate;
 $('#fScore').oninput=scoreHint;
 $('#sMinus').onclick=()=>{ const v=+$('#fScore').value||Math.round(90*F.holes/18)+1; $('#fScore').value=Math.max(1,v-1); vib(4); scoreHint(); };
 $('#sPlus').onclick=()=>{ const v=+$('#fScore').value||Math.round(90*F.holes/18)-1; $('#fScore').value=v+1; vib(4); scoreHint(); };
-$('#rfClose').onclick=()=>{ renderRecords(); show('#s-rec'); };
+$('#rfClose').onclick=()=>{ if(POPUP){ popupClose(); return; } renderRecords(); show('#s-rec'); };
 $('#rfSave').onclick=()=>{
   F.date=$('#fDate').value||today(); F.country=F.abroad?$('#fCountry').value.trim():''; F.region=$('#fRegion').value.trim(); F.course=$('#fCourse').value.trim(); F.memo=$('#fMemo').value.trim();
   if($('#fMate').value.trim()) addMate();
   const s=parseInt($('#fScore').value,10); F.score=(!F.plan&&s>0)?s:null; F.plan=!!F.plan; delete F._kindTouched;
   if(!F.course&&!F.region){ toast('골프장이나 지역은 넣어줘'); $('#fCourse').focus(); return; }
   if(editRec) Object.assign(editRec,F); else DB.records.push(F);
-  save(); vib([10,30,10]); recYear=yearOf(F); toast(editRec?'수정됨':(F.plan?'예정 저장':'기록 저장')); renderRecords(); show('#s-rec');
+  save(); vib([10,30,10]); if(POPUP){ popupClose(); return; } recYear=yearOf(F); calY=+F.date.slice(0,4); calM=+F.date.slice(5,7); selDay=null; recView='month'; toast(editRec?'수정됨':(F.plan?'예정 저장':'기록 저장')); renderRecords(); show('#s-rec');
 };
 $('#rfDel').onclick=()=>{ sheet(`<h4>이 기록 삭제할까?</h4><div class="mut" style="font-size:13px;font-weight:600;margin-bottom:14px">${esc(F.date)} ${esc(F.course||F.region)}</div><div class="row"><button class="btn ghost sm" id="dno">취소</button><button class="btn danger sm" id="dyes">삭제</button></div>`); $('#dno').onclick=closeSheet; $('#dyes').onclick=()=>{ DB.records=DB.records.filter(r=>r!==editRec); save(); closeSheet(); toast('삭제됨'); renderRecords(); show('#s-rec'); }; };
 $('#recImportBtn').onclick=()=>openImport();
@@ -1184,7 +1238,7 @@ window.widgetOpen=function(a,d,id){
   closeSheet(); const r=id?DB.records.find(x=>x.id===id):null;
   const tmr=()=>{ const t=new Date(); t.setDate(t.getDate()+1); return `${t.getFullYear()}-${pad(t.getMonth()+1)}-${pad(t.getDate())}`; };
   renderRecords(); show('#s-rec');
-  if(a==='day'&&d){ calY=+d.slice(0,4); calM=+d.slice(5,7); renderCal(); dayTap(d); return; }
+  if(a==='day'&&d){ calY=+d.slice(0,4); calM=+d.slice(5,7); selDay=+d.slice(8,10); recView='month'; renderRecords(); return; }
   if(a==='add'){ openRecForm(null,{date:d||today(),plan:false}); return; }
   if(a==='plan'){ openRecForm(null,{date:tmr(),plan:true}); return; }
   if(a==='open'&&r){ openRecForm(r); return; }
@@ -1193,6 +1247,7 @@ window.widgetOpen=function(a,d,id){
 };
 window.appBack=function(){
   if($('#sheetBg').classList.contains('show')){ closeSheet(); return true; }
+  if(POPUP) return false;
   const a=$('.screen.active'); const id=a?'#'+a.id:'';
   if(id==='#s-recform'||id==='#s-import'||id==='#s-stats'||id==='#s-list'){ renderRecords(); show('#s-rec'); return true; }
   if(id==='#s-rule'){ renderSetup(); show('#s-setup'); return true; }
@@ -1201,9 +1256,23 @@ window.appBack=function(){
   if(id==='#s-draw'){ renderHole(); return true; }
   return false;
 };
-renderRecords(); show('#s-rec'); setTimeout(syncNative,300);
+if(POPUP){
+  const a=QS.get('a')||'add', d=QS.get('d')||'', id=QS.get('id')||''; const r=id?DB.records.find(x=>x.id===id):null;
+  const tmr=()=>{ const t=new Date(); t.setDate(t.getDate()+1); return `${t.getFullYear()}-${pad(t.getMonth()+1)}-${pad(t.getDate())}`; };
+  $('#pbg').onclick=()=>popupClose();
+  if(a==='menu'&&r){ document.body.classList.add('menu'); recMenu(r); }
+  else if(a==='done'&&r){ openRecForm(r); F.plan=false; renderFormBits(); }
+  else if(a==='edit'&&r){ openRecForm(r); }
+  else if(a==='plan'){ openRecForm(null,{date:(d&&d>today())?d:tmr(),plan:true}); }
+  else openRecForm(null,{date:d||today(),plan:false});
+} else { renderRecords(); show('#s-rec'); setTimeout(syncNative,300); }
 window.addEventListener('beforeunload',save);
-document.addEventListener('visibilitychange',()=>{ if(document.hidden) save(); });
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){ save(); return; }
+  if(POPUP) return;
+  // 위젯 팝업에서 바뀐 기록 다시 읽기
+  try{ const f=JSON.parse(localStorage.getItem(KEY)); if(f&&Array.isArray(f.records)&&!$('#s-recform').classList.contains('active')){ DB.records=f.records; const a=$('.screen.active'); if(a&&a.id==='s-rec') renderRecords(); else if(a&&a.id==='s-stats') renderStats(); } }catch(e){}
+});
 </script>
 </body>
 </html>

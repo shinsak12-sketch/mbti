@@ -9,6 +9,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:configChanges="orientation|screenSize|keyboardHidden" android:excludeFromRecents="true" android:exported="false" android:launchMode="singleTask" android:name="kr.golf.bet.QuickActivity" android:screenOrientation="portrait" android:taskAffinity="kr.golf.bet.quick" android:theme="@android:style/Theme.Translucent.NoTitleBar" android:windowSoftInputMode="adjustResize"/>
+        <service android:exported="false" android:name="kr.golf.bet.GolfListService" android:permission="android.permission.BIND_REMOTEVIEWS"/>
         <receiver android:exported="true" android:label="@string/widget_name" android:name="kr.golf.bet.GolfWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>

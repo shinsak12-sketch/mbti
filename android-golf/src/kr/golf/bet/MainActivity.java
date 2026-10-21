@@ -47,38 +47,10 @@ public class MainActivity extends Activity {
     wv.setBackgroundColor(Color.parseColor("#0e1014"));
     wv.setOverScrollMode(View.OVER_SCROLL_NEVER);
 
-    wv.setWebViewClient(new WebViewClient() {
-      @Override public WebResourceResponse shouldInterceptRequest(WebView v, WebResourceRequest req) {
-        Uri u = req.getUrl();
-        if (u == null || !"app.local".equals(u.getHost())) return null;
-        String path = u.getPath();
-        if (path == null || path.equals("/") || path.isEmpty()) path = "/index.html";
-        String last = path.substring(path.lastIndexOf('/') + 1);
-        if (!last.contains(".")) path = path + ".html";
-        try {
-          InputStream in = getAssets().open("www" + path);
-          WebResourceResponse r = new WebResourceResponse(mime(path), "utf-8", in);
-          HashMap<String, String> h = new HashMap<>();
-          h.put("Access-Control-Allow-Origin", "*");
-          h.put("Cache-Control", "no-cache");
-          r.setResponseHeaders(h);
-          return r;
-        } catch (IOException e) {
-          return new WebResourceResponse("text/plain", "utf-8", 404, "Not Found",
-              new HashMap<String, String>(), new ByteArrayInputStream(new byte[0]));
-        }
-      }
-      @Override public void onPageFinished(WebView v, String url) {
-        loaded = true;
-        if (pendingJs != null) { v.evaluateJavascript(pendingJs, null); pendingJs = null; }
-      }
-      @Override public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest req) {
-        Uri u = req.getUrl();
-        if (u != null && "app.local".equals(u.getHost())) return false;
-        try { startActivity(new Intent(Intent.ACTION_VIEW, u)); } catch (Exception ignored) {}
-        return true;
-      }
-    });
+    wv.setWebViewClient(new AppWebClient(this, new Runnable() { @Override public void run() {
+      loaded = true;
+      if (pendingJs != null) { wv.evaluateJavascript(pendingJs, null); pendingJs = null; }
+    } }));
     wv.setWebChromeClient(new WebChromeClient());
     wv.addJavascriptInterface(new GolfBridge(this), "GolfNative");
     setContentView(wv);
@@ -109,7 +81,7 @@ public class MainActivity extends Activity {
   }
 
   @Override protected void onPause() { super.onPause(); if (wv != null) wv.onPause(); }
-  @Override protected void onResume() { super.onResume(); if (wv != null) wv.onResume(); GolfWidget.updateAll(this); }
+  @Override protected void onResume() { super.onResume(); if (wv != null) wv.onResume(); GolfWidget.refreshAll(this); }
 
   static String mime(String p) {
     String l = p.toLowerCase();

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rrow" android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:background="@drawable/row_bg" android:orientation="horizontal" android:gravity="center_vertical"
+    android:paddingLeft="10dp" android:paddingRight="12dp" android:paddingTop="7dp" android:paddingBottom="7dp">
+    <LinearLayout android:layout_width="38dp" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+        <TextView android:id="@+id/rday" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="16sp" android:textStyle="bold" android:textColor="#f3f4f6"/>
+        <TextView android:id="@+id/rdow" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="9.5sp" android:textStyle="bold" android:textColor="#8b919e"/>
+    </LinearLayout>
+    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginLeft="8dp" android:orientation="vertical">
+        <TextView android:id="@+id/rname" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="13.5sp" android:textStyle="bold" android:textColor="#f3f4f6" android:singleLine="true" android:ellipsize="end"/>
+        <TextView android:id="@+id/rsub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="10.5sp" android:textStyle="bold" android:textColor="#8b919e" android:singleLine="true" android:ellipsize="end"/>
+    </LinearLayout>
+    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="6dp" android:orientation="vertical" android:gravity="right">
+        <TextView android:id="@+id/rright" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="16sp" android:textStyle="bold" android:textColor="#f3f4f6"/>
+        <TextView android:id="@+id/rright2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="9.5sp" android:textStyle="bold" android:textColor="#8b919e"/>
+    </LinearLayout>
+</LinearLayout>

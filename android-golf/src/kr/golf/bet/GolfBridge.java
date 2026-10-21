@@ -1,15 +1,20 @@
 package kr.golf.bet;
 
+import android.app.Activity;
 import android.content.Context;
 import android.webkit.JavascriptInterface;
 
-/** 웹 → 네이티브: 위젯에 쓸 요약(올해 누적, 날짜별 기록·예정, 다가오는 예정)을 저장하고 위젯을 새로 그림. */
+/** 웹 → 네이티브: 위젯용 기록 요약 저장 · 위젯 갱신 · 팝업 닫기 */
 public class GolfBridge {
   private final Context ctx;
-  GolfBridge(Context c) { ctx = c.getApplicationContext(); }
+  private final Activity act;
+  GolfBridge(Activity a) { ctx = a.getApplicationContext(); act = a; }
 
   @JavascriptInterface public void saveSummary(String json) {
-    ctx.getSharedPreferences("golf", Context.MODE_PRIVATE).edit().putString("sum", json == null ? "{}" : json).apply();
-    GolfWidget.updateAll(ctx);
+    ctx.getSharedPreferences("golf", Context.MODE_PRIVATE).edit().putString("sum", json == null ? "{}" : json).commit();
+    GolfWidget.refreshAll(ctx);
+  }
+  @JavascriptInterface public void close() {
+    if (act instanceof QuickActivity) act.runOnUiThread(new Runnable() { @Override public void run() { act.finish(); } });
   }
 }
