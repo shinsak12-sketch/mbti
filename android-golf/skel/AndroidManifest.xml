@@ -24,6 +24,7 @@
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/golf_widget_info"/>
         </receiver>
         <receiver android:exported="false" android:name="kr.golf.bet.ReminderReceiver"/>
+        <service android:exported="false" android:name="kr.golf.bet.SyncJob" android:permission="android.permission.BIND_JOB_SERVICE"/>
         <receiver android:exported="true" android:name="kr.golf.bet.BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>

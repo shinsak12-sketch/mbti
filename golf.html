@@ -627,6 +627,43 @@
   .phv .dots i{width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.3);transition:width .2s,background .2s}
   .phv .dots i.on{width:18px;background:#fff}
   body.pv .sheet-bg{z-index:80} body.pv .toast{z-index:85}
+
+  /* ===== 온라인 · 동행자 공유 ===== */
+  .onl{background:linear-gradient(145deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:var(--sh);position:relative;overflow:hidden;margin-bottom:12px;width:100%;text-align:left;display:block}
+  .onl::after{content:'';position:absolute;right:-40px;top:-40px;width:140px;height:140px;border-radius:50%;border:18px solid var(--accs)}
+  .onl b{display:block;font-size:16px;font-weight:900;letter-spacing:-.3px;position:relative;z-index:1}
+  .onl small{display:block;font-size:12px;color:var(--mut);font-weight:700;margin-top:3px;line-height:1.5;position:relative;z-index:1}
+  .onl em{position:relative;z-index:1;display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-style:normal;font-size:13px;font-weight:900;color:var(--accink);background:var(--acc);padding:9px 14px;border-radius:12px;box-shadow:0 3px 0 color-mix(in srgb,var(--acc) 55%,#000)}
+  .onl.on em{background:var(--chip);color:var(--ink);box-shadow:0 3px 0 var(--line)}
+  .onl .st{position:relative;z-index:1;display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .onl .st span{font-size:11px;font-weight:800;padding:4px 9px;border-radius:999px;background:var(--chip);color:var(--mut)}
+  .onl .st span.ok{background:var(--accs);color:var(--acc)}
+  .codebox{background:var(--hero);color:var(--heroink);border-radius:22px;padding:18px 16px 16px;box-shadow:var(--sh);position:relative;overflow:hidden}
+  .codebox::before{content:'';position:absolute;right:-30px;bottom:-50px;width:150px;height:150px;border-radius:50%;background:rgba(0,0,0,.07)}
+  .codebox small{display:block;font-size:11.5px;font-weight:800;opacity:.75;letter-spacing:.04em}
+  .codebox .cd2{font-size:40px;font-weight:900;letter-spacing:6px;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+  .codebox .nm{font-size:13px;font-weight:800;opacity:.8}
+  .codebox .acts{display:flex;gap:8px;margin-top:14px;position:relative;z-index:1}
+  .codebox .acts button{flex:1;height:42px;border-radius:13px;background:rgba(0,0,0,.14);color:inherit;font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px;transition:transform .08s}
+  .codebox .acts button:active{transform:scale(.96)}
+  .codebox .acts svg{width:17px;height:17px}
+  .frow{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);width:100%;text-align:left}
+  .frow:last-child{border:none}
+  .frow .av{width:38px;height:38px;font-size:14px;background:var(--accs);color:var(--acc);border:none}
+  .frow .tx{flex:1;min-width:0} .frow .tx b{display:block;font-size:14.5px;font-weight:900} .frow .tx small{display:block;font-size:11.5px;color:var(--mut);font-weight:700;margin-top:1px}
+  .frow .tx small.warn{color:var(--blue)}
+  .frow .chev{color:var(--mut)}
+  .bkst{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+  .bkst div{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:10px 12px;box-shadow:var(--sh)}
+  .bkst small{display:block;font-size:10.5px;color:var(--mut);font-weight:800}
+  .bkst b{display:block;font-size:16px;font-weight:900;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sharehint{display:flex;align-items:center;gap:8px;margin-top:8px;padding:10px 12px;border-radius:14px;background:var(--blues);color:var(--blue);font-size:12.5px;font-weight:800}
+  .sharehint svg{width:17px;height:17px;flex:none}
+  .tg.shr{background:var(--blues);color:var(--blue)}
+  .mlist .r .lnk{font-size:10px;font-weight:900;color:var(--blue);background:var(--blues);padding:2px 6px;border-radius:999px;margin-left:6px;vertical-align:1px}
+  #onCode::placeholder{letter-spacing:0;font-weight:700}
+  .spin{width:16px;height:16px;border-radius:50%;border:2.5px solid currentColor;border-right-color:transparent;animation:rot .7s linear infinite;display:inline-block}
+  @keyframes rot{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -757,6 +794,7 @@
   <div class="lbl">동행자</div>
   <div class="inrow"><input class="inp" id="fMate" placeholder="이름 쓰고 추가" maxlength="12" autocomplete="off"><button class="btn sm" id="mateAdd">추가</button></div>
   <div class="mates" id="mates"></div>
+  <div id="shareHint"></div>
   <div class="sugg" id="sMates"></div>
   <div id="scoreWrap"><div class="lbl">타수 <small class="mut">안 쳤으면 비워두기</small></div>
   <div class="scorein"><button class="b" id="sMinus">−</button><input id="fScore" type="number" inputmode="numeric" placeholder="타수 입력"><button class="b" id="sPlus">+</button></div>
@@ -803,10 +841,18 @@
 <section class="screen" id="s-mates">
   <button class="back" id="matesBack"><svg class="i" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>기록</button>
   <div class="top"><div><h1>동행자 관리</h1><div class="sm" id="matesSub"></div></div></div>
+  <div id="onCard"></div>
   <input class="inp" id="mateQ" placeholder="이름 찾기" autocomplete="off">
   <div style="height:10px"></div>
   <div class="rank mlist" id="mateList"></div>
   <div class="note">같은 사람이 여러 이름으로 적혔으면 <b>합치기</b> · 부부처럼 한 이름에 두 명이면 <b>나누기</b> · 바꾸면 지난 기록 전부에 적용됨</div>
+</section>
+
+<!-- ⓗ 온라인 · 동행자 공유 -->
+<section class="screen" id="s-online">
+  <button class="back" id="onBack"><svg class="i" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg><span id="onBackLab">동행자</span></button>
+  <div class="top"><div><h1>같이 보기 · 백업</h1><div class="sm" id="onSub">동행자랑 예정 일정 같이 보기</div></div></div>
+  <div id="onBody"></div>
 </section>
 
 <!-- ⓓ 가져오기 · 백업 -->
@@ -822,6 +868,7 @@
   <button class="btn ghost sm" id="impPrev">미리보기</button>
   <div id="impOut"></div>
   <div class="lbl" style="margin-top:24px">백업</div>
+  <div id="onCard2"></div>
   <div class="row"><button class="btn ghost sm" id="bakCopy">백업 복사</button><button class="btn ghost sm" id="bakLoad">백업 붙여넣기</button></div>
   <div class="note">폰 바꾸거나 앱 지우기 전에 <b>백업 복사</b> 해서 카톡 나에게 보내기 같은 데 붙여두면 됨 · 사진은 이 글 백업에 안 들어감</div>
   <div id="bakBox"></div>
@@ -843,10 +890,10 @@ function popupClose(){ try{ syncNative(); }catch(e){} setTimeout(()=>{ try{ if(w
 /* =================== 저장 =================== */
 const KEY='golfbet.v1';
 const DB=(()=>{ try{ return JSON.parse(localStorage.getItem(KEY))||{rounds:[],theme:'dark',names:[]}; }catch(e){ return {rounds:[],theme:'dark',names:[]}; } })();
-function save(){ try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){} clearTimeout(save._n); save._n=setTimeout(syncNative,600); }
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){} clearTimeout(save._n); save._n=setTimeout(syncNative,600); if(typeof onSaved==='function') onSaved(); }
 function syncNative(){ try{ if(!(window.GolfNative&&GolfNative.saveSummary)) return;
   const recs=(DB.records||[]).map(r=>({i:r.id,d:r.date,p:r.plan?1:0,c:r.course||r.region||'',g:r.abroad?[r.country,r.region].filter(Boolean).join(' '):(r.region||''),m:(r.mates||[]).join(', '),k:r.caddie?1:0,h:r.holes||18,s:r.score||0,o:r.created||0,t:r.tee||''}));
-  GolfNative.saveSummary(JSON.stringify({v:3,records:recs,rem:remCfg()})); }catch(e){} }
+  const S=DB.sync; GolfNative.saveSummary(JSON.stringify({v:3,records:recs,rem:remCfg(),sync:S&&S.token?{url:SYNC_URL,token:S.token,name:(S.me||{}).name||''}:undefined,dropped:S&&S.dropped||undefined})); }catch(e){} }
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const fmt=n=>{ const a=Math.abs(Math.round(n)); return (n<0?'−':'')+a.toLocaleString('ko-KR'); };
 const fmtS=n=>n>0?'+'+fmt(n):(n<0?fmt(n):'0');
@@ -1163,7 +1210,7 @@ function recCard(r){
   const SB=`<span class="sbtn" data-score="${r.id}" role="button"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>타수</span>`;
   const right = r.plan ? (dd>=0?`<b class="dd">${dd===0?'오늘':'D-'+dd}</b><small>예정</small>`:SB) : (r.score?`<b>${r.score}</b><small>${diff>0?'+'+diff:diff}</small>`:SB);
   const ct=costTotal(r);
-  return `<button class="rec ${r.plan?'plan':''} ${r.plan&&dd<0?'past':''}" data-id="${r.id}"><div class="dt"><b>${d}</b><small>${+r.date.slice(0,4)===new Date().getFullYear()?m+'월':"'"+r.date.slice(2,4)+'.'+m}${' '+dowOf(r.date)}</small></div>${phThumb(r)}<div class="mid"><b>${esc(r.course||r.region||'골프장 미입력')}</b>${sub?`<small>${esc(sub)}</small>`:''}<div class="tags">${r.tee?`<span class="tg tee">${esc(r.tee)} 티오프</span>`:''}${r.plan?'<span class="tg pln">예정</span>':''}${r.abroad?'<span class="tg abr">해외</span>':''}<span class="tg ${r.caddie?'cad':''}">${r.caddie?'캐디':'노캐디'}</span>${hsDone(r)?'<span class="tg hs">홀별</span>':''}${ct?`<span class="tg won">${won(ct)}</span>`:''}${r.memo?'<span class="tg">메모</span>':''}</div></div><div class="rs">${right}</div></button>`;
+  return `<button class="rec ${r.plan?'plan':''} ${r.plan&&dd<0?'past':''}" data-id="${r.id}"><div class="dt"><b>${d}</b><small>${+r.date.slice(0,4)===new Date().getFullYear()?m+'월':"'"+r.date.slice(2,4)+'.'+m}${' '+dowOf(r.date)}</small></div>${phThumb(r)}<div class="mid"><b>${esc(r.course||r.region||'골프장 미입력')}</b>${sub?`<small>${esc(sub)}</small>`:''}<div class="tags">${r.tee?`<span class="tg tee">${esc(r.tee)} 티오프</span>`:''}${r.plan?'<span class="tg pln">예정</span>':''}${r.shared?`<span class="tg shr">${esc(r.shared.fromName)} 공유</span>`:(r.plan&&shareTargets(r).length?'<span class="tg shr">같이 봄</span>':'')}${r.abroad?'<span class="tg abr">해외</span>':''}<span class="tg ${r.caddie?'cad':''}">${r.caddie?'캐디':'노캐디'}</span>${hsDone(r)?'<span class="tg hs">홀별</span>':''}${ct?`<span class="tg won">${won(ct)}</span>`:''}${r.memo?'<span class="tg">메모</span>':''}</div></div><div class="rs">${right}</div></button>`;
 }
 function bindRecCards(box,before){ hydrateThumbs(box); box.querySelectorAll('.rec').forEach(b=>{ const r=DB.records.find(x=>x.id===b.dataset.id); if(!r) return; const ph=b.querySelector('.ph'); if(ph){ ph.addEventListener('pointerdown',e=>e.stopPropagation()); ph.addEventListener('click',e=>{ e.stopPropagation(); e.preventDefault(); before&&before(); photoViewer(r,0); }); } const sb=b.querySelector('.sbtn'); if(sb){ sb.addEventListener('pointerdown',e=>e.stopPropagation()); sb.addEventListener('click',e=>{ e.stopPropagation(); e.preventDefault(); before&&before(); scoreSheet(r); }); } b.onclick=()=>{ before&&before(); openRecForm(r); }; longPress(b,()=>{ before&&before(); recMenu(r); }); }); }
 function longPress(el,fn){ let t=null,sx=0,sy=0,fired=false;
@@ -1182,7 +1229,7 @@ function recMenu(r){ const title=esc(r.course||r.region||'라운드'); const sub
   items.push({label:(r.photos||[]).length?`사진 추가 · ${(r.photos||[]).length}장 있음`:'사진 추가 (촬영 · 앨범)',icon:SV.cam,fn:()=>{ closeSheet(); addPhotosTo(r,false); }});
   if(!r.plan||dday(r.date)<=0) items.push({label:hsAny(r)?'홀별 타수 고치기':'홀별 타수 넣기',icon:SV.grid,fn:()=>holeForRec(r)});
   items.push({label:'같은 곳 새로 추가',icon:SV.copy,fn:()=>{ closeSheet(); openRecForm(null,{abroad:r.abroad,country:r.country||'',region:r.region,course:r.course,caddie:r.caddie,holes:r.holes,mates:(r.mates||[]).slice()}); }});
-  items.push({label:'삭제',icon:SV.del,cls:'danger',fn:()=>confirmSheet('이 기록 삭제할까?',sub+' '+title,'삭제',()=>{ DB.records=DB.records.filter(x=>x!==r); PH.del(r.photos||[]); save(); vib(20); toast('삭제됨'); refreshCurrent(); })});
+  items.push({label:'삭제',icon:SV.del,cls:'danger',fn:()=>confirmSheet('이 기록 삭제할까?',sub+' '+title,'삭제',()=>{ DB.records=DB.records.filter(x=>x!==r); PH.del(r.photos||[]); dropShared(r); save(); vib(20); toast('삭제됨'); refreshCurrent(); })});
   actionSheet(title,sub,items); }
 let calY=null, calM=null, selDay=null, recView='month';
 function renderCal(dx){
@@ -1261,17 +1308,18 @@ function scoreSheet(r){ let v=r.score?String(r.score):''; const par=72;
 function mateStats(){ const m=new Map(); DB.records.forEach(r=>(r.mates||[]).forEach(k=>{ const o=m.get(k)||{k,c:0,last:''}; o.c++; if(r.date>o.last) o.last=r.date; m.set(k,o); })); return [...m.values()].sort((a,b)=>b.c-a.c||a.k.localeCompare(b.k)); }
 function renderMateMgr(){ const q=($('#mateQ').value||'').trim(); const all=mateStats(); const list=all.filter(x=>!q||x.k.includes(q));
   $('#matesSub').textContent=`${all.length}명 · 눌러서 바꾸기 · 합치기 · 나누기`;
-  const box=$('#mateList'); box.innerHTML=list.length?list.map((x,i)=>`<div class="r" data-k="${esc(x.k)}"><span class="n">${i+1}</span><div class="nm"><div>${esc(x.k)}<small>마지막 ${x.last.slice(2).replace(/-/g,'.')}</small></div></div><div class="v">${x.c}회</div></div>`).join(''):'<div class="none">없음</div>';
+  const box=$('#mateList'); box.innerHTML=list.length?list.map((x,i)=>`<div class="r" data-k="${esc(x.k)}"><span class="n">${i+1}</span><div class="nm"><div>${esc(x.k)}${linkOf(x.k)?'<span class="lnk">연결</span>':''}<small>마지막 ${x.last.slice(2).replace(/-/g,'.')}</small></div></div><div class="v">${x.c}회</div></div>`).join(''):'<div class="none">없음</div>';
   box.querySelectorAll('.r').forEach(el=>el.onclick=()=>mateMenu(el.dataset.k)); }
-function mateApply(map,msg){ const n=applyMateMap(map); save(); vib([10,30,10]); toast(`${msg} · 기록 ${n}개 바뀜`); closeSheet(); renderMateMgr(); }
+function mateApply(map,msg){ const L=(DB.sync||{}).links; if(L) Object.keys(map).forEach(k=>{ if(L[k]){ const t=map[k][0]; if(t&&!L[t]) L[t]=L[k]; delete L[k]; } }); const n=applyMateMap(map); save(); vib([10,30,10]); toast(`${msg} · 기록 ${n}개 바뀜`); closeSheet(); renderMateMgr(); }
 function mateMenu(k){ const st=mateStats().find(x=>x.k===k)||{c:0,last:''};
   actionSheet(esc(k),`${st.c}회 · 마지막 ${st.last.replace(/-/g,'.')}`,[
+    ...(DB.sync&&DB.sync.token?[{label:linkOf(k)?`앱 친구 연결 바꾸기 · 지금 ${esc(friendName(linkOf(k)))}`:'앱 친구와 연결 (일정 같이 보기)',icon:SV.link,cls:'blue',fn:()=>pickFriendFor(k)}]:[]),
     {label:'이름 바꾸기',icon:SV.edit,fn:()=>{ sheet(`<div class="amenu"><div class="ah"><b>${esc(k)} 이름 바꾸기</b><small>이미 있는 이름으로 바꾸면 그 사람으로 합쳐짐</small></div><input class="inp" id="mNew" value="${esc(k)}" maxlength="12"><div class="row" style="margin-top:10px"><button class="btn ghost sm" id="mNo">취소</button><button class="btn sm" id="mYes">바꾸기</button></div></div>`); const i=$('#mNew'); setTimeout(()=>{ i.focus(); i.select(); },50); $('#mNo').onclick=closeSheet; $('#mYes').onclick=()=>{ const v=i.value.trim(); if(!v||v===k){ closeSheet(); return; } mateApply({[k]:[v]},`${k} → ${v}`); }; }},
     {label:'다른 이름과 합치기',icon:SV.done,fn:()=>{ const others=mateStats().filter(x=>x.k!==k); sheet(`<div class="amenu"><div class="ah"><b>${esc(k)} 을(를) 누구로 합칠까</b><small>고른 이름으로 지난 기록 전부 바뀜</small></div><div class="sugg" id="mPick">${others.map(x=>`<button data-k="${esc(x.k)}">${esc(x.k)}<small>${x.c}</small></button>`).join('')}</div><div class="row" style="margin-top:12px"><button class="btn ghost sm" id="mNo">취소</button></div></div>`); $('#mNo').onclick=closeSheet; $('#mPick').querySelectorAll('button').forEach(b=>b.onclick=()=>mateApply({[k]:[b.dataset.k]},`${k} → ${b.dataset.k}`)); }},
     {label:'여러 명으로 나누기',icon:SV.copy,fn:()=>{ sheet(`<div class="amenu"><div class="ah"><b>${esc(k)} 나누기</b><small>쉼표로 구분 · 예: 전충, 우경</small></div><input class="inp" id="mSplit" placeholder="이름1, 이름2" maxlength="40"><div class="row" style="margin-top:10px"><button class="btn ghost sm" id="mNo">취소</button><button class="btn sm" id="mYes">나누기</button></div></div>`); setTimeout(()=>$('#mSplit').focus(),50); $('#mNo').onclick=closeSheet; $('#mYes').onclick=()=>{ const parts=$('#mSplit').value.split(/[,，·\/]/).map(x=>x.trim()).filter(Boolean); if(parts.length<1){ toast('이름을 넣어줘'); return; } mateApply({[k]:parts},`${k} → ${parts.join(', ')}`); }; }},
     {label:'모든 기록에서 빼기',icon:SV.del,cls:'danger',fn:()=>confirmSheet(`${esc(k)} 빼기`,`기록 ${st.c}개에서 이 이름만 지워짐`,'빼기',()=>mateApply({[k]:[]},`${k} 뺌`))}
   ]); }
-$('#matesBtn').onclick=()=>{ $('#mateQ').value=''; renderMateMgr(); show('#s-mates'); };
+$('#matesBtn').onclick=()=>{ $('#mateQ').value=''; renderMateMgr(); renderOnCard(); show('#s-mates'); };
 $('#matesBack').onclick=()=>{ renderRecords(); show('#s-rec'); };
 $('#mateQ').oninput=renderMateMgr;
 function renderRecords(){
@@ -1336,10 +1384,11 @@ function renderMates(){ const box=$('#mates'); box.innerHTML=F.mates.map((m,i)=>
   const q=$('#fMate').value.trim(); const items=countBy(DB.records,r=>r.mates||[]).filter(([k])=>!F.mates.includes(k)&&(!q||k.includes(q))).slice(0,12);
   const sb=$('#sMates'); sb.innerHTML=items.map(([k,c])=>`<button data-k="${esc(k)}">${esc(k)}<small>${c}</small></button>`).join('');
   sb.querySelectorAll('button').forEach(b=>b.onclick=()=>{ F.mates.push(b.dataset.k); $('#fMate').value=''; vib(5); renderMates(); });
+  renderShareHint();
   if(renderMates._n!==F.mates.length){ renderMates._n=F.mates.length; if($('#fCosts').firstChild) renderCosts(); } }
 function addMate(){ const v=$('#fMate').value.trim(); if(!v) return; v.split(/[,，·\/]/).map(s=>s.trim()).filter(Boolean).forEach(s=>{ if(!F.mates.includes(s)) F.mates.push(s); }); $('#fMate').value=''; vib(6); renderMates(); }
 function scoreHint(){ const s=+$('#fScore').value||0; $('#shint').textContent=s?`18홀 파 72 기준 ${s-72>0?'+':''}${s-72}`:(F.holes!==18?`${F.holes}홀 라운드 · 잘 친 18홀 타수로 적기`:''); }
-$$('#fKind button').forEach(b=>b.onclick=()=>{ F.plan=b.dataset.v==='1'; F._kindTouched=true; vib(6); renderFormBits(); });
+$$('#fKind button').forEach(b=>b.onclick=()=>{ F.plan=b.dataset.v==='1'; F._kindTouched=true; vib(6); renderFormBits(); renderShareHint(); });
 function setDateField(){ $('#fDateTxt').textContent=`${F.date.replace(/-/g,'. ')}. (${dowOf(F.date)})`; }
 $('#fDate').onclick=()=>datePicker(F.date,ds=>{ F.date=ds; setDateField(); if(!editRec&&!F._kindTouched){ F.plan=dday(F.date)>0; renderFormBits(); } });
 function fmtTee(v){ const d=String(v||'').replace(/\D/g,'').slice(0,4); if(d.length<=2) return d; if(d.length===3) return '0'+d[0]+':'+d.slice(1); return d.slice(0,2)+':'+d.slice(2); }
@@ -1371,9 +1420,9 @@ $('#rfSave').onclick=()=>{
   const gone=editRec?(editRec.photos||[]).filter(id=>!(F.photos||[]).includes(id)):[]; if(gone.length) PH.del(gone); delete F._newPh;
   if(editRec){ Object.assign(editRec,F); ['cost','photos','hs','hp'].forEach(k=>{ if(!(k in F)) delete editRec[k]; }); } else DB.records.push(F);
   if(F.plan) askNotify();
-  save(); vib([10,30,10]); if(POPUP){ popupClose(); return; } if(formReturn&&RL){ toast(editRec?'수정됨':'저장'); formReturn(); return; } recYear=yearOf(F); calY=+F.date.slice(0,4); calM=+F.date.slice(5,7); selDay=null; recView='month'; toast(editRec?'수정됨':(F.plan?'예정 저장':'기록 저장')); renderRecords(); show('#s-rec');
+  save(); vib([10,30,10]); if(POPUP){ popupClose(); return; } if(formReturn&&RL){ toast(editRec?'수정됨':'저장'); formReturn(); return; } recYear=yearOf(F); calY=+F.date.slice(0,4); calM=+F.date.slice(5,7); selDay=null; recView='month'; const sn=F.plan&&!F.shared?shareTargets(F).length:0; toast((editRec?'수정됨':(F.plan?'예정 저장':'기록 저장'))+(sn?` · ${sn}명에게 공유`:'')); renderRecords(); show('#s-rec');
 };
-$('#rfDel').onclick=()=>{ sheet(`<h4>이 기록 삭제할까?</h4><div class="mut" style="font-size:13px;font-weight:600;margin-bottom:14px">${esc(F.date)} ${esc(F.course||F.region)}</div><div class="row"><button class="btn ghost sm" id="dno">취소</button><button class="btn danger sm" id="dyes">삭제</button></div>`); $('#dno').onclick=closeSheet; $('#dyes').onclick=()=>{ DB.records=DB.records.filter(r=>r!==editRec); PH.del((editRec.photos||[]).concat(F._newPh||[])); save(); closeSheet(); toast('삭제됨'); renderRecords(); show('#s-rec'); }; };
+$('#rfDel').onclick=()=>{ sheet(`<h4>이 기록 삭제할까?</h4><div class="mut" style="font-size:13px;font-weight:600;margin-bottom:14px">${esc(F.date)} ${esc(F.course||F.region)}</div><div class="row"><button class="btn ghost sm" id="dno">취소</button><button class="btn danger sm" id="dyes">삭제</button></div>`); $('#dno').onclick=closeSheet; $('#dyes').onclick=()=>{ DB.records=DB.records.filter(r=>r!==editRec); PH.del((editRec.photos||[]).concat(F._newPh||[])); dropShared(editRec); save(); closeSheet(); toast('삭제됨'); renderRecords(); show('#s-rec'); }; };
 $('#recImportBtn').onclick=()=>openImport();
 $('#remBtn').onclick=()=>{ vib(6); remSheet(); };
 
@@ -1399,7 +1448,7 @@ async function makePhoto(file){ const im=await loadImg(file); const w=im.natural
 function pickPhotos(cam,onStart){ return new Promise(res=>{ $$('input.phpick').forEach(x=>x.remove()); const i=document.createElement('input'); i.type='file'; i.accept='image/*'; i.className='phpick'; i.hidden=true; if(cam) i.setAttribute('capture','environment'); else i.multiple=true; document.body.appendChild(i);
   i.onchange=async()=>{ const fs=[...(i.files||[])].slice(0,20); i.remove(); if(!fs.length){ res([]); return; } onStart&&onStart(fs.length); const ids=[]; for(const f of fs){ try{ ids.push(await makePhoto(f)); }catch(e){} } if(ids.length<fs.length) toast('못 읽은 사진이 있음'); res(ids); }; i.click(); }); }
 function phThumb(r){ const p=r.photos||[]; if(!p.length) return ''; return `<span class="ph" role="button" aria-label="사진 ${p.length}장"><img data-pid="${p[0]}" alt="">${p.length>1?`<i>${p.length}</i>`:''}</span>`; }
-function hydrateThumbs(box){ box.querySelectorAll('img[data-pid]').forEach(img=>{ PH.thumb(img.dataset.pid).then(u=>{ if(u){ img.onload=()=>img.classList.add('ok'); img.src=u; } else { const s=img.closest('.ph'); if(s) s.classList.add('miss'); } }); }); }
+function hydrateThumbs(box){ box.querySelectorAll('img[data-pid]').forEach(img=>{ const id=img.dataset.pid; PH.thumb(id).then(u=>u||(online()&&(DB.sync.phUp||{})[id]===1?fetchPhoto(id):null)).then(u=>{ if(u){ img.onload=()=>img.classList.add('ok'); img.src=u; } else { const s=img.closest('.ph'); if(s) s.classList.add('miss'); } }); }); }
 function addPhotosTo(r,cam){ pickPhotos(cam,n=>toast(`사진 ${n}장 넣는 중`)).then(ids=>{ if(!ids.length) return; r.photos=(r.photos||[]).concat(ids); save(); vib([10,30,10]); toast(`사진 ${ids.length}장 추가`); if(POPUP){ popupClose(); return; } if($('#phv').classList.contains('show')) photoViewer(r,r.photos.length-ids.length); refreshCurrent(); }); }
 function renderFormPhotos(){ const box=$('#fPhotos'); const ids=F.photos||[];
   box.innerHTML=`<button class="pa" type="button" data-c="1">${SV.cam}촬영</button><button class="pa" type="button" data-c="0">${SV.img}앨범</button>`+ids.map((id,i)=>`<div class="pi" data-i="${i}"><img data-pid="${id}" alt=""><button type="button" data-x="${i}" aria-label="빼기">${ICX}</button></div>`).join('');
@@ -1519,6 +1568,137 @@ function remSheet(){ const c=remCfg(); const st=nativeNotify();
   const tb=$('#remTest'); if(tb) tb.onclick=()=>{ if(nativeNotify()==='ask'){ toast('알림 권한부터 허용'); return; } try{ GolfNative.testNotify(); toast('알림 보냄 · 위에서 내려 확인'); }catch(e){} };
   $('#remOk').onclick=()=>{ syncNative(); closeSheet(); }; }
 
+
+/* ---------- 온라인: 동행자와 예정 같이 보기 · 자동 백업 ---------- */
+const SYNC_URL='https://golf-sync-issac-s-projects1.vercel.app/api/';
+SV.link='<svg class="i" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>';
+SV.share='<svg class="i" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/></svg>';
+SV.cloud='<svg class="i" viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 .6-8A6 6 0 0 0 6 9.5 4.3 4.3 0 0 0 7 18z"/><path d="M12 11v5M9.5 13.5L12 11l2.5 2.5"/></svg>';
+const SY=()=>DB.sync||(DB.sync={});
+const online=()=>!!(DB.sync&&DB.sync.token);
+async function api(op,o={}){ const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),o.timeout||15000);
+  try{ const h={}; if(DB.sync&&DB.sync.token) h['x-golf-token']=DB.sync.token; if(o.body) h['content-type']='application/json';
+    const r=await fetch(SYNC_URL+op+(o.q||''),{method:o.method||(o.body||o.raw?'POST':'GET'),headers:h,body:o.raw||(o.body?JSON.stringify(o.body):undefined),signal:ctl.signal,cache:'no-store'});
+    if(o.blob) return r.ok?await r.blob():null; const j=await r.json().catch(()=>({})); if(!r.ok) throw Object.assign(new Error(j.error||('http '+r.status)),{status:r.status}); return j; }
+  finally{ clearTimeout(t); } }
+function linkOf(name){ return ((DB.sync||{}).links||{})[name]||null; }
+function friendName(uid){ const f=((DB.sync||{}).friends||[]).find(x=>x.uid===uid); return f?f.name:'친구'; }
+function shareTargets(r){ if(!online()||!r||r.shared) return []; const fr=new Set((DB.sync.friends||[]).map(f=>f.uid)); return [...new Set((r.mates||[]).map(linkOf).filter(u=>u&&fr.has(u)))]; }
+function renderShareHint(){ const box=$('#shareHint'); if(!box) return; if(!F||!F.plan||F.shared){ box.innerHTML=F&&F.shared?`<div class="sharehint">${SV.link}${esc(F.shared.fromName)}님이 공유한 일정 · 바뀌면 자동으로 따라감</div>`:''; return; }
+  const t=shareTargets(F); box.innerHTML=t.length?`<div class="sharehint">${SV.share}${t.map(u=>esc(friendName(u))).join(' · ')} 에게 이 일정이 같이 보임</div>`:''; }
+/* 내 예정이 바뀌면 같이 보는 사람들한테 보냄 (저장할 때마다 차이만) */
+const PLAN_F=['date','tee','course','region','country','abroad','caddie','holes','memo'];
+function planPayload(r){ const o={id:r.id}; PLAN_F.forEach(k=>o[k]=r[k]==null?'':r[k]); o.mates=(r.mates||[]).slice(); return o; }
+function diffShares(){ if(!online()) return; const S=SY(); S.sent=S.sent||{}; S.outbox=S.outbox||[]; const t0=today(); const mine=new Map();
+  DB.records.forEach(r=>{ if(r.shared) return; if(r.plan&&r.date>=t0) mine.set(r.id,r); });
+  // 바뀐 것 · 새로 같이 볼 사람
+  mine.forEach((r,id)=>{ const to=shareTargets(r); const prev=S.sent[id]||{to:[],sig:''}; const sig=JSON.stringify(planPayload(r));
+    const gone=prev.to.filter(u=>!to.includes(u)); if(gone.length) S.outbox.push({to:gone,cancel:id});
+    const need=sig!==prev.sig?to:to.filter(u=>!prev.to.includes(u)); if(need.length) S.outbox.push({to:need,plan:planPayload(r)});
+    if(to.length) S.sent[id]={to,sig}; else delete S.sent[id]; });
+  // 지운 예정은 취소 알림 · 다녀옴으로 바뀐 건 그냥 끝
+  Object.keys(S.sent).forEach(id=>{ if(mine.has(id)) return; const r=DB.records.find(x=>x.id===id); if(!r) S.outbox.push({to:S.sent[id].to,cancel:id}); delete S.sent[id]; });
+  if(S.outbox.length) flushOutbox(); }
+let flushing=false;
+async function flushOutbox(){ const S=SY(); if(flushing||!S.outbox||!S.outbox.length) return; flushing=true;
+  try{ const items=S.outbox.slice(0,30); await api('share',{body:{items}}); S.outbox=S.outbox.slice(items.length); try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){} }
+  catch(e){} finally{ flushing=false; } if(S.outbox.length) setTimeout(flushOutbox,20000); }
+/* 받은 공유 일정 합치기 */
+function sharedId(k){ return 's_'+k.replace(':','_'); }
+function dropShared(r){ if(r&&r.shared){ const S=SY(); S.dropped=S.dropped||{}; S.dropped[r.id]=1; } }
+async function pollInbox(fresh){ if(!online()) return 0; let ib; try{ ib=await api('inbox',{q:fresh?'?fresh=1':''}); }catch(e){ return 0; }
+  const S=SY(); S.seen=S.seen||{}; const items=ib.items||{}; const me=(S.me||{}).name||''; const news=[]; let ch=0;
+  Object.keys(items).forEach(k=>{ const x=items[k]; if(S.seen[k]===x.u) return; S.seen[k]=x.u; const id=sharedId(k); const cur=DB.records.find(r=>r.id===id);
+    if(x.cancel){ if(cur&&cur.plan){ DB.records=DB.records.filter(r=>r!==cur); ch++; news.push(`${x.fromName}님이 ${+cur.date.slice(5,7)}/${+cur.date.slice(8,10)} 일정 취소`); } return; }
+    const p=x.plan; if(!p||(S.dropped||{})[id]) return; if(cur&&!cur.plan) return;
+    const mates=[x.fromName].concat((p.mates||[]).filter(m=>m&&m!==me)).filter((m,i,a)=>a.indexOf(m)===i);
+    const o={id,date:p.date,tee:p.tee||'',course:p.course||'',region:p.region||'',country:p.country||'',abroad:!!p.abroad,caddie:!!p.caddie,holes:p.holes||18,memo:p.memo||'',mates,plan:true,shared:{k,from:x.from,fromName:x.fromName}};
+    if(cur){ Object.assign(cur,o); news.push(`${x.fromName}님이 일정 바꿈 · ${+p.date.slice(5,7)}/${+p.date.slice(8,10)} ${p.course||p.region}`); }
+    else { o.created=x.u; o.score=null; DB.records.push(o); news.push(`${x.fromName}님이 일정 공유 · ${+p.date.slice(5,7)}/${+p.date.slice(8,10)} ${p.course||p.region}`); }
+    ch++; });
+  try{ if(window.GolfNative&&GolfNative.markSeen) GolfNative.markSeen(JSON.stringify(S.seen)); }catch(e){}
+  if(ch||news.length){ save(); if(!POPUP){ refreshCurrent(); if(news.length) toast(news.length>1?`${news[0]} 외 ${news.length-1}건`:news[0],2600); } }
+  return ch; }
+/* 자동 백업: 기록 바뀌면 조금 뒤에 · 사진은 아직 안 올린 것만 */
+function bkHash(){ const s=JSON.stringify([DB.records,DB.pars||{},(DB.sync||{}).links||{}]); let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))|0; return h+':'+s.length; }
+async function backupNow(force){ if(!online()) return false; const S=SY(); const h=bkHash(); if(!force&&S.bkHash===h) return true;
+  try{ await api('backup',{body:{v:1,records:DB.records,pars:DB.pars||{},links:S.links||{},rem:DB.rem||null}}); S.bkHash=h; S.bkAt=Date.now(); try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){} uploadPhotos(); return true; }catch(e){ return false; } }
+let upBusy=false;
+async function uploadPhotos(){ if(!online()||upBusy) return; upBusy=true; const S=SY(); S.phUp=S.phUp||{};
+  try{ const ids=[...new Set(DB.records.flatMap(r=>r.photos||[]))].filter(id=>!S.phUp[id]); for(const id of ids.slice(0,12)){ const b=await PH.get('full',id); if(!b){ S.phUp[id]=-1; continue; } await api('photo',{q:'?id='+id,raw:b,timeout:30000}); S.phUp[id]=1; }
+    try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){} }catch(e){} finally{ upBusy=false; } }
+async function fetchPhoto(id){ if(!online()) return null; const b=await api('photo',{q:'?id='+id,blob:true,timeout:30000}).catch(()=>null); if(!b) return null;
+  const im=await loadImg(b).catch(()=>null); if(!im) return null; const w=im.naturalWidth,h=im.naturalHeight,sz=Math.min(w,h); const tc=document.createElement('canvas'); tc.width=tc.height=200; tc.getContext('2d').drawImage(im,(w-sz)/2,(h-sz)/2,sz,sz,0,0,200,200);
+  const th=await toBlob(tc,.8); await PH.put(id,b,th); SY().phUp=Object.assign(SY().phUp||{},{[id]:1}); return PH.thumb(id); }
+let onSavedT=null;
+function onSaved(){ if(!online()||POPUP&&!navigator.onLine) return; clearTimeout(onSavedT); onSavedT=setTimeout(()=>{ diffShares(); clearTimeout(onSaved._b); onSaved._b=setTimeout(()=>backupNow(),20000); },1200); }
+let tickAt=0;
+async function syncTick(now){ if(!online()||POPUP) return; if(!now&&Date.now()-tickAt<4*60000) return; tickAt=Date.now(); flushOutbox(); await pollInbox(); diffShares(); backupNow(); }
+setInterval(()=>{ if(!document.hidden) syncTick(); },5*60000);
+/* 화면 */
+let onFrom='mates';
+function renderOnCard(){ const html=online()?(()=>{ const S=DB.sync; const n=(S.friends||[]).length; const lk=Object.keys(S.links||{}).length; return `<button class="onl on" data-go="1"><b>같이 보기 켜짐 · 내 코드 ${esc(S.me.code)}</b><small>친구 ${n}명 · 기록 이름 연결 ${lk}명 · 예정에 연결된 동행자 넣으면 그 사람 앱에도 뜸</small><div class="st"><span class="ok">자동 백업 ${S.bkAt?ago(S.bkAt):'대기'}</span>${(S.outbox||[]).length?`<span>보낼 것 ${(S.outbox||[]).length}</span>`:''}</div><em>${SV.link}친구 · 백업 관리</em></button>`; })()
+  :`<button class="onl" data-go="1"><b>동행자랑 예정 같이 보기</b><small>예정 넣고 동행자 체크하면 그 사람 폰에도 일정이 뜨고 알림이 감<br>기록 · 사진은 자동 백업 · 폰 바꿔도 그대로</small><em>${SV.cloud}켜기</em></button>`;
+  ['#onCard','#onCard2'].forEach(s=>{ const b=$(s); if(!b) return; b.innerHTML=html; b.firstChild.onclick=()=>{ onFrom=s==='#onCard'?'mates':'import'; openOnline(); }; }); }
+function ago(t){ const m=Math.round((Date.now()-t)/60000); return m<1?'방금':m<60?m+'분 전':m<1440?Math.round(m/60)+'시간 전':Math.round(m/1440)+'일 전'; }
+function openOnline(){ $('#onBackLab').textContent=onFrom==='import'?'가져오기 · 백업':'동행자'; renderOnline(); show('#s-online'); if(online()) refreshMe(); }
+$('#onBack').onclick=()=>{ if(onFrom==='import'){ openImport(); renderOnCard(); } else { renderMateMgr(); renderOnCard(); show('#s-mates'); } };
+async function refreshMe(){ try{ const j=await api('me'); const S=SY(); S.me=j.me; S.friends=j.friends; autoLink(); save(); if($('#s-online').classList.contains('active')) renderOnline(); }catch(e){ if(e.status===401||e.status===404){ toast('연결 정보가 맞지 않음 · 다시 연결해줘'); } } }
+function autoLink(){ const S=SY(); S.links=S.links||{}; const names=new Set(mateStats().map(x=>x.k)); const linked=new Set(Object.values(S.links)); (S.friends||[]).forEach(f=>{ if(!linked.has(f.uid)&&names.has(f.name)&&!S.links[f.name]){ S.links[f.name]=f.uid; } }); }
+function renderOnline(){ const box=$('#onBody');
+  if(!online()){ $('#onSub').textContent='동행자랑 예정 일정 같이 보기';
+    box.innerHTML=`<div class="sub" style="margin-top:4px"><div class="it"><span class="av" style="width:30px;height:30px;font-size:12px">1</span><div class="tx">내 이름 정하고 켜기<small>동행자 앱에 이 이름으로 보임</small></div></div><div class="it"><span class="av" style="width:30px;height:30px;font-size:12px">2</span><div class="tx">코드 주고받기<small>내 코드를 카톡으로 보내거나 상대 코드 넣으면 서로 연결</small></div></div><div class="it"><span class="av" style="width:30px;height:30px;font-size:12px">3</span><div class="tx">예정에 동행자 체크<small>연결된 사람이면 그 사람 앱 달력에 뜨고 알림 · 바꾸거나 지우면 따라감</small></div></div></div>
+    <div class="lbl">내 이름</div><input class="inp" id="onName" maxlength="12" placeholder="예: 신삭" autocomplete="off" value="${esc((DB.sync||{}).name||'')}">
+    <div style="height:12px"></div><button class="btn" id="onJoin">${SV.cloud}켜기</button>
+    <div style="height:8px"></div><button class="btn ghost sm" id="onRecover">예전 폰 계정 이어쓰기 (복구 키)</button>
+    <div class="note">기록 · 사진은 내 계정에만 백업되고 친구한테는 <b>예정 일정(날짜 · 골프장 · 티 · 동행자)</b>만 보임 · 동행자도 이 앱을 깔아야 함</div>`;
+    $('#onJoin').onclick=async()=>{ const nm=$('#onName').value.trim(); if(!nm){ toast('이름 넣어줘'); $('#onName').focus(); return; } const b=$('#onJoin'); b.disabled=true; b.innerHTML='<span class="spin"></span>연결 중';
+      try{ const j=await api('join',{body:{name:nm}}); const S=SY(); S.token=j.token; S.me=j.me; S.friends=[]; S.links=S.links||{}; save(); syncNative(); vib([10,30,10]); toast('켜짐 · 이제 코드 주고받기'); renderOnline(); backupNow(true); }
+      catch(e){ toast('연결 안 됨 · 인터넷 확인'); b.disabled=false; b.innerHTML=SV.cloud+'켜기'; } };
+    $('#onRecover').onclick=()=>{ sheet(`<div class="amenu"><div class="ah"><b>복구 키 넣기</b><small>예전 폰에서 복사해둔 GOLFKEY: 로 시작하는 글</small></div><textarea class="inp" id="rkIn" style="min-height:80px;padding-top:12px;font-size:13px" placeholder="GOLFKEY:..."></textarea><div class="row" style="margin-top:10px"><button class="btn ghost sm" id="rkNo">취소</button><button class="btn sm" id="rkOk">이어쓰기</button></div></div>`); $('#rkNo').onclick=closeSheet;
+      $('#rkOk').onclick=async()=>{ const m=$('#rkIn').value.match(/GOLFKEY:([a-z0-9]{10,20}\.[A-Za-z0-9_-]{20,40})/); if(!m){ toast('키 모양이 아님'); return; } const S=SY(); const old=S.token; S.token=m[1];
+        try{ const j=await api('me'); S.me=j.me; S.friends=j.friends; save(); syncNative(); closeSheet(); toast(`${j.me.name} 계정 이어씀 · 백업에서 가져오기 눌러 기록 받기`); renderOnline(); }catch(e){ S.token=old; toast(e.status===401?'맞지 않는 키':'안 됨 · 인터넷 확인'); } }; };
+    return; }
+  const S=DB.sync; $('#onSub').textContent=`${S.me.name} · 친구 ${(S.friends||[]).length}명`;
+  const fr=(S.friends||[]).map(f=>{ const names=Object.keys(S.links||{}).filter(k=>S.links[k]===f.uid); return `<button class="frow" data-u="${f.uid}"><span class="av">${esc(f.name.slice(0,1))}</span><div class="tx"><b>${esc(f.name)}</b>${names.length?`<small>기록 속 이름 · ${names.map(esc).join(', ')}</small>`:'<small class="warn">기록 속 동행자 이름과 연결하기 ›</small>'}</div><span class="chev">${SV.right}</span></button>`; }).join('');
+  const recN=DB.records.length, phAll=[...new Set(DB.records.flatMap(r=>r.photos||[]))], phUp=phAll.filter(id=>(S.phUp||{})[id]===1).length;
+  box.innerHTML=`<div class="codebox"><small>내 코드 · 동행자한테 보내기</small><div class="cd2">${esc(S.me.code)}</div><div class="nm">${esc(S.me.name)} <span id="onRename" style="text-decoration:underline;cursor:pointer;margin-left:4px">이름 바꾸기</span></div><div class="acts"><button id="onCopy">${SV.copy}복사</button><button id="onShare">${SV.share}보내기</button></div></div>
+  <div class="lbl">친구 코드 넣기</div><div class="inrow"><input class="inp" id="onCode" maxlength="6" placeholder="받은 6자리" autocomplete="off" style="text-transform:uppercase;letter-spacing:3px;font-weight:900"><button class="btn sm" id="onAdd">연결</button></div>
+  <div class="lbl"><span>친구 ${(S.friends||[]).length}명</span><button class="more" id="onRef">새로고침</button></div>
+  <div class="rank" style="padding:2px 14px">${fr||'<div class="none" style="padding:16px 0;text-align:center;color:var(--mut);font-size:13px;font-weight:700">아직 없음 · 위 코드를 동행자한테 보내기</div>'}</div>
+  <div class="lbl">자동 백업</div><div class="bkst"><div><small>마지막</small><b>${S.bkAt?ago(S.bkAt):'—'}</b></div><div><small>기록</small><b>${recN}개</b></div><div><small>사진</small><b>${phUp}/${phAll.length}</b></div></div>
+  <div class="row"><button class="btn ghost sm" id="onBk">지금 백업</button><button class="btn ghost sm" id="onRestore">백업에서 가져오기</button></div>
+  <div class="lbl">폰 바꿀 때</div><button class="opt" id="onKey"><span>복구 키 복사<small>새 폰에서 이 키 넣으면 친구 · 백업 그대로</small></span><em>복사</em></button>
+  <div class="note">복구 키는 <b>카톡 나에게 보내기</b> 같은 데 저장해두기 · 남한테 주면 내 계정처럼 쓸 수 있으니 주의 · 동행자한테 보이는 건 예정 일정만</div>
+  <div style="height:8px"></div><button class="btn ghost sm" id="onOff" style="color:var(--red)">이 폰에서 같이 보기 끄기</button>`;
+  const code=`골프 기록 앱 같이 보기 코드: ${S.me.code} (${S.me.name})`;
+  $('#onCopy').onclick=()=>{ copyText(S.me.code); toast('코드 복사됨'); };
+  $('#onKey').onclick=()=>{ copyText('GOLFKEY:'+S.token); vib(8); toast('복구 키 복사됨 · 나에게 보내두기'); };
+  $('#onShare').onclick=()=>{ try{ if(window.GolfNative&&GolfNative.shareText){ GolfNative.shareText(code); return; } }catch(e){} if(navigator.share) navigator.share({text:code}).catch(()=>{}); else { copyText(code); toast('복사됨 · 카톡에 붙여넣기'); } };
+  $('#onRename').onclick=()=>{ sheet(`<div class="amenu"><div class="ah"><b>내 이름 바꾸기</b><small>친구 앱에 보이는 이름</small></div><input class="inp" id="rnIn" maxlength="12" value="${esc(S.me.name)}"><div class="row" style="margin-top:10px"><button class="btn ghost sm" id="rnNo">취소</button><button class="btn sm" id="rnOk">바꾸기</button></div></div>`); $('#rnNo').onclick=closeSheet; $('#rnOk').onclick=async()=>{ const v=$('#rnIn').value.trim(); if(!v) return; closeSheet(); try{ const j=await api('me',{body:{name:v}}); S.me=j.me; S.friends=j.friends; save(); syncNative(); renderOnline(); toast('바뀜'); }catch(e){ toast('안 됨 · 인터넷 확인'); } }; };
+  $('#onCode').oninput=e=>{ e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6); };
+  $('#onAdd').onclick=async()=>{ const c=$('#onCode').value.trim(); if(c.length!==6){ toast('6자리 코드'); return; } const b=$('#onAdd'); b.disabled=true;
+    try{ const j=await api('friend',{body:{code:c}}); S.friends=(S.friends||[]).filter(f=>f.uid!==j.friend.uid).concat(j.friend); autoLink(); save(); vib([10,30,10]); toast(`${j.friend.name} 연결됨`); renderOnline(); if(!Object.values(S.links||{}).includes(j.friend.uid)) setTimeout(()=>pickMateFor(j.friend),400); diffShares(); }
+    catch(e){ toast(e.status===404?'없는 코드':(e.message==='self'?'내 코드임':'안 됨 · 인터넷 확인')); } finally{ b.disabled=false; } };
+  $('#onRef').onclick=()=>{ vib(6); refreshMe(); pollInbox(true); };
+  box.querySelectorAll('.frow').forEach(b=>b.onclick=()=>{ const f=S.friends.find(x=>x.uid===b.dataset.u); friendMenu(f); });
+  $('#onBk').onclick=async()=>{ const b=$('#onBk'); b.innerHTML='<span class="spin"></span>백업 중'; const ok=await backupNow(true); await uploadPhotos(); toast(ok?'백업 끝':'안 됨 · 인터넷 확인'); renderOnline(); };
+  $('#onRestore').onclick=()=>confirmSheet('백업에서 가져오기','이 폰에 없는 기록만 더해짐 · 있는 기록은 그대로','가져오기',async()=>{ try{ const j=await api('backup'); const have=new Set(DB.records.map(r=>r.id)); let n=0; (j.records||[]).forEach(r=>{ if(r&&r.id&&r.date&&!have.has(r.id)){ DB.records.push(r); n++; } }); DB.pars=Object.assign({},j.pars||{},DB.pars||{}); S.links=Object.assign({},j.links||{},S.links||{}); save(); toast(n?`기록 ${n}개 가져옴 · 사진은 보일 때 받아옴`:'새로 가져올 기록 없음'); renderOnline(); }catch(e){ toast('안 됨 · 인터넷 확인'); } });
+  $('#onOff').onclick=()=>confirmSheet('같이 보기 끌까?','이 폰 연결만 끊김 · 기록은 그대로 · 다시 켜면 새 코드','끄기',()=>{ DB.sync={links:S.links,name:S.me.name}; save(); syncNative(); renderOnline(); toast('꺼짐'); }); }
+function copyText(t){ try{ navigator.clipboard.writeText(t); }catch(e){ const a=document.createElement('textarea'); a.value=t; document.body.appendChild(a); a.select(); try{ document.execCommand('copy'); }catch(_){} a.remove(); } }
+function friendMenu(f){ const S=DB.sync; const names=Object.keys(S.links||{}).filter(k=>S.links[k]===f.uid);
+  actionSheet(esc(f.name),names.length?`기록 속 이름 ${names.join(', ')}`:'기록 이름 연결 안 됨',[
+    {label:names.length?'기록 이름 바꾸기':'기록 속 동행자 이름 고르기',icon:SV.link,cls:'blue',fn:()=>pickMateFor(f)},
+    {label:'친구 끊기',icon:SV.del,cls:'danger',fn:()=>confirmSheet(`${esc(f.name)} 끊기`,'서로 일정 공유가 멈춤','끊기',async()=>{ try{ await api('unfriend',{body:{uid:f.uid}}); S.friends=S.friends.filter(x=>x.uid!==f.uid); Object.keys(S.links||{}).forEach(k=>{ if(S.links[k]===f.uid) delete S.links[k]; }); save(); diffShares(); renderOnline(); toast('끊김'); }catch(e){ toast('안 됨 · 인터넷 확인'); } })}]); }
+function pickMateFor(f){ const S=SY(); S.links=S.links||{}; const all=mateStats();
+  sheet(`<div class="amenu"><div class="ah"><b>${esc(f.name)} = 기록 속 누구?</b><small>예정에 이 이름 넣으면 ${esc(f.name)} 앱에 일정이 뜸</small></div><input class="inp" id="pmQ" placeholder="이름 찾기" autocomplete="off"><div class="sugg" id="pmList" style="margin-top:10px;max-height:40vh;overflow:auto"></div><div class="row" style="margin-top:12px"><button class="btn ghost sm" id="pmNo">닫기</button>${Object.values(S.links).includes(f.uid)?'<button class="btn ghost sm" id="pmCut" style="color:var(--red)">연결 풀기</button>':''}</div></div>`);
+  const draw=()=>{ const q=$('#pmQ').value.trim(); let list=all.filter(x=>!q||x.k.includes(q)); if(q&&!all.some(x=>x.k===q)) list=[{k:q,c:0,nw:1}].concat(list);
+    $('#pmList').innerHTML=list.map(x=>`<button data-k="${esc(x.k)}" class="${S.links[x.k]===f.uid?'on':''}">${esc(x.k)}${x.nw?'<small>새 이름</small>':`<small>${x.c}</small>`}</button>`).join('');
+    $('#pmList').querySelectorAll('button').forEach(b=>b.onclick=()=>{ const k=b.dataset.k; if(S.links[k]===f.uid) delete S.links[k]; else S.links[k]=f.uid; vib(6); save(); draw(); diffShares(); if($('#s-online').classList.contains('active')) renderOnline(); }); };
+  $('#pmQ').oninput=draw; $('#pmNo').onclick=closeSheet; const cut=$('#pmCut'); if(cut) cut.onclick=()=>{ Object.keys(S.links).forEach(k=>{ if(S.links[k]===f.uid) delete S.links[k]; }); save(); closeSheet(); diffShares(); renderOnline(); toast('연결 풀림'); }; draw(); }
+function pickFriendFor(name){ const S=DB.sync; const fr=S.friends||[]; if(!fr.length){ closeSheet(); toast('먼저 친구 코드로 연결'); onFrom='mates'; openOnline(); return; }
+  actionSheet(`${esc(name)} = 어느 친구?`,'고르면 이 이름 넣은 예정이 그 친구 앱에도 뜸',fr.map(f=>({label:f.name+(S.links[name]===f.uid?' · 지금 연결':''),icon:SV.link,cls:S.links[name]===f.uid?'blue':'',fn:()=>{ S.links=S.links||{}; S.links[name]=f.uid; save(); diffShares(); closeSheet(); renderMateMgr(); toast(`${name} → ${f.name} 연결`); }})).concat(S.links[name]?[{label:'연결 풀기',icon:SV.del,cls:'danger',fn:()=>{ delete S.links[name]; save(); diffShares(); closeSheet(); renderMateMgr(); toast('연결 풀림'); }}]:[])); }
+
 /* ---------- ⓒ 통계 ---------- */
 function statList(year){ return DB.records.filter(r=>!r.plan&&(year==='all'||yearOf(r)===year)); }
 const periodLab=y=>y==='all'?'전체 기간':y+'년';
@@ -1615,7 +1795,7 @@ function drawTrend(S){
 
 /* ---------- ⓓ 가져오기 · 백업 ---------- */
 let impYear=new Date().getFullYear();
-function openImport(){ const y=new Date().getFullYear(); const box=$('#impYear'); box.innerHTML=[y,y-1,y-2].map(v=>`<button data-v="${v}" class="${v===impYear?'on':''}">${v}</button>`).join(''); box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ impYear=+b.dataset.v; box.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); }); $('#impOut').innerHTML=''; $('#bakBox').innerHTML=''; impRows=null; show('#s-import'); }
+function openImport(){ const y=new Date().getFullYear(); const box=$('#impYear'); box.innerHTML=[y,y-1,y-2].map(v=>`<button data-v="${v}" class="${v===impYear?'on':''}">${v}</button>`).join(''); box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ impYear=+b.dataset.v; box.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); }); $('#impOut').innerHTML=''; $('#bakBox').innerHTML=''; impRows=null; renderOnCard(); show('#s-import'); }
 function parseMemo(text,defYear){
   let year=defYear; const out=[];
   for(const raw of text.split(/\r?\n/)){
@@ -1670,6 +1850,7 @@ window.widgetOpen=function(a,d,id){
   if(a==='day'&&d){ calY=+d.slice(0,4); calM=+d.slice(5,7); selDay=+d.slice(8,10); recView='month'; renderRecords(); return; }
   if(a==='add'){ openRecForm(null,{date:d||today(),plan:false}); return; }
   if(a==='plan'){ openRecForm(null,{date:tmr(),plan:true}); return; }
+  if(a==='open'&&!r&&id&&id.startsWith('s_')&&DB.sync&&DB.sync.token){ pollInbox(true).then(()=>{ const r2=DB.records.find(x=>x.id===id); if(r2) openRecForm(r2); }); return; }
   if(a==='open'&&r){ openRecForm(r); return; }
   if(a==='done'&&r){ openRecForm(r); F.plan=false; renderFormBits(); toast('타수 넣고 저장하면 끝'); return; }
   if(a==='stats'){ show('#s-stats'); renderStats(); return; }
@@ -1683,6 +1864,7 @@ window.appBack=function(){
   if(id==='#s-recform'&&formReturn&&RL){ formReturn(); return true; }
   if(id==='#s-recform'||id==='#s-import'||id==='#s-stats'||id==='#s-list'||id==='#s-mates'){ renderRecords(); show('#s-rec'); return true; }
   if(id==='#s-rank'){ renderStats(); show('#s-stats'); return true; }
+  if(id==='#s-online'){ $('#onBack').click(); return true; }
   if(id==='#s-rlist'){ $('#rlBack').click(); return true; }
   if(id==='#s-rule'){ renderSetup(); show('#s-setup'); return true; }
   if(id==='#s-setup'){ $('#setupClose').click(); return true; }
@@ -1700,11 +1882,12 @@ if(POPUP){
   else if(a==='score'&&r){ document.body.classList.add('menu'); scoreSheet(r); }
   else if(a==='plan'){ openRecForm(null,{date:(d&&d>today())?d:tmr(),plan:true}); }
   else openRecForm(null,{date:d||today(),plan:false});
-} else { renderRecords(); show('#s-rec'); setTimeout(syncNative,300); if(DB.records.some(r=>r.plan&&dday(r.date)>=0)) setTimeout(askNotify,1500); }
+} else { renderRecords(); show('#s-rec'); setTimeout(syncNative,300); setTimeout(()=>syncTick(true),800); if(DB.records.some(r=>r.plan&&dday(r.date)>=0)) setTimeout(askNotify,1500); }
 window.addEventListener('beforeunload',save);
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){ save(); return; }
   if(POPUP) return;
+  setTimeout(()=>syncTick(true),400);
   // 위젯 팝업에서 바뀐 기록 다시 읽기
   try{ const f=JSON.parse(localStorage.getItem(KEY)); if(f&&Array.isArray(f.records)&&!$('#s-recform').classList.contains('active')){ DB.records=f.records; const a=$('.screen.active'); if(a&&a.id==='s-rec') renderRecords(); else if(a&&a.id==='s-stats') renderStats(); } }catch(e){}
 });

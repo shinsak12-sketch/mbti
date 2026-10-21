@@ -1,0 +1,4 @@
+{
+  "rewrites": [{ "source": "/api/:op", "destination": "/api/g?op=:op" }],
+  "functions": { "api/g.js": { "maxDuration": 15 } }
+}

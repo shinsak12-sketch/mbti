@@ -78,18 +78,23 @@ public class Reminders {
     } catch (Exception ignored) {}
   }
 
-  static void show(Context c, String title, String text, String id) {
+  /** 동행자 공유 일정 알림 (같은 일정은 한 칸에서 갱신) */
+  static void notifyShared(Context c, String title, String text, String id, int nid) { show(c, title, text, id, nid); }
+
+  static void show(Context c, String title, String text, String id) { show(c, title, text, id, (id + title).hashCode()); }
+
+  static void show(Context c, String title, String text, String id, int nid) {
     ensureChannel(c);
     Intent open = new Intent(c, MainActivity.class);
     open.setAction(Intent.ACTION_VIEW);
     open.setData(Uri.parse("golf://w?a=open&d=&id=" + id + "&r=n"));
     open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-    PendingIntent pi = PendingIntent.getActivity(c, (id + title).hashCode(), open, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+    PendingIntent pi = PendingIntent.getActivity(c, nid, open, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
     Notification.Builder b = Build.VERSION.SDK_INT >= 26 ? new Notification.Builder(c, CH) : new Notification.Builder(c);
     b.setSmallIcon(c.getResources().getIdentifier("ic_stat_golf", "drawable", c.getPackageName()))
      .setContentTitle(title).setContentText(text).setStyle(new Notification.BigTextStyle().bigText(text))
      .setAutoCancel(true).setContentIntent(pi).setColor(0xFF6FA516);
     NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
-    nm.notify((id + title).hashCode(), b.build());
+    nm.notify(nid, b.build());
   }
 }

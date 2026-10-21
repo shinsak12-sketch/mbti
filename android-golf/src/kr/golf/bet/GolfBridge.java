@@ -18,6 +18,21 @@ public class GolfBridge {
     ctx.getSharedPreferences("golf", Context.MODE_PRIVATE).edit().putString("sum", json == null ? "{}" : json).commit();
     GolfWidget.refreshAll(ctx);
     Reminders.schedule(ctx);
+    if (json != null && json.contains("\"sync\"")) SyncJob.ensure(ctx);
+  }
+
+  /** 백그라운드 확인이 이미 본 공유 일정 표시 (웹이 받은함을 합친 뒤 알림 중복 막기) */
+  @JavascriptInterface public void markSeen(String json) {
+    ctx.getSharedPreferences("golf", Context.MODE_PRIVATE).edit().putString("nseen", json == null ? "{}" : json).apply();
+  }
+
+  /** 친구 코드 보내기: 카톡 등 공유 창 */
+  @JavascriptInterface public void shareText(final String text) {
+    act.runOnUiThread(new Runnable() { @Override public void run() {
+      android.content.Intent i = new android.content.Intent(android.content.Intent.ACTION_SEND);
+      i.setType("text/plain"); i.putExtra(android.content.Intent.EXTRA_TEXT, text);
+      try { act.startActivity(android.content.Intent.createChooser(i, "코드 보내기")); } catch (Exception ignored) {}
+    } });
   }
 
   /** 알림 권한: "granted" · "ask" (안드로이드 13+에서 아직 안 물어봄/거절) */
