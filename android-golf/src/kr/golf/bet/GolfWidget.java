@@ -171,7 +171,8 @@ public class GolfWidget extends AppWidgetProvider {
     if (next != null) {
       String d = next.optString("d"); long dd = dayNum(d) - todayN;
       String who = next.optString("m");
-      v.setTextViewText(nn, Integer.parseInt(d.substring(5, 7)) + "/" + Integer.parseInt(d.substring(8, 10)) + " (" + dow(d) + ")  " + next.optString("c") + (who.length() > 0 ? " · " + who : ""));
+      String tee = next.optString("t");
+      v.setTextViewText(nn, Integer.parseInt(d.substring(5, 7)) + "/" + Integer.parseInt(d.substring(8, 10)) + " (" + dow(d) + ")" + (tee.length() > 0 ? " " + tee : "") + "  " + next.optString("c") + (who.length() > 0 ? " · " + who : ""));
       v.setTextViewText(nd, dd == 0 ? "오늘" : dd == 1 ? "내일" : "D-" + dd);
       v.setOnClickPendingIntent(nb, quick(c, dd == 0 ? "done" : "menu", "", next.optString("i"), wid * 10 + 3));
     } else {

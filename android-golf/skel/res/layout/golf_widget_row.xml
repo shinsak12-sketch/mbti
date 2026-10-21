@@ -12,7 +12,7 @@
         <TextView android:id="@+id/rsub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="10.5sp" android:textStyle="bold" android:textColor="#8b919e" android:singleLine="true" android:ellipsize="end"/>
     </LinearLayout>
     <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="6dp" android:orientation="vertical" android:gravity="right">
-        <TextView android:id="@+id/rright" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="16sp" android:textStyle="bold" android:textColor="#f3f4f6"/>
+        <TextView android:id="@+id/rright" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingLeft="8dp" android:paddingRight="8dp" android:paddingTop="3dp" android:paddingBottom="3dp" android:textSize="15sp" android:textStyle="bold" android:textColor="#f3f4f6"/>
         <TextView android:id="@+id/rright2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="9.5sp" android:textStyle="bold" android:textColor="#8b919e"/>
     </LinearLayout>
 </LinearLayout>

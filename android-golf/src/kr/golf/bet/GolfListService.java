@@ -37,13 +37,23 @@ public class GolfListService extends RemoteViewsService {
       v.setTextViewText(id("rdow"), Integer.parseInt(d.substring(5, 7)) + "월 " + GolfWidget.dow(d));
       v.setTextViewText(id("rname"), r.optString("c"));
       StringBuilder sub = new StringBuilder();
+      String tee = r.optString("t"); if (tee.length() > 0) add(sub, tee + " 티");
       add(sub, r.optString("g")); add(sub, r.optString("m")); add(sub, r.optInt("k") == 1 ? "캐디" : "노캐디"); if (holes != 18) add(sub, holes + "홀");
       v.setTextViewText(id("rsub"), sub.toString());
       v.setInt(id("rrow"), "setBackgroundResource", GolfWidget.rid(c, plan ? "row_plan" : "row_bg", "drawable"));
       int dayC = Color.parseColor(plan ? "#8fb6ff" : "#f3f4f6");
       v.setTextColor(id("rday"), dayC);
-      if (plan) {
-        long dd = GolfWidget.dayNum(d) - GolfWidget.dayNum(GolfWidget.todayStr());
+      long ddAll = GolfWidget.dayNum(d) - GolfWidget.dayNum(GolfWidget.todayStr());
+      boolean needScore = (plan && ddAll < 0) || (!plan && score <= 0);
+      v.setInt(id("rright"), "setBackgroundResource", GolfWidget.rid(c, needScore ? "w_btn_score" : "c_none", "drawable"));
+      if (needScore) {
+        v.setTextViewText(id("rright"), "+ 타수");
+        v.setTextColor(id("rright"), Color.parseColor("#c6ff3d"));
+        v.setTextViewText(id("rright2"), plan ? "지난 예정" : "");
+        Intent sf = new Intent(); sf.putExtra("a", "score"); sf.putExtra("id", r.optString("i")); sf.putExtra("d", d);
+        v.setOnClickFillInIntent(id("rright"), sf);
+      } else if (plan) {
+        long dd = ddAll;
         v.setTextViewText(id("rright"), dd < 0 ? "지남" : dd == 0 ? "오늘" : dd == 1 ? "내일" : "D-" + dd);
         v.setTextColor(id("rright"), Color.parseColor("#5b94ff"));
         v.setTextViewText(id("rright2"), "예정");
