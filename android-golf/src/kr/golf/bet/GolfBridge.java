@@ -17,7 +17,19 @@ public class GolfBridge {
   @JavascriptInterface public void saveSummary(String json) {
     ctx.getSharedPreferences("golf", Context.MODE_PRIVATE).edit().putString("sum", json == null ? "{}" : json).commit();
     GolfWidget.refreshAll(ctx);
+    Reminders.schedule(ctx);
   }
+
+  /** 알림 권한: "granted" · "ask" (안드로이드 13+에서 아직 안 물어봄/거절) */
+  @JavascriptInterface public String notifyState() {
+    if (android.os.Build.VERSION.SDK_INT < 33) return "granted";
+    return act.checkSelfPermission("android.permission.POST_NOTIFICATIONS") == android.content.pm.PackageManager.PERMISSION_GRANTED ? "granted" : "ask";
+  }
+  @JavascriptInterface public void requestNotify() {
+    if (android.os.Build.VERSION.SDK_INT < 33) return;
+    act.runOnUiThread(new Runnable() { @Override public void run() { act.requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"}, 77); } });
+  }
+  @JavascriptInterface public void testNotify() { Reminders.show(ctx, "알림 테스트", "라운드 알림이 이렇게 떠", ""); }
 
   @JavascriptInterface public void close() {
     if (act instanceof QuickActivity) act.runOnUiThread(new Runnable() { @Override public void run() { act.finish(); } });

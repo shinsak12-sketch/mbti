@@ -22,6 +22,7 @@ import java.util.HashMap;
 /** 골프 내기: 로컬 assets/www 를 https://app.local 로 서빙하는 WebView 껍데기. */
 public class MainActivity extends Activity {
   private WebView wv;
+  private GolfChrome chrome;
   private boolean loaded = false;
   private String pendingJs = null;
 
@@ -37,7 +38,7 @@ public class MainActivity extends Activity {
     s.setDomStorageEnabled(true);
     s.setMediaPlaybackRequiresUserGesture(false);
     s.setAllowFileAccess(false);
-    s.setAllowContentAccess(false);
+    s.setAllowContentAccess(true);
     s.setSupportZoom(false);
     s.setBuiltInZoomControls(false);
     s.setDisplayZoomControls(false);
@@ -51,7 +52,8 @@ public class MainActivity extends Activity {
       loaded = true;
       if (pendingJs != null) { wv.evaluateJavascript(pendingJs, null); pendingJs = null; }
     } }));
-    wv.setWebChromeClient(new WebChromeClient());
+    chrome = new GolfChrome(this);
+    wv.setWebChromeClient(chrome);
     wv.addJavascriptInterface(new GolfBridge(this, wv), "GolfNative");
     setContentView(wv);
     wv.loadUrl("https://app.local/index.html");
@@ -79,6 +81,8 @@ public class MainActivity extends Activity {
       }
     });
   }
+
+  @Override protected void onActivityResult(int req, int res, Intent data) { super.onActivityResult(req, res, data); if (chrome != null) chrome.onResult(req, res, data); }
 
   @Override protected void onPause() { super.onPause(); if (wv != null) wv.onPause(); }
   @Override protected void onResume() { super.onResume(); if (wv != null) wv.onResume(); GolfWidget.refreshAll(this); }

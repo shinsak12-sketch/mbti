@@ -14,6 +14,7 @@ import android.webkit.WebView;
 /** 위젯에서 뜨는 홈 화면 위 팝업 (기록 · 예정 입력, 기록 메뉴). 저장하면 닫히고 위젯이 바로 갱신됨. */
 public class QuickActivity extends Activity {
   private WebView wv;
+  private GolfChrome chrome;
 
   @Override protected void onCreate(Bundle b) {
     super.onCreate(b);
@@ -23,13 +24,14 @@ public class QuickActivity extends Activity {
     s.setJavaScriptEnabled(true);
     s.setDomStorageEnabled(true);
     s.setAllowFileAccess(false);
-    s.setAllowContentAccess(false);
+    s.setAllowContentAccess(true);
     s.setSupportZoom(false);
     s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
     wv.setBackgroundColor(Color.TRANSPARENT);
     wv.setOverScrollMode(View.OVER_SCROLL_NEVER);
     wv.setWebViewClient(new AppWebClient(this, null));
-    wv.setWebChromeClient(new WebChromeClient());
+    chrome = new GolfChrome(this);
+    wv.setWebChromeClient(chrome);
     wv.addJavascriptInterface(new GolfBridge(this, wv), "GolfNative");
     setContentView(wv);
     load(getIntent());
@@ -58,5 +60,7 @@ public class QuickActivity extends Activity {
       @Override public void onReceiveValue(String v) { if (!"\"1\"".equals(v)) finish(); }
     });
   }
+  @Override protected void onActivityResult(int req, int res, Intent data) { super.onActivityResult(req, res, data); if (chrome != null) chrome.onResult(req, res, data); }
+
   @Override protected void onPause() { super.onPause(); GolfWidget.refreshAll(this); }
 }
