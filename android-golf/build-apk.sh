@@ -18,6 +18,17 @@ rm -rf "$WORK/apk"; cp -r "$HERE/skel" "$WORK/apk"; cp "$WORK/classes.dex" "$WOR
 WWW="$WORK/apk/assets/www"; mkdir -p "$WWW/icons"
 cp "$HERE/../golf.html" "$WWW/index.html"; cp "$HERE/../golf.html" "$WWW/golf.html"; cp "$HERE/../golf.webmanifest" "$WWW/"
 cp "$HERE"/../icons/golf-*.png "$WWW/icons/" 2>/dev/null || true
+# 개인 기록 시드 (repo에 안 올라감 · 있으면 첫 실행 때 한 번 합쳐짐)
+if [ -f "$HERE/seed.json" ]; then
+  python3 -I - "$HERE/seed.json" "$WWW/golf.html" "$WWW/index.html" <<'PY'
+import sys
+seed=open(sys.argv[1],encoding='utf-8').read().replace('</','<\\/')
+for f in sys.argv[2:]:
+    s=open(f,encoding='utf-8').read()
+    s=s.replace('<script>','<script>window.GOLF_SEED='+seed+';</script>\n<script>',1)
+    open(f,'w',encoding='utf-8').write(s)
+PY
+fi
 java -jar "$TOOLS/apktool.jar" b "$WORK/apk" --use-aapt2 -o "$WORK/unsigned.apk" -p "$TOOLS/framework" >/dev/null
 java -jar "$TOOLS/uber-apk-signer.jar" -a "$WORK/unsigned.apk" -o "$OUT" --allowResign >/dev/null
 mv -f "$OUT"/unsigned-aligned-debugSigned.apk "$OUT/golf-naegi.apk"

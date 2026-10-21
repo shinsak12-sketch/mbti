@@ -515,6 +515,9 @@
   <input class="inp" type="date" id="fDate">
   <div class="lbl">국내 · 해외</div>
   <div class="seg" id="fAbroad"><button data-v="0">국내</button><button data-v="1">해외</button></div>
+  <div id="countryWrap"><div class="lbl">국가</div>
+  <input class="inp" id="fCountry" placeholder="예: 태국 · 필리핀 · 말레이시아" maxlength="20" autocomplete="off">
+  <div class="sugg" id="sCountry"></div></div>
   <div class="lbl">지역</div>
   <input class="inp" id="fRegion" placeholder="예: 안성 · 후아힌 · 세부" maxlength="20" autocomplete="off">
   <div class="sugg" id="sRegion"></div>
@@ -860,7 +863,10 @@ function renderResult(){
 
 /* =================== 골프 기록 · 통계 =================== */
 DB.records=DB.records||[];
-const OVERSEAS=['후아힌','방콕','파타야','치앙마이','치앙라이','푸켓','칸차나부리','카오야이','세부','클락','마닐라','보라카이','다낭','하노이','호치민','나트랑','냐짱','달랏','푸꾸옥','하이퐁','하롱','조호바루','쿠알라룸푸르','코타키나발루','페낭','랑카위','싱가포르','빈탄','바탐','발리','자카르타','타이중','타이베이','가오슝','오키나와','후쿠오카','미야자키','가고시마','구마모토','오사카','도쿄','홋카이도','삿포로','하와이','괌','사이판','하이난','칭다오','상해','상하이','웨이하이','연태','다롄','시안','비엔티안','방비엥','시엠립','프놈펜','울란바토르','골드코스트','시드니','오클랜드','라스베가스','팜스프링스','LA','두바이'];
+if(window.GOLF_SEED&&Array.isArray(window.GOLF_SEED.records)&&!(DB.seeds||[]).includes(window.GOLF_SEED.id)){ const have=new Set(DB.records.map(r=>r.id)); const key=r=>r.date+'|'+r.course; const hk=new Set(DB.records.map(key)); let n=0; window.GOLF_SEED.records.forEach(r=>{ if(!have.has(r.id)&&!hk.has(key(r))){ DB.records.push(r); n++; } }); DB.seeds=(DB.seeds||[]).concat(window.GOLF_SEED.id); save(); if(n) setTimeout(()=>toast(`지난 기록 ${n}개 들어옴`,2400),600); }
+const OVERSEAS=['후아힌','방콕','파타야','치앙마이','치앙라이','푸켓','칸차나부리','카오야이','세부','클락','마닐라','보라카이','다낭','하노이','호치민','나트랑','냐짱','달랏','푸꾸옥','하이퐁','하롱','조호바루','쿠알라룸푸르','코타키나발루','페낭','랑카위','싱가포르','빈탄','바탐','발리','자카르타','타이중','타이베이','가오슝','오키나와','후쿠오카','미야자키','가고시마','구마모토','오사카','도쿄','홋카이도','삿포로','하와이','괌','사이판','하이난','칭다오','상해','상하이','웨이하이','연태','다롄','시안','비엔티안','방비엥','시엠립','프놈펜','울란바토르','골드코스트','시드니','오클랜드','라스베가스','팜스프링스','LA','두바이','심양'];
+const COUNTRY_OF=(()=>{ const m={}; Object.entries({'태국':['후아힌','방콕','파타야','치앙마이','치앙라이','푸켓','칸차나부리','카오야이'],'필리핀':['세부','클락','마닐라','보라카이'],'베트남':['다낭','하노이','호치민','나트랑','냐짱','달랏','푸꾸옥','하이퐁','하롱'],'말레이시아':['조호바루','쿠알라룸푸르','코타키나발루','페낭','랑카위'],'싱가포르':['싱가포르'],'인도네시아':['빈탄','바탐','발리','자카르타'],'대만':['타이중','타이베이','가오슝'],'일본':['오키나와','후쿠오카','미야자키','가고시마','구마모토','오사카','도쿄','홋카이도','삿포로'],'미국':['하와이','괌','사이판','라스베가스','팜스프링스','LA'],'중국':['하이난','칭다오','상해','상하이','웨이하이','연태','다롄','시안','심양'],'라오스':['비엔티안','방비엥'],'캄보디아':['시엠립','프놈펜'],'몽골':['울란바토르'],'호주':['골드코스트','시드니'],'뉴질랜드':['오클랜드'],'UAE':['두바이']}).forEach(([c,rs])=>rs.forEach(r=>m[r]=c)); return m; })();
+const COUNTRIES=['태국','필리핀','베트남','말레이시아','일본','중국','대만','인도네시아','미국'];
 const DOMESTIC=['안성','여주','이천','용인','포천','가평','양평','춘천','홍천','원주','횡성','평창','강릉','군산','익산','전주','무주','고창','부안','나주','순천','여수','광양','해남','영암','부산','김해','양산','경주','대구','구미','청도','칠곡','청주','충주','제천','음성','진천','천안','아산','세종','대전','공주','부여','보령','태안','서산','당진','제주','서귀포','인천','영종','강화','화성','평택','파주','고양','김포','남양주','하남','곤지암','광주','문경','상주','안동','포항','울산','거제','통영','사천','진주','창원','함안','밀양','고성','홍성','예산','논산','장성','담양','곡성','화순','영광','함평','무안','목포','보성','장흥','강진','완도','진도','남원','정읍','김제'];
 const DOW='일월화수목금토';
 let recYear=null, recFilter='all', statYear=null, F=null, editRec=null, impRows=null;
@@ -895,7 +901,7 @@ function renderRecords(){
   const groups={}; list.forEach(r=>{ const k=r.date.slice(0,7); (groups[k]=groups[k]||[]).push(r); });
   Object.keys(groups).sort().reverse().forEach(k=>{ const g=groups[k]; const [y,m]=k.split('-'); const gh=g.reduce((a,r)=>a+(r.holes||0),0);
     html+=`<div class="mhd"><span>${recYear==='all'?y+'. ':''}${+m}월</span><small>${g.length}회 · ${gh}홀</small></div>`;
-    g.forEach(r=>{ const d=+r.date.slice(8,10); const sub=[r.region, r.holes!==18?r.holes+'홀':'', (r.mates||[]).join(', ')].filter(Boolean).join(' · ');
+    g.forEach(r=>{ const d=+r.date.slice(8,10); const sub=[r.abroad&&r.country?`${r.country} ${r.region||''}`.trim():r.region, r.holes!==18?r.holes+'홀':'', (r.mates||[]).join(', ')].filter(Boolean).join(' · ');
       const diff=r.score&&r.holes===18?r.score-72:null;
       html+=`<button class="rec" data-id="${r.id}"><div class="dt"><b>${d}</b><small>${+m}월 ${dowOf(r.date)}</small></div><div class="mid"><b>${esc(r.course||r.region||'골프장 미입력')}</b>${sub?`<small>${esc(sub)}</small>`:''}<div class="tags">${r.abroad?'<span class="tg abr">해외</span>':''}<span class="tg ${r.caddie?'cad':''}">${r.caddie?'캐디':'노캐디'}</span>${r.memo?'<span class="tg">메모</span>':''}</div></div><div class="rs">${r.score?`<b>${r.score}</b><small>${r.holes!==18?r.holes+'홀':(diff>0?'+'+diff:diff)}</small>`:'<b class="none">—</b>'}</div></button>`; });
   });
@@ -907,24 +913,28 @@ function renderRecords(){
 function openRecForm(rec,preset){
   editRec=rec||null;
   if(rec) F=JSON.parse(JSON.stringify(rec));
-  else { const last=DB.records.slice().sort(recSort)[0]; F=Object.assign({id:uid(),created:Date.now(),date:today(),abroad:false,region:'',course:'',caddie:last?last.caddie:true,holes:18,mates:[],score:null,memo:''},preset||{}); }
+  else { const last=DB.records.slice().sort(recSort)[0]; F=Object.assign({id:uid(),created:Date.now(),date:today(),abroad:false,country:'',region:'',course:'',caddie:last?last.caddie:true,holes:18,mates:[],score:null,memo:''},preset||{}); }
   $('#rfTitle').textContent=rec?'기록 수정':'새 기록'; $('#rfDel').hidden=!rec;
-  $('#fDate').value=F.date; $('#fRegion').value=F.region||''; $('#fCourse').value=F.course||''; $('#fScore').value=F.score||''; $('#fMemo').value=F.memo||''; $('#fMate').value='';
+  $('#fDate').value=F.date; $('#fCountry').value=F.country||''; $('#fRegion').value=F.region||''; $('#fCourse').value=F.course||''; $('#fScore').value=F.score||''; $('#fMemo').value=F.memo||''; $('#fMate').value='';
   renderFormBits(); show('#s-recform');
 }
 function renderFormBits(){
   $$('#fAbroad button').forEach(b=>b.classList.toggle('on',+b.dataset.v===(F.abroad?1:0)));
   $$('#fCaddie button').forEach(b=>b.classList.toggle('on',+b.dataset.v===(F.caddie?1:0)));
   $('#hVal').innerHTML=`${F.holes}<small>홀</small>`; $$('#hChips button').forEach(b=>b.classList.toggle('on',+b.dataset.h===F.holes));
+  $('#countryWrap').hidden=!F.abroad; renderSuggCountry();
   renderSuggRegion(); renderSuggCourse(); renderMates(); scoreHint();
 }
-function renderSuggRegion(){ const q=$('#fRegion').value.trim(); const items=countBy(DB.records.filter(r=>!!r.abroad===!!F.abroad),r=>r.region).filter(([k])=>k!==q&&(!q||k.includes(q))).slice(0,10);
+function renderSuggCountry(){ const q=$('#fCountry').value.trim(); const cnt=new Map(countBy(DB.records.filter(r=>r.abroad),r=>r.country)); COUNTRIES.forEach(c=>{ if(!cnt.has(c)) cnt.set(c,0); }); const items=[...cnt.entries()].sort((a,b)=>b[1]-a[1]).filter(([k])=>k!==q&&(!q||k.includes(q))).slice(0,10);
+  const box=$('#sCountry'); box.innerHTML=items.map(([k,c])=>`<button data-k="${esc(k)}">${esc(k)}${c?`<small>${c}</small>`:''}</button>`).join('');
+  box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ $('#fCountry').value=b.dataset.k; F.country=b.dataset.k; vib(5); renderSuggCountry(); renderSuggRegion(); renderSuggCourse(); }); }
+function renderSuggRegion(){ const q=$('#fRegion').value.trim(), ct=F.abroad?$('#fCountry').value.trim():''; const items=countBy(DB.records.filter(r=>!!r.abroad===!!F.abroad&&(!ct||r.country===ct)),r=>r.region).filter(([k])=>k!==q&&(!q||k.includes(q))).slice(0,10);
   const box=$('#sRegion'); box.innerHTML=items.map(([k,c])=>`<button data-k="${esc(k)}">${esc(k)}<small>${c}</small></button>`).join('');
-  box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ $('#fRegion').value=b.dataset.k; F.region=b.dataset.k; vib(5); renderSuggRegion(); renderSuggCourse(); }); }
+  box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ $('#fRegion').value=b.dataset.k; F.region=b.dataset.k; if(F.abroad&&!$('#fCountry').value.trim()){ const ref=DB.records.find(r=>r.region===b.dataset.k&&r.country); const c=ref?ref.country:(COUNTRY_OF[b.dataset.k]||''); if(c){ $('#fCountry').value=c; F.country=c; renderSuggCountry(); } } vib(5); renderSuggRegion(); renderSuggCourse(); }); }
 function renderSuggCourse(){ const q=$('#fCourse').value.trim(), rg=$('#fRegion').value.trim(); let pool=DB.records.filter(r=>!!r.abroad===!!F.abroad); if(rg) pool=pool.filter(r=>r.region===rg);
   const items=countBy(pool,r=>r.course).filter(([k])=>k!==q&&(!q||k.includes(q))).slice(0,10);
   const box=$('#sCourse'); box.innerHTML=items.map(([k,c])=>`<button data-k="${esc(k)}">${esc(k)}<small>${c}</small></button>`).join('');
-  box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const k=b.dataset.k; $('#fCourse').value=k; F.course=k; const ref=DB.records.filter(r=>r.course===k).sort(recSort)[0]; if(ref){ if(!$('#fRegion').value.trim()&&ref.region){ $('#fRegion').value=ref.region; F.region=ref.region; } if(ref.holes) F.holes=ref.holes; F.abroad=!!ref.abroad; } vib(5); renderFormBits(); }); }
+  box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const k=b.dataset.k; $('#fCourse').value=k; F.course=k; const ref=DB.records.filter(r=>r.course===k).sort(recSort)[0]; if(ref){ if(!$('#fRegion').value.trim()&&ref.region){ $('#fRegion').value=ref.region; F.region=ref.region; } if(ref.holes) F.holes=ref.holes; F.abroad=!!ref.abroad; if(ref.country&&!$('#fCountry').value.trim()){ $('#fCountry').value=ref.country; F.country=ref.country; } } vib(5); renderFormBits(); }); }
 function renderMates(){ const box=$('#mates'); box.innerHTML=F.mates.map((m,i)=>`<span>${esc(m)}<button data-i="${i}" aria-label="빼기">${ICX}</button></span>`).join('');
   box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ F.mates.splice(+b.dataset.i,1); vib(5); renderMates(); });
   const q=$('#fMate').value.trim(); const items=countBy(DB.records,r=>r.mates||[]).filter(([k])=>!F.mates.includes(k)&&(!q||k.includes(q))).slice(0,12);
@@ -937,7 +947,8 @@ $$('#fCaddie button').forEach(b=>b.onclick=()=>{ F.caddie=b.dataset.v==='1'; vib
 $('#hMinus').onclick=()=>{ F.holes=Math.max(9,F.holes-9); vib(5); renderFormBits(); };
 $('#hPlus').onclick=()=>{ F.holes=Math.min(72,F.holes+9); vib(5); renderFormBits(); };
 $$('#hChips button').forEach(b=>b.onclick=()=>{ F.holes=+b.dataset.h; vib(5); renderFormBits(); });
-$('#fRegion').oninput=e=>{ F.region=e.target.value.trim(); renderSuggRegion(); renderSuggCourse(); };
+$('#fCountry').oninput=e=>{ F.country=e.target.value.trim(); renderSuggCountry(); renderSuggRegion(); };
+$('#fRegion').oninput=e=>{ F.region=e.target.value.trim(); if(F.abroad&&!$('#fCountry').value.trim()&&COUNTRY_OF[F.region]){ $('#fCountry').value=COUNTRY_OF[F.region]; F.country=COUNTRY_OF[F.region]; renderSuggCountry(); } renderSuggRegion(); renderSuggCourse(); };
 $('#fCourse').oninput=e=>{ F.course=e.target.value.trim(); renderSuggCourse(); };
 $('#fMate').oninput=()=>renderMates();
 $('#fMate').onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); addMate(); } };
@@ -947,7 +958,7 @@ $('#sMinus').onclick=()=>{ const v=+$('#fScore').value||Math.round(90*F.holes/18
 $('#sPlus').onclick=()=>{ const v=+$('#fScore').value||Math.round(90*F.holes/18)-1; $('#fScore').value=v+1; vib(4); scoreHint(); };
 $('#rfClose').onclick=()=>{ renderRecords(); show('#s-rec'); };
 $('#rfSave').onclick=()=>{
-  F.date=$('#fDate').value||today(); F.region=$('#fRegion').value.trim(); F.course=$('#fCourse').value.trim(); F.memo=$('#fMemo').value.trim();
+  F.date=$('#fDate').value||today(); F.country=F.abroad?$('#fCountry').value.trim():''; F.region=$('#fRegion').value.trim(); F.course=$('#fCourse').value.trim(); F.memo=$('#fMemo').value.trim();
   if($('#fMate').value.trim()) addMate();
   const s=parseInt($('#fScore').value,10); F.score=s>0?s:null;
   if(!F.course&&!F.region){ toast('골프장이나 지역은 넣어줘'); $('#fCourse').focus(); return; }
@@ -984,9 +995,10 @@ function renderStats(){
   const rankBox=(title,items,sub)=>{ const mx2=Math.max(1,...items.map(x=>x.c)); return `<div class="lbl">${title}</div><div class="rank">${items.length?items.map((x,i)=>`<div class="r"><span class="n">${i+1}</span><div class="nm"><div>${esc(x.k)}${x.tag?`<small>${x.tag}</small>`:''}</div><i style="width:${x.c/mx2*100}%"></i></div><div class="v">${x.c}회${x.sub?`<small>${x.sub}</small>`:''}</div></div>`).join(''):'<div class="none">없음</div>'}</div>`; };
   const avgOf=g=>{ const e=g.map(eq18).filter(v=>v!=null); return e.length?`평균 ${Math.round(e.reduce((a,b)=>a+b,0)/e.length)}타`:''; };
   const courses=countBy(L,r=>r.course).slice(0,5).map(([k,c])=>{ const g=L.filter(r=>r.course===k); return {k,c,tag:g[0].region||'',sub:avgOf(g)||`${g.reduce((a,r)=>a+r.holes,0)}홀`}; });
-  const regions=countBy(L,r=>r.region).slice(0,5).map(([k,c])=>{ const g=L.filter(r=>r.region===k); return {k,c,tag:g[0].abroad?'해외':'',sub:`${g.reduce((a,r)=>a+r.holes,0)}홀`}; });
+  const regions=countBy(L,r=>r.region).slice(0,5).map(([k,c])=>{ const g=L.filter(r=>r.region===k); return {k,c,tag:g[0].abroad?(g[0].country||'해외'):'',sub:`${g.reduce((a,r)=>a+r.holes,0)}홀`}; });
+  const ctrs=countBy(L.filter(r=>r.abroad),r=>r.country||'기타').slice(0,5).map(([k,c])=>{ const g=L.filter(r=>r.abroad&&(r.country||'기타')===k); return {k,c,sub:`${g.reduce((a,r)=>a+r.holes,0)}홀`}; });
   const mates=countBy(L,r=>r.mates||[]).slice(0,5).map(([k,c])=>{ const g=L.filter(r=>(r.mates||[]).includes(k)); return {k,c,sub:avgOf(g)}; });
-  h+=rankBox('많이 간 골프장',courses)+rankBox('많이 간 지역',regions)+rankBox('같이 많이 친 사람',mates);
+  h+=rankBox('많이 간 골프장',courses)+rankBox('많이 간 지역',regions)+(ctrs.length?rankBox('해외 · 나라별',ctrs):'')+rankBox('같이 많이 친 사람',mates);
   body.innerHTML=h;
   // 막대 툴팁
   const cc=$('#colChart'), tip=$('#colTip');
@@ -1035,7 +1047,8 @@ function parseMemo(text,defYear){
     let abroad=false, region='', course=before;
     if(toks.length&&OVERSEAS.some(o=>toks[0]===o||toks[0].startsWith(o))){ abroad=true; region=toks[0]; course=toks.slice(1).join(' ')||toks[0]; }
     else { const dom=DOMESTIC.find(n=>before.includes(n)); if(dom) region=dom; }
-    out.push({id:uid(),created:Date.now()+out.length,date:`${year}-${pad(mo)}-${pad(d)}`,abroad,region,course,caddie,holes,mates,score,memo:''});
+    const country=abroad?(COUNTRY_OF[region]||Object.keys(COUNTRY_OF).filter(k=>region.startsWith(k)).map(k=>COUNTRY_OF[k])[0]||''):'';
+    out.push({id:uid(),created:Date.now()+out.length,date:`${year}-${pad(mo)}-${pad(d)}`,abroad,country,region,course,caddie,holes,mates,score,memo:''});
   }
   return out;
 }
@@ -1044,7 +1057,7 @@ $('#impPrev').onclick=()=>{
   const rows=parseMemo($('#impText').value,impYear); impRows=rows; const out=$('#impOut');
   if(!rows.length){ out.innerHTML=`<div class="note">읽을 줄이 없음 · "2/16 골프장 캐디" 같은 줄이 있어야 함</div>`; return; }
   const fresh=rows.filter(r=>!isDup(r)); const ys=[...new Set(rows.map(yearOf))];
-  out.innerHTML=`<div class="prev">${rows.map(r=>`<div class="p ${isDup(r)?'dup':''}"><span class="d">${r.date.slice(2).replace(/-/g,'.')}</span><div class="c"><b>${esc(r.course||r.region)}</b><small>${[r.abroad?'해외':'국내',r.region,r.caddie?'캐디':'노캐디',r.holes+'홀',r.mates.join(', '),isDup(r)?'이미 있음':''].filter(Boolean).map(esc).join(' · ')}</small></div></div>`).join('')}</div><div class="note">${rows.length}줄 읽음 · ${ys.join(', ')}년 · 새로 ${fresh.length}개 · 지역은 아는 지명만 자동으로 채워짐, 나머지는 나중에 기록 눌러서 고치면 됨</div><div style="height:10px"></div><button class="btn" id="impDo" ${fresh.length?'':'disabled'}>${fresh.length}개 추가</button>`;
+  out.innerHTML=`<div class="prev">${rows.map(r=>`<div class="p ${isDup(r)?'dup':''}"><span class="d">${r.date.slice(2).replace(/-/g,'.')}</span><div class="c"><b>${esc(r.course||r.region)}</b><small>${[r.abroad?(r.country||'해외'):'국내',r.region,r.caddie?'캐디':'노캐디',r.holes+'홀',r.mates.join(', '),isDup(r)?'이미 있음':''].filter(Boolean).map(esc).join(' · ')}</small></div></div>`).join('')}</div><div class="note">${rows.length}줄 읽음 · ${ys.join(', ')}년 · 새로 ${fresh.length}개 · 지역은 아는 지명만 자동으로 채워짐, 나머지는 나중에 기록 눌러서 고치면 됨</div><div style="height:10px"></div><button class="btn" id="impDo" ${fresh.length?'':'disabled'}>${fresh.length}개 추가</button>`;
   $('#impDo').onclick=()=>{ const add=impRows.filter(r=>!isDup(r)); DB.records.push(...add); save(); vib([10,30,10]); toast(`${add.length}개 추가됨`); recYear=add.length?yearOf(add.sort(recSort)[0]):recYear; $('#impText').value=''; renderRecords(); show('#s-rec'); };
 };
 $('#impBack').onclick=()=>{ renderRecords(); show('#s-rec'); };

@@ -7,3 +7,4 @@ npm-debug.log*
 android/tools/
 android/out/
 android-golf/out/
+android-golf/seed.json
