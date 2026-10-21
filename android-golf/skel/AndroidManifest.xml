@@ -9,5 +9,11 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <receiver android:exported="true" android:label="@string/widget_name" android:name="kr.golf.bet.GolfWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/golf_widget_info"/>
+        </receiver>
     </application>
 </manifest>

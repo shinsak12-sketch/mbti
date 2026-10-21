@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -73,12 +74,20 @@ public class MainActivity extends Activity {
       }
     });
     wv.setWebChromeClient(new WebChromeClient());
+    wv.addJavascriptInterface(new GolfBridge(this), "GolfNative");
     setContentView(wv);
     wv.loadUrl("https://app.local/index.html");
   }
 
+  /** 뒤로 키: 웹 화면이 처리하면(이전 화면으로) 그대로, 첫 화면이면 앱 종료 */
   @Override public void onBackPressed() {
-    if (wv != null && wv.canGoBack()) wv.goBack(); else super.onBackPressed();
+    if (wv == null) { super.onBackPressed(); return; }
+    wv.evaluateJavascript("(window.appBack&&window.appBack())?'1':'0'", new ValueCallback<String>() {
+      @Override public void onReceiveValue(String v) {
+        if ("\"1\"".equals(v)) return;
+        if (wv.canGoBack()) wv.goBack(); else finish();
+      }
+    });
   }
 
   @Override protected void onPause() { super.onPause(); if (wv != null) wv.onPause(); }

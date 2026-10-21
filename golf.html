@@ -411,6 +411,55 @@
   .prev .p .c small{color:var(--mut);font-weight:600}
   .prev .p.dup{opacity:.4}
   .note{font-size:12px;color:var(--mut);font-weight:600;line-height:1.6;margin-top:8px}
+
+  /* ===== 예정 카드 · 길게 누르기 ===== */
+  .rec{-webkit-touch-callout:none;user-select:none}
+  .rec.pressing{transform:scale(.965);box-shadow:0 0 0 2px var(--acc),var(--sh);transition:transform .45s ease,box-shadow .2s}
+  .rec.plan{background:linear-gradient(135deg,var(--blues) 0%,transparent 80%),var(--card);border:1.5px dashed var(--blue)}
+  .rec.plan .dt{background:var(--blues)} .rec.plan .dt b,.rec.plan .dt small{color:var(--blue)}
+  .rec.plan.past{opacity:.6}
+  .rec .rs .dd{font-size:18px;color:var(--blue);letter-spacing:-.4px}
+  .tg.pln{background:var(--blues);color:var(--blue)}
+  .mhd.pl span{color:var(--blue)}
+  /* ===== 달력 ===== */
+  .cal{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px 12px 10px;margin-bottom:14px;box-shadow:var(--sh);touch-action:pan-y;overflow:hidden}
+  .cal .ch{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+  .cal .ch b{font-size:17px;font-weight:900;letter-spacing:-.4px;min-width:96px;text-align:center}
+  .cal .ch .nb{width:34px;height:34px;border-radius:11px;background:var(--chip);display:grid;place-items:center;flex:none}
+  .cal .ch .nb svg{width:16px;height:16px}
+  .cal .ch .nb:active{transform:scale(.9)}
+  .cal .ch .sum{margin-left:auto;font-size:11.5px;font-weight:800;color:var(--mut);text-align:right;line-height:1.35}
+  .cal .ch .sum em{font-style:normal;color:var(--acc)} .cal .ch .sum i{font-style:normal;color:var(--blue)}
+  .cal .ch .tdy{font-size:11px;font-weight:800;padding:6px 9px;border-radius:999px;background:var(--chip);color:var(--ink)}
+  .cal .wk,.cal .gd{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+  .cal .wk span{text-align:center;font-size:10.5px;font-weight:800;color:var(--mut);padding-bottom:6px}
+  .cal .wk span:first-child{color:var(--red)}
+  .cal .dc{aspect-ratio:1;display:grid;place-items:center;position:relative;font-size:13.5px;font-weight:800;color:var(--ink);cursor:pointer}
+  .cal .dc span{width:80%;height:80%;border-radius:50%;display:grid;place-items:center;transition:transform .12s}
+  .cal .dc:active span{transform:scale(.86)}
+  .cal .dc.sun{color:var(--red)}
+  .cal .dc.pl span{background:var(--acc);color:var(--accink)}
+  .cal .dc.pn span{box-shadow:inset 0 0 0 2px var(--blue);color:var(--blue)}
+  .cal .dc.pl.pn span{box-shadow:0 0 0 2px var(--blue)}
+  .cal .dc.td:not(.pl):not(.pn) span{box-shadow:inset 0 0 0 1.5px var(--mut)}
+  .cal .dc i{position:absolute;right:2%;top:0;font-style:normal;font-size:9px;font-weight:900;background:var(--ink);color:var(--bg);border-radius:999px;padding:0 4px;line-height:14px}
+  .cal .lgd{display:flex;gap:14px;justify-content:center;margin-top:8px;font-size:11px;font-weight:700;color:var(--mut)}
+  .cal .lgd span{display:flex;align-items:center;gap:5px}
+  .cal .lgd span::before{content:'';width:10px;height:10px;border-radius:50%;background:var(--acc)}
+  .cal .lgd span.p::before{background:none;box-shadow:inset 0 0 0 2px var(--blue)}
+  .cal .gd.slide{animation:calIn .28s cubic-bezier(.2,.8,.3,1)}
+  @keyframes calIn{from{opacity:.2;transform:translateX(var(--dx,0px))}to{opacity:1;transform:none}}
+  /* ===== 액션 시트 ===== */
+  .amenu .ah{padding:2px 4px 12px}
+  .amenu .ah b{display:block;font-size:17px;font-weight:900;letter-spacing:-.3px}
+  .amenu .ah small{color:var(--mut);font-weight:700;font-size:12px}
+  .amenu button.ai{display:flex;align-items:center;gap:12px;width:100%;padding:15px 14px;border-radius:15px;background:var(--card);border:1px solid var(--line);font-size:15px;font-weight:800;margin-bottom:8px;text-align:left;transition:transform .08s}
+  .amenu button.ai svg{color:var(--mut)}
+  .amenu button.ai.danger{color:var(--red)} .amenu button.ai.danger svg{color:var(--red)}
+  .amenu button.ai.blue{color:var(--blue)} .amenu button.ai.blue svg{color:var(--blue)}
+  .amenu button.ai:active{transform:scale(.98)}
+  .dsheet .rec{box-shadow:none}
+  .sheet{max-height:86vh;overflow:auto}
 </style>
 </head>
 <body>
@@ -504,6 +553,8 @@
   </div>
   <div class="yrchips" id="recYears"></div>
   <div id="recHero"></div>
+  <div id="recCal"></div>
+  <div id="recPlans"></div>
   <div class="seg" id="recFilter"><button data-f="all">전체</button><button data-f="dom">국내</button><button data-f="abroad">해외</button></div>
   <div id="recList"></div>
 </section>
@@ -511,6 +562,7 @@
 <!-- ⓑ 기록 입력 -->
 <section class="screen" id="s-recform">
   <div class="top"><div><h1 id="rfTitle">새 기록</h1><div class="sm">다녀온 라운드 남기기</div></div><button class="ic" id="rfClose"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="seg" id="fKind" style="margin-top:4px"><button data-v="0">다녀옴</button><button data-v="1">예정</button></div>
   <div class="lbl">날짜</div>
   <input class="inp" type="date" id="fDate">
   <div class="lbl">국내 · 해외</div>
@@ -533,9 +585,9 @@
   <div class="inrow"><input class="inp" id="fMate" placeholder="이름 쓰고 추가" maxlength="12" autocomplete="off"><button class="btn sm" id="mateAdd">추가</button></div>
   <div class="mates" id="mates"></div>
   <div class="sugg" id="sMates"></div>
-  <div class="lbl">타수 <small class="mut">안 쳤으면 비워두기</small></div>
+  <div id="scoreWrap"><div class="lbl">타수 <small class="mut">안 쳤으면 비워두기</small></div>
   <div class="scorein"><button class="b" id="sMinus">−</button><input id="fScore" type="number" inputmode="numeric" placeholder="타수 입력"><button class="b" id="sPlus">+</button></div>
-  <div class="shint" id="shint"></div>
+  <div class="shint" id="shint"></div></div>
   <div class="lbl">메모</div>
   <textarea class="inp" id="fMemo" placeholder="날씨 · 그린 상태 · 기억할 것" maxlength="300"></textarea>
   <div style="height:14px"></div>
@@ -579,7 +631,8 @@
 /* =================== 저장 =================== */
 const KEY='golfbet.v1';
 const DB=(()=>{ try{ return JSON.parse(localStorage.getItem(KEY))||{rounds:[],theme:'dark',names:[]}; }catch(e){ return {rounds:[],theme:'dark',names:[]}; } })();
-function save(){ try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){} }
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){} clearTimeout(save._n); save._n=setTimeout(syncNative,600); }
+function syncNative(){ try{ if(window.GolfNative&&GolfNative.saveDays) GolfNative.saveDays((DB.records||[]).map(r=>r.date+':'+(r.plan?1:0)).join(',')); }catch(e){} }
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const fmt=n=>{ const a=Math.abs(Math.round(n)); return (n<0?'−':'')+a.toLocaleString('ko-KR'); };
 const fmtS=n=>n>0?'+'+fmt(n):(n<0?fmt(n):'0');
@@ -677,11 +730,13 @@ function renderList(){
   const hw=$('#heroWrap'); hw.innerHTML='';
   if(live.length){ const r=live[0]; const c=compute(r); const doneN=r.holes.slice(0,r.holesN).filter(h=>h.done).length; const lead=c.totals.map((v,i)=>({v,i})).sort((a,b)=>b.v-a.v)[0];
     const el=document.createElement('div'); el.className='hero'; el.innerHTML=`<div class="ring"></div><div class="tag">진행중 · ${Math.min(doneN+1,r.holesN)}번 홀</div><h4>${esc(r.name)||dateLabel(r.created)+' 라운드'}</h4><div class="meta">${dateLabel(r.created)} · ${MODES[r.mode].label} · ${MODES[r.mode].unitLab} ${fmt(r.unit)} · ${r.players.length}명</div><div class="holes ${r.holesN===9?'h9':''}">${r.holes.slice(0,r.holesN).map((h,i)=>`<i class="${h.done?'f':(i===doneN?'cur':'')}"></i>`).join('')}</div><div class="foot"><div class="lead">${doneN?`선두 <b>${esc(r.players[lead.i].name)}</b> ${fmtS(lead.v)}`:'아직 입력 전'}</div><div class="go"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></div>`;
-    el.onclick=()=>openRound(r); hw.appendChild(el); }
+    el.onclick=()=>openRound(r); longPress(el,()=>roundMenu(r)); hw.appendChild(el); }
   const tiles=$('#tiles'); tiles.innerHTML='';
   const nb=document.createElement('button'); nb.className='tile new'; nb.innerHTML=`<div><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>새 경기</div>`; nb.onclick=()=>{ cur=newRound(); openSetup(true); }; tiles.appendChild(nb);
-  rs.forEach((r,idx)=>{ if(live.length&&r===live[0]) return; const c=compute(r); const lead=c.totals.map((v,i)=>({v,i})).sort((a,b)=>b.v-a.v)[0]; const b=document.createElement('button'); b.className='tile'; b.innerHTML=`<div class="d">${dateLabel(r.created)}</div><b>${esc(r.name)||MODES[r.mode].label+' 라운드'}</b><span class="kind ${r.done?'':'live'}">${r.done?MODES[r.mode].label:'진행중 · '+MODES[r.mode].label}</span><div class="avs">${r.players.map(p=>`<span class="av">${esc(p.name.slice(0,1))}</span>`).join('')}</div><span class="w ${lead.v>0?'up':''}">${lead.v>0?esc(r.players[lead.i].name)+' '+fmtS(lead.v):'—'}</span>`; b.onclick=()=>openRound(r); tiles.appendChild(b); });
+  rs.forEach((r,idx)=>{ if(live.length&&r===live[0]) return; const c=compute(r); const lead=c.totals.map((v,i)=>({v,i})).sort((a,b)=>b.v-a.v)[0]; const b=document.createElement('button'); b.className='tile'; b.innerHTML=`<div class="d">${dateLabel(r.created)}</div><b>${esc(r.name)||MODES[r.mode].label+' 라운드'}</b><span class="kind ${r.done?'':'live'}">${r.done?MODES[r.mode].label:'진행중 · '+MODES[r.mode].label}</span><div class="avs">${r.players.map(p=>`<span class="av">${esc(p.name.slice(0,1))}</span>`).join('')}</div><span class="w ${lead.v>0?'up':''}">${lead.v>0?esc(r.players[lead.i].name)+' '+fmtS(lead.v):'—'}</span>`; b.onclick=()=>openRound(r); longPress(b,()=>roundMenu(r)); tiles.appendChild(b); });
 }
+function roundMenu(r){ const title=esc(r.name)||MODES[r.mode].label+' 라운드'; const sub=`${dateLabel(r.created)} · ${MODES[r.mode].label} · ${r.done?'완료':'진행중'}`;
+  actionSheet(title,sub,[{label:'열기',icon:SV.open,fn:()=>{ closeSheet(); openRound(r); }},{label:'경기 설정 수정',icon:SV.edit,fn:()=>{ closeSheet(); cur=r; openSetup(false); }},{label:'삭제',icon:SV.del,cls:'danger',fn:()=>confirmSheet('이 경기 삭제할까?',sub,'삭제',()=>{ DB.rounds=DB.rounds.filter(x=>x!==r); save(); toast('삭제됨'); renderList(); })}]); }
 function esc(s){ return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function dateLabel(ts){ const d=new Date(ts); return `${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} (${'일월화수목금토'[d.getDay()]})`; }
 function openRound(r){ cur=r; if(r.done) renderResult(); else { r.cur=Math.min(r.cur,r.holesN-1); renderHole(); } }
@@ -883,38 +938,83 @@ function countBy(list,keyFn){ const m=new Map(); list.forEach(r=>{ const ks=[].c
 function yearChips(box,cur,onPick,withAll=true){ const ys=recYears(); if(!ys.length) ys.push(new Date().getFullYear()); const items=ys.map(y=>[y,y+'년']); if(withAll&&ys.length>1) items.push(['all','전체']); box.innerHTML=items.map(([v,l])=>`<button data-v="${v}" class="${String(v)===String(cur)?'on':''}">${l}</button>`).join(''); box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ onPick(b.dataset.v==='all'?'all':+b.dataset.v); vib(6); }); }
 
 /* ---------- ⓐ 기록 목록 ---------- */
+function dday(ds){ const [y,m,d]=ds.split('-').map(Number); const t=new Date(); return Math.round((new Date(y,m-1,d)-new Date(t.getFullYear(),t.getMonth(),t.getDate()))/86400000); }
+const SV={edit:'<svg class="i" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>',del:'<svg class="i" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',done:'<svg class="i" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>',copy:'<svg class="i" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V4H4v12h4"/></svg>',open:'<svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',plus:'<svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',left:'<svg class="i" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>',right:'<svg class="i" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>'};
+function recCard(r){
+  const m=+r.date.slice(5,7), d=+r.date.slice(8,10); const sub=[r.abroad&&r.country?`${r.country} ${r.region||''}`.trim():r.region, r.holes!==18?r.holes+'홀':'', (r.mates||[]).join(', ')].filter(Boolean).join(' · ');
+  const dd=r.plan?dday(r.date):null; const diff=r.score&&r.holes===18?r.score-72:null;
+  const right = r.plan ? (dd>=0?`<b class="dd">${dd===0?'오늘':'D-'+dd}</b><small>예정</small>`:`<b class="none">지남</b><small>예정</small>`) : (r.score?`<b>${r.score}</b><small>${r.holes!==18?r.holes+'홀':(diff>0?'+'+diff:diff)}</small>`:'<b class="none">—</b>');
+  return `<button class="rec ${r.plan?'plan':''} ${r.plan&&dd<0?'past':''}" data-id="${r.id}"><div class="dt"><b>${d}</b><small>${m}월 ${dowOf(r.date)}</small></div><div class="mid"><b>${esc(r.course||r.region||'골프장 미입력')}</b>${sub?`<small>${esc(sub)}</small>`:''}<div class="tags">${r.plan?'<span class="tg pln">예정</span>':''}${r.abroad?'<span class="tg abr">해외</span>':''}<span class="tg ${r.caddie?'cad':''}">${r.caddie?'캐디':'노캐디'}</span>${r.memo?'<span class="tg">메모</span>':''}</div></div><div class="rs">${right}</div></button>`;
+}
+function bindRecCards(box,before){ box.querySelectorAll('.rec').forEach(b=>{ const r=DB.records.find(x=>x.id===b.dataset.id); if(!r) return; b.onclick=()=>{ before&&before(); openRecForm(r); }; longPress(b,()=>{ before&&before(); recMenu(r); }); }); }
+function longPress(el,fn){ let t=null,sx=0,sy=0,fired=false;
+  const cancel=()=>{ clearTimeout(t); el.classList.remove('pressing'); };
+  el.addEventListener('pointerdown',e=>{ fired=false; sx=e.clientX; sy=e.clientY; el.classList.add('pressing'); t=setTimeout(()=>{ fired=true; el.classList.remove('pressing'); vib(28); fn(); },480); });
+  el.addEventListener('pointermove',e=>{ if(Math.hypot(e.clientX-sx,e.clientY-sy)>10) cancel(); });
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>el.addEventListener(ev,cancel));
+  el.addEventListener('click',e=>{ if(fired){ e.preventDefault(); e.stopImmediatePropagation(); fired=false; } },true);
+  el.addEventListener('contextmenu',e=>e.preventDefault()); }
+function actionSheet(title,sub,items){ sheet(`<div class="amenu"><div class="ah"><b>${title}</b><small>${sub||''}</small></div>${items.map((it,i)=>`<button class="ai ${it.cls||''}" data-i="${i}">${it.icon||''}${it.label}</button>`).join('')}<button class="ai" data-i="x" style="justify-content:center;color:var(--mut)">닫기</button></div>`);
+  $('#sheet').querySelectorAll('.ai').forEach(b=>b.onclick=()=>{ if(b.dataset.i==='x'){ closeSheet(); return; } items[+b.dataset.i].fn(); }); }
+function confirmSheet(title,sub,label,fn){ sheet(`<div class="amenu"><div class="ah"><b>${title}</b><small>${sub||''}</small></div><div class="row"><button class="btn ghost sm" id="cNo">취소</button><button class="btn danger sm" id="cYes">${label}</button></div></div>`); $('#cNo').onclick=closeSheet; $('#cYes').onclick=()=>{ closeSheet(); fn(); }; }
+function recMenu(r){ const title=esc(r.course||r.region||'라운드'); const sub=`${r.date.replace(/-/g,'.')} (${dowOf(r.date)})${r.plan?' · 예정':''}`;
+  const items=[{label:'수정',icon:SV.edit,fn:()=>{ closeSheet(); openRecForm(r); }}];
+  if(r.plan) items.push({label:'다녀옴으로 바꾸기',icon:SV.done,cls:'blue',fn:()=>{ closeSheet(); openRecForm(r); F.plan=false; renderFormBits(); toast('타수 넣고 저장하면 끝'); }});
+  items.push({label:'같은 곳 새로 추가',icon:SV.copy,fn:()=>{ closeSheet(); openRecForm(null,{abroad:r.abroad,country:r.country||'',region:r.region,course:r.course,caddie:r.caddie,holes:r.holes,mates:(r.mates||[]).slice()}); }});
+  items.push({label:'삭제',icon:SV.del,cls:'danger',fn:()=>confirmSheet('이 기록 삭제할까?',sub+' '+title,'삭제',()=>{ DB.records=DB.records.filter(x=>x!==r); save(); vib(20); toast('삭제됨'); renderRecords(); })});
+  actionSheet(title,sub,items); }
+let calY=null, calM=null;
+function renderCal(dx){
+  const t=new Date(); if(calY==null){ calY=t.getFullYear(); calM=t.getMonth()+1; }
+  const pre=`${calY}-${pad(calM)}-`; const items=DB.records.filter(r=>r.date.startsWith(pre));
+  const by={}; items.forEach(r=>{ const d=+r.date.slice(8,10); by[d]=by[d]||{p:0,l:0}; if(r.plan) by[d].l++; else by[d].p++; });
+  const nP=items.filter(r=>!r.plan).length, nL=items.filter(r=>r.plan).length;
+  const first=new Date(calY,calM-1,1).getDay(), dim=new Date(calY,calM,0).getDate(); const isCur=calY===t.getFullYear()&&calM===t.getMonth()+1;
+  let cells=''; for(let i=0;i<first;i++) cells+='<div></div>';
+  for(let d=1;d<=dim;d++){ const b=by[d]||{p:0,l:0}; const col=(first+d-1)%7; const cls=['dc',b.p?'pl':'',b.l?'pn':'',isCur&&d===t.getDate()?'td':'',col===0?'sun':''].join(' '); cells+=`<div class="${cls}" data-d="${d}"><span>${d}</span>${b.p>1?`<i>×${b.p}</i>`:''}</div>`; }
+  $('#recCal').innerHTML=`<div class="cal"><div class="ch"><button class="nb" id="calPrev" aria-label="이전 달">${SV.left}</button><b>${calY}년 ${calM}월</b><button class="nb" id="calNext" aria-label="다음 달">${SV.right}</button>${isCur?'':'<button class="tdy" id="calToday">오늘</button>'}<div class="sum"><em>다녀옴 ${nP}</em><br><i>예정 ${nL}</i></div></div><div class="wk">${'일월화수목금토'.split('').map(x=>`<span>${x}</span>`).join('')}</div><div class="gd ${dx?'slide':''}" style="--dx:${dx||0}px">${cells}</div><div class="lgd"><span>다녀옴</span><span class="p">예정</span></div></div>`;
+  const go=n=>{ calM+=n; if(calM<1){ calM=12; calY--; } if(calM>12){ calM=1; calY++; } vib(6); renderCal(n>0?40:-40); };
+  $('#calPrev').onclick=()=>go(-1); $('#calNext').onclick=()=>go(1); const td=$('#calToday'); if(td) td.onclick=()=>{ calY=t.getFullYear(); calM=t.getMonth()+1; renderCal(); };
+  const gd=$('#recCal .gd'); let sx=null,sy=0,moved=false;
+  gd.addEventListener('pointerdown',e=>{ sx=e.clientX; sy=e.clientY; moved=false; });
+  gd.addEventListener('pointerup',e=>{ if(sx==null) return; const dxp=e.clientX-sx, dyp=e.clientY-sy; sx=null; if(Math.abs(dxp)>50&&Math.abs(dxp)>Math.abs(dyp)*1.3){ moved=true; go(dxp<0?1:-1); } });
+  gd.querySelectorAll('.dc').forEach(c=>c.onclick=()=>{ if(moved) return; dayTap(`${calY}-${pad(calM)}-${pad(+c.dataset.d)}`); });
+}
+function dayTap(ds){ const list=DB.records.filter(r=>r.date===ds).sort((a,b)=>(a.created||0)-(b.created||0)); const future=dday(ds)>0;
+  if(!list.length){ openRecForm(null,{date:ds,plan:future}); return; }
+  sheet(`<div class="amenu dsheet"><div class="ah"><b>${+ds.slice(5,7)}월 ${+ds.slice(8,10)}일 (${dowOf(ds)})</b><small>${list.length}개 · 눌러서 수정 · 길게 눌러서 메뉴</small></div><div id="dayList">${list.map(recCard).join('')}</div><button class="ai" id="dayAdd">${SV.plus}이 날 ${future?'예정':'기록'} 추가</button><button class="ai" id="dayClose" style="justify-content:center;color:var(--mut)">닫기</button></div>`);
+  bindRecCards($('#dayList'),closeSheet); $('#dayAdd').onclick=()=>{ closeSheet(); openRecForm(null,{date:ds,plan:future}); }; $('#dayClose').onclick=closeSheet; }
 function renderRecords(){
   const ys=recYears();
   if(recYear==null||(recYear!=='all'&&!ys.includes(recYear))) recYear=ys[0]||new Date().getFullYear();
   yearChips($('#recYears'),recYear,v=>{ recYear=v; renderRecords(); });
-  const inYear=DB.records.filter(r=>recYear==='all'||yearOf(r)===recYear);
+  const played=DB.records.filter(r=>!r.plan); const upcoming=DB.records.filter(r=>r.plan&&dday(r.date)>=0).sort((a,b)=>a.date<b.date?-1:(a.date>b.date?1:0));
+  const inYear=played.filter(r=>recYear==='all'||yearOf(r)===recYear);
   const holes=inYear.reduce((a,r)=>a+(r.holes||0),0); const cad=inYear.filter(r=>r.caddie).length; const abr=inYear.filter(r=>r.abroad).length;
   const sc=inYear.map(eq18).filter(v=>v!=null); const avg=sc.length?Math.round(sc.reduce((a,b)=>a+b,0)/sc.length*10)/10:null;
-  $('#recSub').textContent=DB.records.length?`전체 ${DB.records.length}회 기록`:'다녀온 라운드를 남겨두자';
+  $('#recSub').textContent=DB.records.length?`전체 ${played.length}회 기록${upcoming.length?` · 예정 ${upcoming.length}`:''}`:'다녀온 라운드를 남겨두자';
   $('#recHero').innerHTML=`<div class="yhero"><div class="ring"></div><div class="y">${recYear==='all'?'전체 기간':recYear+'년'} 골프</div><div class="big"><b>${inYear.length}<small>회</small></b><b>${holes.toLocaleString('ko-KR')}<small>홀</small></b></div><div class="chips"><span>캐디 ${cad}</span><span>노캐디 ${inYear.length-cad}</span><span>해외 ${abr}</span>${avg!=null?`<span>평균 ${avg}타</span>`:''}</div></div>`;
+  renderCal();
+  const pb=$('#recPlans'); pb.innerHTML=upcoming.length?`<div class="mhd pl"><span>다가오는 예정</span><small>${upcoming.length}개</small></div>${upcoming.map(recCard).join('')}`:''; bindRecCards(pb);
   $$('#recFilter button').forEach(b=>{ b.classList.toggle('on',b.dataset.f===recFilter); b.onclick=()=>{ recFilter=b.dataset.f; vib(6); renderRecords(); }; });
-  const list=inYear.filter(r=>recFilter==='all'||(recFilter==='abroad')===!!r.abroad).sort(recSort);
+  const pastPlans=DB.records.filter(r=>r.plan&&dday(r.date)<0&&(recYear==='all'||yearOf(r)===recYear));
+  const list=inYear.concat(pastPlans).filter(r=>recFilter==='all'||(recFilter==='abroad')===!!r.abroad).sort(recSort);
   const box=$('#recList');
-  if(!DB.records.length){ box.innerHTML=`<div class="emptyc" style="margin-top:14px">아직 기록 없음<br>아래 <b>+</b> 로 라운드 추가하거나<br>메모장 기록을 한 번에 가져오기<button class="btn ghost sm" id="emptyImp">메모 가져오기</button></div>`; $('#emptyImp').onclick=openImport; return; }
+  if(!DB.records.length){ box.innerHTML=`<div class="emptyc" style="margin-top:14px">아직 기록 없음<br>아래 <b>+</b> 로 라운드나 예정 추가<br>메모장 기록은 한 번에 가져오기<button class="btn ghost sm" id="emptyImp">메모 가져오기</button></div>`; $('#emptyImp').onclick=openImport; return; }
   if(!list.length){ box.innerHTML=`<div class="emptyc" style="margin-top:14px">이 조건엔 기록 없음</div>`; return; }
-  let html='', lastKey='';
+  let html='';
   const groups={}; list.forEach(r=>{ const k=r.date.slice(0,7); (groups[k]=groups[k]||[]).push(r); });
-  Object.keys(groups).sort().reverse().forEach(k=>{ const g=groups[k]; const [y,m]=k.split('-'); const gh=g.reduce((a,r)=>a+(r.holes||0),0);
-    html+=`<div class="mhd"><span>${recYear==='all'?y+'. ':''}${+m}월</span><small>${g.length}회 · ${gh}홀</small></div>`;
-    g.forEach(r=>{ const d=+r.date.slice(8,10); const sub=[r.abroad&&r.country?`${r.country} ${r.region||''}`.trim():r.region, r.holes!==18?r.holes+'홀':'', (r.mates||[]).join(', ')].filter(Boolean).join(' · ');
-      const diff=r.score&&r.holes===18?r.score-72:null;
-      html+=`<button class="rec" data-id="${r.id}"><div class="dt"><b>${d}</b><small>${+m}월 ${dowOf(r.date)}</small></div><div class="mid"><b>${esc(r.course||r.region||'골프장 미입력')}</b>${sub?`<small>${esc(sub)}</small>`:''}<div class="tags">${r.abroad?'<span class="tg abr">해외</span>':''}<span class="tg ${r.caddie?'cad':''}">${r.caddie?'캐디':'노캐디'}</span>${r.memo?'<span class="tg">메모</span>':''}</div></div><div class="rs">${r.score?`<b>${r.score}</b><small>${r.holes!==18?r.holes+'홀':(diff>0?'+'+diff:diff)}</small>`:'<b class="none">—</b>'}</div></button>`; });
-  });
-  box.innerHTML=html;
-  box.querySelectorAll('.rec').forEach(b=>b.onclick=()=>{ const r=DB.records.find(x=>x.id===b.dataset.id); if(r) openRecForm(r); });
+  Object.keys(groups).sort().reverse().forEach(k=>{ const g=groups[k]; const [y,m]=k.split('-'); const gp=g.filter(r=>!r.plan); const gh=gp.reduce((a,r)=>a+(r.holes||0),0);
+    html+=`<div class="mhd"><span>${recYear==='all'?y+'. ':''}${+m}월</span><small>${gp.length}회 · ${gh}홀</small></div>`+g.map(recCard).join(''); });
+  box.innerHTML=html; bindRecCards(box);
 }
 
 /* ---------- ⓑ 기록 입력 ---------- */
 function openRecForm(rec,preset){
   editRec=rec||null;
   if(rec) F=JSON.parse(JSON.stringify(rec));
-  else { const last=DB.records.slice().sort(recSort)[0]; F=Object.assign({id:uid(),created:Date.now(),date:today(),abroad:false,country:'',region:'',course:'',caddie:last?last.caddie:true,holes:18,mates:[],score:null,memo:''},preset||{}); }
-  $('#rfTitle').textContent=rec?'기록 수정':'새 기록'; $('#rfDel').hidden=!rec;
+  else { const last=DB.records.slice().sort(recSort)[0]; F=Object.assign({id:uid(),created:Date.now(),date:today(),plan:false,abroad:false,country:'',region:'',course:'',caddie:last?last.caddie:true,holes:18,mates:[],score:null,memo:''},preset||{}); }
+  $('#rfDel').hidden=!rec;
   $('#fDate').value=F.date; $('#fCountry').value=F.country||''; $('#fRegion').value=F.region||''; $('#fCourse').value=F.course||''; $('#fScore').value=F.score||''; $('#fMemo').value=F.memo||''; $('#fMate').value='';
   renderFormBits(); show('#s-recform');
 }
@@ -922,6 +1022,7 @@ function renderFormBits(){
   $$('#fAbroad button').forEach(b=>b.classList.toggle('on',+b.dataset.v===(F.abroad?1:0)));
   $$('#fCaddie button').forEach(b=>b.classList.toggle('on',+b.dataset.v===(F.caddie?1:0)));
   $('#hVal').innerHTML=`${F.holes}<small>홀</small>`; $$('#hChips button').forEach(b=>b.classList.toggle('on',+b.dataset.h===F.holes));
+  $('#rfTitle').textContent=(editRec?'':'새 ')+(F.plan?'예정':'기록')+(editRec?' 수정':''); $$('#fKind button').forEach(b=>b.classList.toggle('on',+b.dataset.v===(F.plan?1:0))); $('#scoreWrap').hidden=!!F.plan; $('#rfSave').textContent=F.plan?'예정 저장':'저장';
   $('#countryWrap').hidden=!F.abroad; renderSuggCountry();
   renderSuggRegion(); renderSuggCourse(); renderMates(); scoreHint();
 }
@@ -942,6 +1043,8 @@ function renderMates(){ const box=$('#mates'); box.innerHTML=F.mates.map((m,i)=>
   sb.querySelectorAll('button').forEach(b=>b.onclick=()=>{ F.mates.push(b.dataset.k); $('#fMate').value=''; vib(5); renderMates(); }); }
 function addMate(){ const v=$('#fMate').value.trim(); if(!v) return; v.split(/[,，·\/]/).map(s=>s.trim()).filter(Boolean).forEach(s=>{ if(!F.mates.includes(s)) F.mates.push(s); }); $('#fMate').value=''; vib(6); renderMates(); }
 function scoreHint(){ const s=+$('#fScore').value||0; const par=Math.round(72*F.holes/18); $('#shint').textContent=s?`${F.holes}홀 파 ${par} 기준 ${s-par>0?'+':''}${s-par}${F.holes!==18?` · 18홀 환산 ${Math.round(s*18/F.holes)}타`:''}`:''; }
+$$('#fKind button').forEach(b=>b.onclick=()=>{ F.plan=b.dataset.v==='1'; F._kindTouched=true; vib(6); renderFormBits(); });
+$('#fDate').onchange=e=>{ F.date=e.target.value; if(!editRec&&!F._kindTouched){ F.plan=dday(F.date)>0; renderFormBits(); } };
 $$('#fAbroad button').forEach(b=>b.onclick=()=>{ F.abroad=b.dataset.v==='1'; vib(6); renderFormBits(); });
 $$('#fCaddie button').forEach(b=>b.onclick=()=>{ F.caddie=b.dataset.v==='1'; vib(6); renderFormBits(); });
 $('#hMinus').onclick=()=>{ F.holes=Math.max(9,F.holes-9); vib(5); renderFormBits(); };
@@ -960,10 +1063,10 @@ $('#rfClose').onclick=()=>{ renderRecords(); show('#s-rec'); };
 $('#rfSave').onclick=()=>{
   F.date=$('#fDate').value||today(); F.country=F.abroad?$('#fCountry').value.trim():''; F.region=$('#fRegion').value.trim(); F.course=$('#fCourse').value.trim(); F.memo=$('#fMemo').value.trim();
   if($('#fMate').value.trim()) addMate();
-  const s=parseInt($('#fScore').value,10); F.score=s>0?s:null;
+  const s=parseInt($('#fScore').value,10); F.score=(!F.plan&&s>0)?s:null; F.plan=!!F.plan; delete F._kindTouched;
   if(!F.course&&!F.region){ toast('골프장이나 지역은 넣어줘'); $('#fCourse').focus(); return; }
   if(editRec) Object.assign(editRec,F); else DB.records.push(F);
-  save(); vib([10,30,10]); recYear=yearOf(F); toast(editRec?'수정됨':'기록 저장'); renderRecords(); show('#s-rec');
+  save(); vib([10,30,10]); recYear=yearOf(F); toast(editRec?'수정됨':(F.plan?'예정 저장':'기록 저장')); renderRecords(); show('#s-rec');
 };
 $('#rfDel').onclick=()=>{ sheet(`<h4>이 기록 삭제할까?</h4><div class="mut" style="font-size:13px;font-weight:600;margin-bottom:14px">${esc(F.date)} ${esc(F.course||F.region)}</div><div class="row"><button class="btn ghost sm" id="dno">취소</button><button class="btn danger sm" id="dyes">삭제</button></div>`); $('#dno').onclick=closeSheet; $('#dyes').onclick=()=>{ DB.records=DB.records.filter(r=>r!==editRec); save(); closeSheet(); toast('삭제됨'); renderRecords(); show('#s-rec'); }; };
 $('#recImportBtn').onclick=()=>openImport();
@@ -972,7 +1075,7 @@ $('#recImportBtn').onclick=()=>openImport();
 function renderStats(){
   const ys=recYears(); if(statYear==null||(statYear!=='all'&&!ys.includes(statYear))) statYear=ys[0]||new Date().getFullYear();
   yearChips($('#stYears'),statYear,v=>{ statYear=v; renderStats(); });
-  const L=DB.records.filter(r=>statYear==='all'||yearOf(r)===statYear).sort((a,b)=>a.date<b.date?-1:1);
+  const L=DB.records.filter(r=>!r.plan&&(statYear==='all'||yearOf(r)===statYear)).sort((a,b)=>a.date<b.date?-1:1);
   $('#stSub').textContent=statYear==='all'?'전체 기간':statYear+'년';
   const body=$('#stBody');
   if(!L.length){ body.innerHTML=`<div class="emptyc">기록이 쌓이면 여기 통계가 나옴</div>`; return; }
@@ -1073,7 +1176,17 @@ $('#recFab').onclick=()=>openRecForm(null);
 window.addEventListener('resize',()=>{ if($('#s-stats').classList.contains('active')) renderStats(); });
 
 /* =================== 시작 =================== */
-renderRecords(); show('#s-rec');
+window.appBack=function(){
+  if($('#sheetBg').classList.contains('show')){ closeSheet(); return true; }
+  const a=$('.screen.active'); const id=a?'#'+a.id:'';
+  if(id==='#s-recform'||id==='#s-import'||id==='#s-stats'||id==='#s-list'){ renderRecords(); show('#s-rec'); return true; }
+  if(id==='#s-rule'){ renderSetup(); show('#s-setup'); return true; }
+  if(id==='#s-setup'){ $('#setupClose').click(); return true; }
+  if(id==='#s-hole'||id==='#s-result'){ save(); renderList(); show('#s-list'); return true; }
+  if(id==='#s-draw'){ renderHole(); return true; }
+  return false;
+};
+renderRecords(); show('#s-rec'); setTimeout(syncNative,300);
 window.addEventListener('beforeunload',save);
 document.addEventListener('visibilitychange',()=>{ if(document.hidden) save(); });
 </script>
