@@ -22,6 +22,8 @@ import java.util.HashMap;
 /** 골프 내기: 로컬 assets/www 를 https://app.local 로 서빙하는 WebView 껍데기. */
 public class MainActivity extends Activity {
   private WebView wv;
+  private boolean loaded = false;
+  private String pendingJs = null;
 
   @Override protected void onCreate(Bundle b) {
     super.onCreate(b);
@@ -66,6 +68,10 @@ public class MainActivity extends Activity {
               new HashMap<String, String>(), new ByteArrayInputStream(new byte[0]));
         }
       }
+      @Override public void onPageFinished(WebView v, String url) {
+        loaded = true;
+        if (pendingJs != null) { v.evaluateJavascript(pendingJs, null); pendingJs = null; }
+      }
       @Override public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest req) {
         Uri u = req.getUrl();
         if (u != null && "app.local".equals(u.getHost())) return false;
@@ -77,7 +83,19 @@ public class MainActivity extends Activity {
     wv.addJavascriptInterface(new GolfBridge(this), "GolfNative");
     setContentView(wv);
     wv.loadUrl("https://app.local/index.html");
+    handleIntent(getIntent());
   }
+
+  @Override protected void onNewIntent(Intent i) { super.onNewIntent(i); setIntent(i); handleIntent(i); }
+
+  /** 위젯에서 누른 버튼/날짜 → 웹 화면의 해당 기능으로 바로 이동 */
+  private void handleIntent(Intent i) {
+    Uri u = i == null ? null : i.getData();
+    if (u == null || !"golf".equals(u.getScheme())) return;
+    String js = "window.widgetOpen&&window.widgetOpen('" + safe(u.getQueryParameter("a")) + "','" + safe(u.getQueryParameter("d")) + "','" + safe(u.getQueryParameter("id")) + "')";
+    if (loaded && wv != null) wv.evaluateJavascript(js, null); else pendingJs = js;
+  }
+  static String safe(String s) { return s == null ? "" : s.replaceAll("[^A-Za-z0-9\\-]", ""); }
 
   /** 뒤로 키: 웹 화면이 처리하면(이전 화면으로) 그대로, 첫 화면이면 앱 종료 */
   @Override public void onBackPressed() {
@@ -91,7 +109,7 @@ public class MainActivity extends Activity {
   }
 
   @Override protected void onPause() { super.onPause(); if (wv != null) wv.onPause(); }
-  @Override protected void onResume() { super.onResume(); if (wv != null) wv.onResume(); }
+  @Override protected void onResume() { super.onResume(); if (wv != null) wv.onResume(); GolfWidget.updateAll(this); }
 
   static String mime(String p) {
     String l = p.toLowerCase();

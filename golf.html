@@ -632,7 +632,10 @@
 const KEY='golfbet.v1';
 const DB=(()=>{ try{ return JSON.parse(localStorage.getItem(KEY))||{rounds:[],theme:'dark',names:[]}; }catch(e){ return {rounds:[],theme:'dark',names:[]}; } })();
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){} clearTimeout(save._n); save._n=setTimeout(syncNative,600); }
-function syncNative(){ try{ if(window.GolfNative&&GolfNative.saveDays) GolfNative.saveDays((DB.records||[]).map(r=>r.date+':'+(r.plan?1:0)).join(',')); }catch(e){} }
+function syncNative(){ try{ if(!(window.GolfNative&&GolfNative.saveSummary)) return; const recs=DB.records||[]; const y=new Date().getFullYear();
+  const played=recs.filter(r=>!r.plan&&+r.date.slice(0,4)===y);
+  const plans=recs.filter(r=>r.plan&&dday(r.date)>=0).sort((a,b)=>a.date<b.date?-1:(a.date>b.date?1:0)).slice(0,10).map(r=>({id:r.id,date:r.date,course:r.course||r.region||'',mates:(r.mates||[]).join(', ')}));
+  GolfNative.saveSummary(JSON.stringify({y,n:played.length,h:played.reduce((a,r)=>a+(r.holes||0),0),days:recs.map(r=>r.date+':'+(r.plan?1:0)),plans})); }catch(e){} }
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const fmt=n=>{ const a=Math.abs(Math.round(n)); return (n<0?'−':'')+a.toLocaleString('ko-KR'); };
 const fmtS=n=>n>0?'+'+fmt(n):(n<0?fmt(n):'0');
@@ -1176,6 +1179,18 @@ $('#recFab').onclick=()=>openRecForm(null);
 window.addEventListener('resize',()=>{ if($('#s-stats').classList.contains('active')) renderStats(); });
 
 /* =================== 시작 =================== */
+/* 홈 화면 위젯에서 눌렀을 때 */
+window.widgetOpen=function(a,d,id){
+  closeSheet(); const r=id?DB.records.find(x=>x.id===id):null;
+  const tmr=()=>{ const t=new Date(); t.setDate(t.getDate()+1); return `${t.getFullYear()}-${pad(t.getMonth()+1)}-${pad(t.getDate())}`; };
+  renderRecords(); show('#s-rec');
+  if(a==='day'&&d){ calY=+d.slice(0,4); calM=+d.slice(5,7); renderCal(); dayTap(d); return; }
+  if(a==='add'){ openRecForm(null,{date:d||today(),plan:false}); return; }
+  if(a==='plan'){ openRecForm(null,{date:tmr(),plan:true}); return; }
+  if(a==='open'&&r){ openRecForm(r); return; }
+  if(a==='done'&&r){ openRecForm(r); F.plan=false; renderFormBits(); toast('타수 넣고 저장하면 끝'); return; }
+  if(a==='stats'){ show('#s-stats'); renderStats(); return; }
+};
 window.appBack=function(){
   if($('#sheetBg').classList.contains('show')){ closeSheet(); return true; }
   const a=$('.screen.active'); const id=a?'#'+a.id:'';
