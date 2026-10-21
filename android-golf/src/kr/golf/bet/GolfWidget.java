@@ -114,7 +114,7 @@ public class GolfWidget extends AppWidgetProvider {
     String pre = ym[0] + "-" + two(ym[1]) + "-"; String day = sel > 0 ? pre + two(sel) : null;
     List<JSONObject> out = new ArrayList<>();
     for (JSONObject o : records(c)) { String d = o.optString("d"); if (day != null ? d.equals(day) : d.startsWith(pre)) out.add(o); }
-    Collections.sort(out, BY_DATE);
+    Collections.sort(out, Collections.reverseOrder(BY_DATE));
     return out;
   }
 

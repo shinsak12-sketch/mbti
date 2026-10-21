@@ -1061,7 +1061,7 @@ function renderMonthList(){
   const box=$('#recMonth'); if(recView!=='month'){ box.innerHTML=''; return; }
   const pre=`${calY}-${pad(calM)}-`; const sel=selDay?pre+pad(selDay):null;
   let list=DB.records.filter(r=>r.date.startsWith(pre)); if(sel) list=list.filter(r=>r.date===sel);
-  list.sort((a,b)=>a.date<b.date?-1:(a.date>b.date?1:(a.created||0)-(b.created||0)));
+  list.sort(recSort);
   const gp=list.filter(r=>!r.plan), gl=list.filter(r=>r.plan); const gh=gp.reduce((a,r)=>a+(r.holes||0),0);
   let head;
   if(sel) head=`<div class="mhd"><span>${calM}월 ${selDay}일 (${dowOf(sel)})</span><button class="lk" id="selClear">${calM}월 전체</button></div>`;
@@ -1129,7 +1129,7 @@ function renderRecords(){
   $('#recHero').innerHTML=`<div class="yhero"><div class="ring"></div><div class="y">${recYear==='all'?'전체 기간':recYear+'년'} 골프</div><div class="big"><b>${inYear.length}<small>회</small></b><b>${holes.toLocaleString('ko-KR')}<small>홀</small></b></div><div class="chips"><span>캐디 ${cad}</span><span>노캐디 ${inYear.length-cad}</span><span>해외 ${abr}</span>${avg!=null?`<span>평균 ${avg}타</span>`:''}</div></div>`;
   $('#recHero .yhero').onclick=()=>{ recView=recView==='year'?'month':'year'; vib(6); renderRecords(); if(recView==='year') setTimeout(()=>$('#recView').scrollIntoView({behavior:'smooth',block:'start'}),50); };
   renderNext(); renderCal();
-  $$('#recView button').forEach(b=>{ b.classList.toggle('on',b.dataset.v===recView); b.textContent=b.dataset.v==='month'?`${calM}월`:`${recYear==='all'?'전체 기간':recYear+'년'} 전체`; b.onclick=()=>{ recView=b.dataset.v; vib(6); renderRecords(); }; });
+  $$('#recView button').forEach(b=>{ b.classList.toggle('on',b.dataset.v===recView); b.textContent=b.dataset.v==='month'?`${calM}월`:(recYear==='all'?'전체 기간':`${recYear}년 전체`); b.onclick=()=>{ recView=b.dataset.v; vib(6); renderRecords(); }; });
   $('#recYearBox').hidden=recView!=='year'; renderMonthList();
   $$('#recFilter button').forEach(b=>{ b.classList.toggle('on',b.dataset.f===recFilter); b.onclick=()=>{ recFilter=b.dataset.f; vib(6); renderRecords(); }; });
   const pastPlans=DB.records.filter(r=>r.plan&&dday(r.date)<0&&(recYear==='all'||yearOf(r)===recYear));
