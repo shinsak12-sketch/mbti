@@ -883,6 +883,10 @@
 <div class="sheet-bg" id="sheetBg"><div class="sheet" id="sheet"></div></div>
 
 <script>
+/* 시작하다 오류 나면 검은 화면 대신 원인 보이게 */
+window.addEventListener('error',e=>{ if(document.querySelector('.screen.active')) return; const d=document.createElement('div'); d.style.cssText='position:fixed;left:16px;right:16px;top:40%;padding:16px;border-radius:16px;background:#2a1d1f;color:#ffb4b4;font:700 13px/1.5 system-ui;z-index:99'; d.textContent='앱 시작 중 오류 · 화면 캡처해서 보내줘 · '+(e.message||e); document.body.appendChild(d); });
+</script>
+<script>
 /* =================== 위젯 팝업 모드 =================== */
 const QS=new URLSearchParams(location.search); const POPUP=QS.get('popup')==='1';
 if(POPUP){ document.documentElement.classList.add('popup'); document.body.classList.add('popup'); }
@@ -890,7 +894,7 @@ function popupClose(){ try{ syncNative(); }catch(e){} setTimeout(()=>{ try{ if(w
 /* =================== 저장 =================== */
 const KEY='golfbet.v1';
 const DB=(()=>{ try{ return JSON.parse(localStorage.getItem(KEY))||{rounds:[],theme:'dark',names:[]}; }catch(e){ return {rounds:[],theme:'dark',names:[]}; } })();
-function save(){ try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){} clearTimeout(save._n); save._n=setTimeout(syncNative,600); if(typeof onSaved==='function') onSaved(); }
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){} clearTimeout(save._n); save._n=setTimeout(syncNative,600); try{ onSaved(); }catch(e){} }
 function syncNative(){ try{ if(!(window.GolfNative&&GolfNative.saveSummary)) return;
   const recs=(DB.records||[]).map(r=>({i:r.id,d:r.date,p:r.plan?1:0,c:r.course||r.region||'',g:r.abroad?[r.country,r.region].filter(Boolean).join(' '):(r.region||''),m:(r.mates||[]).join(', '),k:r.caddie?1:0,h:r.holes||18,s:r.score||0,o:r.created||0,t:r.tee||''}));
   const S=DB.sync; GolfNative.saveSummary(JSON.stringify({v:3,records:recs,rem:remCfg(),sync:S&&S.token?{url:SYNC_URL,token:S.token,name:(S.me||{}).name||''}:undefined,dropped:S&&S.dropped||undefined})); }catch(e){} }
@@ -1574,8 +1578,8 @@ const SYNC_URL='https://golf-sync-issac-s-projects1.vercel.app/api/';
 SV.link='<svg class="i" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>';
 SV.share='<svg class="i" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/></svg>';
 SV.cloud='<svg class="i" viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 .6-8A6 6 0 0 0 6 9.5 4.3 4.3 0 0 0 7 18z"/><path d="M12 11v5M9.5 13.5L12 11l2.5 2.5"/></svg>';
-const SY=()=>DB.sync||(DB.sync={});
-const online=()=>!!(DB.sync&&DB.sync.token);
+function SY(){ return DB.sync||(DB.sync={}); }
+function online(){ return !!(DB.sync&&DB.sync.token); }
 async function api(op,o={}){ const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),o.timeout||15000);
   try{ const h={}; if(DB.sync&&DB.sync.token) h['x-golf-token']=DB.sync.token; if(o.body) h['content-type']='application/json';
     const r=await fetch(SYNC_URL+op+(o.q||''),{method:o.method||(o.body||o.raw?'POST':'GET'),headers:h,body:o.raw||(o.body?JSON.stringify(o.body):undefined),signal:ctl.signal,cache:'no-store'});
@@ -1630,8 +1634,8 @@ async function uploadPhotos(){ if(!online()||upBusy) return; upBusy=true; const 
 async function fetchPhoto(id){ if(!online()) return null; const b=await api('photo',{q:'?id='+id,blob:true,timeout:30000}).catch(()=>null); if(!b) return null;
   const im=await loadImg(b).catch(()=>null); if(!im) return null; const w=im.naturalWidth,h=im.naturalHeight,sz=Math.min(w,h); const tc=document.createElement('canvas'); tc.width=tc.height=200; tc.getContext('2d').drawImage(im,(w-sz)/2,(h-sz)/2,sz,sz,0,0,200,200);
   const th=await toBlob(tc,.8); await PH.put(id,b,th); SY().phUp=Object.assign(SY().phUp||{},{[id]:1}); return PH.thumb(id); }
-let onSavedT=null;
-function onSaved(){ if(!online()||POPUP&&!navigator.onLine) return; clearTimeout(onSavedT); onSavedT=setTimeout(()=>{ diffShares(); clearTimeout(onSaved._b); onSaved._b=setTimeout(()=>backupNow(),20000); },1200); }
+var onSavedT=null, booted=false;
+function onSaved(){ if(!booted||!online()||POPUP&&!navigator.onLine) return; clearTimeout(onSavedT); onSavedT=setTimeout(()=>{ diffShares(); clearTimeout(onSaved._b); onSaved._b=setTimeout(()=>backupNow(),20000); },1200); }
 let tickAt=0;
 async function syncTick(now){ if(!online()||POPUP) return; if(!now&&Date.now()-tickAt<4*60000) return; tickAt=Date.now(); flushOutbox(); await pollInbox(); diffShares(); backupNow(); }
 setInterval(()=>{ if(!document.hidden) syncTick(); },5*60000);
@@ -1882,7 +1886,9 @@ if(POPUP){
   else if(a==='score'&&r){ document.body.classList.add('menu'); scoreSheet(r); }
   else if(a==='plan'){ openRecForm(null,{date:(d&&d>today())?d:tmr(),plan:true}); }
   else openRecForm(null,{date:d||today(),plan:false});
-} else { renderRecords(); show('#s-rec'); setTimeout(syncNative,300); setTimeout(()=>syncTick(true),800); if(DB.records.some(r=>r.plan&&dday(r.date)>=0)) setTimeout(askNotify,1500); }
+} 
+booted=true;
+if(!POPUP){ renderRecords(); show('#s-rec'); setTimeout(syncNative,300); setTimeout(()=>syncTick(true),800); if(DB.records.some(r=>r.plan&&dday(r.date)>=0)) setTimeout(askNotify,1500); }
 window.addEventListener('beforeunload',save);
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){ save(); return; }
