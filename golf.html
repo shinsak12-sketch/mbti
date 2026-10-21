@@ -276,14 +276,149 @@
   .sheet h4{font-size:17px;font-weight:900;margin-bottom:12px}
   .sheet .chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 14px}
   .sheet .chips button{padding:8px 12px;border-radius:999px;font-weight:800;font-size:12.5px;background:var(--chip)}
+
+  /* ===== 탭 · 공통 ===== */
+  :root{--c1:#6fa516;--c2:#4a83ea}
+  html[data-theme=light]{--c1:#16a34a;--c2:#2f6fed}
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:none;justify-content:center;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:var(--bg);background:color-mix(in srgb,var(--bg) 84%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+  body.has-tabs .tabbar{display:flex}
+  body.has-tabs .toast{bottom:calc(96px + env(safe-area-inset-bottom))}
+  body.has-tabs .app{padding-bottom:calc(100px + env(safe-area-inset-bottom))}
+  .tabbar .in{display:flex;gap:6px;max-width:520px;width:100%}
+  .tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 7px;border-radius:15px;font-size:11px;font-weight:800;color:var(--mut);transition:background .2s,color .2s}
+  .tabbar button svg{width:22px;height:22px}
+  .tabbar button.on{color:var(--ink);background:var(--card);box-shadow:var(--sh)}
+  .tabbar button.on svg{color:var(--acc)}
+  .tabbar button:active{transform:scale(.95)}
+  .fab{position:fixed;right:max(16px,calc(50vw - 244px));bottom:calc(86px + env(safe-area-inset-bottom));width:60px;height:60px;border-radius:20px;background:var(--acc);color:var(--accink);display:none;place-items:center;box-shadow:0 18px 30px -10px rgba(0,0,0,.7);z-index:41;transition:transform .12s}
+  .fab:active{transform:scale(.92)}
+  .fab svg{width:28px;height:28px;stroke-width:2.6}
+  body[data-tab=rec] .fab{display:grid}
+
+  /* ===== 기록 목록 ===== */
+  .yrchips{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;scrollbar-width:none;padding:2px}
+  .yrchips::-webkit-scrollbar{display:none}
+  .yrchips button{padding:8px 14px;border-radius:999px;font-weight:800;font-size:13px;background:var(--card);border:1px solid var(--line);color:var(--mut);flex:none}
+  .yrchips button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .yhero{background:var(--hero);color:var(--heroink);border-radius:24px;padding:18px;position:relative;overflow:hidden;margin-bottom:14px;box-shadow:var(--sh)}
+  .yhero .y{font-size:12px;font-weight:800;letter-spacing:.1em;opacity:.75}
+  .yhero .big{display:flex;align-items:baseline;gap:16px;margin-top:6px}
+  .yhero .big b{font-size:44px;font-weight:900;letter-spacing:-2px;line-height:1}
+  .yhero .big b small{font-size:15px;font-weight:800;opacity:.75;margin-left:3px;letter-spacing:0}
+  .yhero .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;position:relative}
+  .yhero .chips span{font-size:11.5px;font-weight:800;padding:5px 10px;border-radius:999px;background:rgba(0,0,0,.13)}
+  html[data-theme=light] .yhero .chips span{background:rgba(255,255,255,.14)}
+  .yhero .ring{position:absolute;right:-50px;top:-60px;width:180px;height:180px;border-radius:50%;border:28px solid rgba(0,0,0,.08)}
+  html[data-theme=light] .yhero .ring{border-color:rgba(255,255,255,.07)}
+  .mhd{display:flex;justify-content:space-between;align-items:baseline;margin:18px 4px 8px;font-size:14px;font-weight:900;letter-spacing:-.3px}
+  .mhd small{font-size:11px;color:var(--mut);font-weight:700;letter-spacing:0}
+  .rec{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:11px 12px;margin-bottom:8px;width:100%;text-align:left;box-shadow:var(--sh);transition:transform .1s}
+  .rec:active{transform:scale(.985)}
+  .rec .dt{width:48px;flex:none;text-align:center;border-radius:14px;background:var(--chip);padding:7px 0 6px}
+  .rec .dt b{display:block;font-size:20px;font-weight:900;letter-spacing:-.6px;line-height:1.05}
+  .rec .dt small{font-size:10px;font-weight:800;color:var(--mut)}
+  .rec .mid{flex:1;min-width:0}
+  .rec .mid b{display:block;font-size:15px;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rec .mid small{display:block;font-size:11.5px;color:var(--mut);font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rec .tags{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+  .tg{font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:var(--chip);color:var(--mut)}
+  .tg.cad{background:var(--accs);color:var(--acc)} .tg.abr{background:var(--blues);color:var(--blue)}
+  .rec .rs{flex:none;text-align:right;min-width:44px}
+  .rec .rs b{display:block;font-size:23px;font-weight:900;letter-spacing:-1px;line-height:1.05}
+  .rec .rs small{font-size:10.5px;color:var(--mut);font-weight:800}
+  .rec .rs .none{font-size:15px;color:var(--mut)}
+  .emptyc{background:var(--card);border:1.5px dashed var(--line);border-radius:20px;padding:26px 16px;text-align:center;color:var(--mut);font-weight:700;font-size:13px;line-height:1.7}
+  .emptyc .btn{margin-top:14px}
+
+  /* ===== 기록 입력 ===== */
+  .sugg{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .sugg:empty{display:none}
+  .sugg button{padding:7px 11px;border-radius:999px;font-size:12px;font-weight:800;background:var(--chip);color:var(--ink);transition:transform .08s}
+  .sugg button:active{transform:scale(.94)}
+  .sugg button small{color:var(--mut);font-weight:700;margin-left:4px}
+  .mates{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .mates:empty{display:none}
+  .mates span{display:inline-flex;align-items:center;gap:6px;padding:6px 6px 6px 12px;border-radius:999px;background:var(--acc);color:var(--accink);font-size:13px;font-weight:800;animation:pop .25s cubic-bezier(.3,1.5,.5,1)}
+  .mates span button{width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.18);color:inherit;display:grid;place-items:center}
+  .mates span button svg{width:12px;height:12px;stroke-width:3}
+  .inrow{display:flex;gap:8px}
+  .inrow .inp{flex:1}
+  .inrow .btn{width:auto;padding:0 18px;flex:none}
+  .scorein{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:8px}
+  .scorein input{flex:1;min-width:0;height:60px;border:none;background:transparent;font-size:36px;font-weight:900;text-align:center;letter-spacing:-1px;outline:none;color:var(--ink)}
+  .scorein input::placeholder{color:var(--mut);font-size:16px;font-weight:700;letter-spacing:0}
+  .scorein .b{width:46px;height:46px;border-radius:14px;background:var(--chip);display:grid;place-items:center;font-size:22px;font-weight:600;flex:none}
+  .scorein .b:active{transform:scale(.9)}
+  .shint{text-align:center;font-size:12px;font-weight:800;color:var(--mut);margin-top:6px;min-height:18px}
+  input[type=date].inp{font-size:16px}
+  textarea.inp{height:auto;min-height:84px;padding:12px 14px;resize:vertical;font-weight:600;line-height:1.5}
+  .hchips{display:flex;gap:6px;margin-top:8px}
+  .hchips button{flex:1;padding:9px 0;border-radius:12px;font-size:12.5px;font-weight:800;background:var(--chip);color:var(--mut)}
+  .hchips button.on{background:var(--ink);color:var(--bg)}
+
+  /* ===== 통계 ===== */
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:var(--sh);min-width:0}
+  .kpi small{display:block;font-size:11px;font-weight:800;color:var(--mut);letter-spacing:.04em}
+  .kpi b{display:block;font-size:30px;font-weight:900;letter-spacing:-1.3px;margin-top:4px;line-height:1.05}
+  .kpi b em{font-style:normal;font-size:13px;color:var(--mut);font-weight:800;margin-left:3px;letter-spacing:0}
+  .kpi span{display:block;font-size:11px;color:var(--mut);font-weight:600;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .kpi.hero{background:var(--hero);color:var(--heroink);border-color:var(--hero)}
+  .kpi.hero small,.kpi.hero span,.kpi.hero b em{color:inherit;opacity:.78}
+  .split{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:10px;box-shadow:var(--sh)}
+  .split .hd{display:flex;justify-content:space-between;font-size:13px;font-weight:800;margin-bottom:10px}
+  .split .hd small{color:var(--mut);font-weight:700;font-size:11.5px}
+  .split .bar{display:flex;gap:2px;height:16px}
+  .split .bar i{display:block;height:100%;border-radius:4px;min-width:4px;transition:width .5s cubic-bezier(.2,.8,.3,1)}
+  .split .lg{display:flex;justify-content:space-between;margin-top:9px;font-size:12px;font-weight:800}
+  .split .lg span{display:flex;align-items:center;gap:6px}
+  .split .lg span::before{content:'';width:10px;height:10px;border-radius:3px;background:var(--k)}
+  .split .lg em{font-style:normal;color:var(--mut);font-weight:700}
+  .chart{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 12px 10px;position:relative;box-shadow:var(--sh)}
+  .chart .ttl{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:800;margin:0 2px 4px}
+  .chart .ttl small{font-size:11px;color:var(--mut);font-weight:700}
+  .cols{display:grid;gap:4px;align-items:end;height:136px;padding-top:18px;border-bottom:1px solid var(--line)}
+  .cols .m{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;cursor:pointer;position:relative}
+  .cols .m i{display:block;width:70%;max-width:22px;background:var(--c1);border-radius:4px 4px 0 0;transition:height .5s cubic-bezier(.2,.8,.3,1)}
+  .cols .m em{font-style:normal;font-size:10.5px;font-weight:800;color:var(--ink);margin-bottom:3px}
+  .cols .m.on i{background:var(--acc)}
+  .clab{display:grid;gap:4px;margin-top:5px}
+  .clab span{text-align:center;font-size:10px;color:var(--mut);font-weight:700}
+  .tip{position:absolute;left:0;top:0;pointer-events:none;background:var(--ink);color:var(--bg);font-size:11.5px;font-weight:800;padding:6px 9px;border-radius:9px;white-space:nowrap;transform:translate(-50%,calc(-100% - 8px));opacity:0;transition:opacity .12s;z-index:5;line-height:1.35}
+  .tip small{display:block;font-weight:700;opacity:.75;font-size:10.5px}
+  .tip.show{opacity:1}
+  svg.trend{width:100%;height:160px;display:block;overflow:visible}
+  svg.trend text{font-family:inherit;font-size:10px;font-weight:700;fill:var(--mut)}
+  .rank{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:4px 14px;box-shadow:var(--sh)}
+  .rank .r{display:grid;grid-template-columns:18px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px;font-weight:800}
+  .rank .r:last-child{border:none}
+  .rank .r .n{color:var(--mut);font-size:11px;text-align:center}
+  .rank .r .nm{min-width:0}
+  .rank .r .nm div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rank .r .nm div small{color:var(--mut);font-weight:700;font-size:11px;margin-left:5px}
+  .rank .r .nm i{display:block;height:6px;border-radius:3px;background:var(--c1);margin-top:6px;transition:width .5s cubic-bezier(.2,.8,.3,1)}
+  .rank .r .v{text-align:right;font-size:14px;font-weight:900;min-width:66px}
+  .rank .r .v small{display:block;font-size:10.5px;color:var(--mut);font-weight:700}
+  .rank .none{padding:16px 0;text-align:center;color:var(--mut);font-weight:700;font-size:13px}
+
+  /* ===== 가져오기 ===== */
+  .prev{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:4px 12px;margin-top:10px;max-height:340px;overflow:auto}
+  .prev .p{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.5px;font-weight:700}
+  .prev .p:last-child{border:none}
+  .prev .p .d{width:62px;flex:none;color:var(--mut);font-weight:800}
+  .prev .p .c{flex:1;min-width:0}
+  .prev .p .c b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .prev .p .c small{color:var(--mut);font-weight:600}
+  .prev .p.dup{opacity:.4}
+  .note{font-size:12px;color:var(--mut);font-weight:600;line-height:1.6;margin-top:8px}
 </style>
 </head>
 <body>
 <div class="app">
 
 <!-- ① 리스트 -->
-<section class="screen active" id="s-list">
-  <div class="top"><div><h1>골프 내기</h1><div class="sm" id="listSub"></div></div><button class="ic" id="themeBtn" aria-label="테마"><svg class="i" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.5 0-1-.1-1.4A5.5 5.5 0 0 1 13.4 3.1 9 9 0 0 0 12 3z"/></svg></button></div>
+<section class="screen" id="s-list">
+  <div class="top"><div><h1>내기</h1><div class="sm" id="listSub"></div></div></div>
   <div class="stats" id="stats"></div>
   <div id="heroWrap"></div>
   <div class="lbl">라운드</div>
@@ -356,9 +491,84 @@
   <div class="lbl">스코어카드</div>
   <div class="card" style="padding:6px 8px;overflow-x:auto"><table class="sc" id="sctable"></table></div>
   <div class="row" style="margin-top:14px"><button class="btn ghost sm" id="resEdit">홀 수정</button><button class="btn sm" id="resHome">목록으로</button></div>
+  <div style="height:8px"></div><button class="btn ghost sm" id="resToRec">이 라운드 기록으로 저장</button>
+</section>
+
+<!-- ⓐ 기록 목록 -->
+<section class="screen" id="s-rec">
+  <div class="top"><div><h1>골프 기록</h1><div class="sm" id="recSub"></div></div>
+    <div class="row" style="gap:8px">
+      <button class="ic" id="recImportBtn" aria-label="가져오기 · 백업"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg></button>
+      <button class="ic" id="themeBtn" aria-label="테마"><svg class="i" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.5 0-1-.1-1.4A5.5 5.5 0 0 1 13.4 3.1 9 9 0 0 0 12 3z"/></svg></button>
+    </div>
+  </div>
+  <div class="yrchips" id="recYears"></div>
+  <div id="recHero"></div>
+  <div class="seg" id="recFilter"><button data-f="all">전체</button><button data-f="dom">국내</button><button data-f="abroad">해외</button></div>
+  <div id="recList"></div>
+</section>
+
+<!-- ⓑ 기록 입력 -->
+<section class="screen" id="s-recform">
+  <div class="top"><div><h1 id="rfTitle">새 기록</h1><div class="sm">다녀온 라운드 남기기</div></div><button class="ic" id="rfClose"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="lbl">날짜</div>
+  <input class="inp" type="date" id="fDate">
+  <div class="lbl">국내 · 해외</div>
+  <div class="seg" id="fAbroad"><button data-v="0">국내</button><button data-v="1">해외</button></div>
+  <div class="lbl">지역</div>
+  <input class="inp" id="fRegion" placeholder="예: 안성 · 후아힌 · 세부" maxlength="20" autocomplete="off">
+  <div class="sugg" id="sRegion"></div>
+  <div class="lbl">골프장</div>
+  <input class="inp" id="fCourse" placeholder="예: 포레스트시티 클래식" maxlength="40" autocomplete="off">
+  <div class="sugg" id="sCourse"></div>
+  <div class="lbl">캐디</div>
+  <div class="seg" id="fCaddie"><button data-v="1">캐디</button><button data-v="0">노캐디</button></div>
+  <div class="lbl">홀 수</div>
+  <div class="dial"><button class="b" id="hMinus">−</button><div class="lab">홀<small>9홀 단위</small></div><span class="v" id="hVal"></span><button class="b" id="hPlus">+</button></div>
+  <div class="hchips" id="hChips"><button data-h="9">9</button><button data-h="18">18</button><button data-h="27">27</button><button data-h="36">36</button></div>
+  <div class="lbl">동행자</div>
+  <div class="inrow"><input class="inp" id="fMate" placeholder="이름 쓰고 추가" maxlength="12" autocomplete="off"><button class="btn sm" id="mateAdd">추가</button></div>
+  <div class="mates" id="mates"></div>
+  <div class="sugg" id="sMates"></div>
+  <div class="lbl">타수 <small class="mut">안 쳤으면 비워두기</small></div>
+  <div class="scorein"><button class="b" id="sMinus">−</button><input id="fScore" type="number" inputmode="numeric" placeholder="타수 입력"><button class="b" id="sPlus">+</button></div>
+  <div class="shint" id="shint"></div>
+  <div class="lbl">메모</div>
+  <textarea class="inp" id="fMemo" placeholder="날씨 · 그린 상태 · 기억할 것" maxlength="300"></textarea>
+  <div style="height:14px"></div>
+  <button class="btn" id="rfSave">저장</button>
+  <div style="height:10px"></div>
+  <button class="btn ghost sm" id="rfDel" hidden>이 기록 삭제</button>
+</section>
+
+<!-- ⓒ 통계 -->
+<section class="screen" id="s-stats">
+  <div class="top"><div><h1>통계</h1><div class="sm" id="stSub"></div></div></div>
+  <div class="yrchips" id="stYears"></div>
+  <div id="stBody"></div>
+</section>
+
+<!-- ⓓ 가져오기 · 백업 -->
+<section class="screen" id="s-import">
+  <button class="back" id="impBack"><svg class="i" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>기록</button>
+  <div class="top"><div><h1>가져오기 · 백업</h1><div class="sm">메모장 기록 한 번에 넣기</div></div></div>
+  <div class="lbl">메모 붙여넣기</div>
+  <textarea class="inp" id="impText" style="min-height:180px" placeholder="26년 골프 35회 657홀&#10;2/16 조호바루 포레스트시티 클래식 노캐디&#10;3/15 골프존카운티 캐디(정상,이재)&#10;4/24 중원(27) 캐디(전충, 고경)"></textarea>
+  <div class="note">한 줄에 한 라운드 · <b>월/일 골프장 캐디|노캐디(동행자)</b> 형식 · 괄호 속 숫자는 홀 수 · "26년" 줄이 있으면 그 아래는 그 해로 들어감 · 연도 줄 없으면 아래 연도 사용</div>
+  <div class="lbl">연도 줄 없을 때 기본 연도</div>
+  <div class="seg" id="impYear"></div>
+  <div style="height:10px"></div>
+  <button class="btn ghost sm" id="impPrev">미리보기</button>
+  <div id="impOut"></div>
+  <div class="lbl" style="margin-top:24px">백업</div>
+  <div class="row"><button class="btn ghost sm" id="bakCopy">백업 복사</button><button class="btn ghost sm" id="bakLoad">백업 붙여넣기</button></div>
+  <div class="note">폰 바꾸거나 앱 지우기 전에 <b>백업 복사</b> 해서 카톡 나에게 보내기 같은 데 붙여두면 됨</div>
+  <div id="bakBox"></div>
 </section>
 
 </div>
+<nav class="tabbar" id="tabbar"><div class="in"><button data-t="rec"><svg class="i" viewBox="0 0 24 24"><path d="M7 3h10a2 2 0 0 1 2 2v16l-7-4-7 4V5a2 2 0 0 1 2-2z"/></svg>기록</button><button data-t="stats"><svg class="i" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>통계</button><button data-t="bet"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9v.01M18 15v.01"/></svg>내기</button></div></nav>
+<button class="fab" id="recFab" aria-label="새 기록"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
 <div class="toast" id="toast"></div>
 <div class="sheet-bg" id="sheetBg"><div class="sheet" id="sheet"></div></div>
 
@@ -372,7 +582,8 @@ const fmt=n=>{ const a=Math.abs(Math.round(n)); return (n<0?'−':'')+a.toLocale
 const fmtS=n=>n>0?'+'+fmt(n):(n<0?fmt(n):'0');
 const vib=p=>{ try{ navigator.vibrate&&navigator.vibrate(p); }catch(e){} };
 function toast(m,ms=1600){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),ms); }
-function show(id){ $$('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); window.scrollTo({top:0}); }
+const TABS={'#s-rec':'rec','#s-stats':'stats','#s-list':'bet'};
+function show(id){ $$('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); window.scrollTo({top:0}); const t=TABS[id]||''; document.body.classList.toggle('has-tabs',!!t); document.body.dataset.tab=t; $$('#tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.t===t)); }
 function applyTheme(){ document.documentElement.setAttribute('data-theme',DB.theme==='light'?'light':'dark'); document.querySelector('meta[name=theme-color]').content=DB.theme==='light'?'#f2f3f5':'#0e1014'; }
 applyTheme();
 $('#themeBtn').onclick=()=>{ DB.theme=DB.theme==='light'?'dark':'light'; save(); applyTheme(); vib(8); };
@@ -641,12 +852,215 @@ function renderResult(){
   t.innerHTML=html;
   $('#resEdit').onclick=()=>{ if(r.done){ r.done=false; } r.cur=Math.min(r.cur,r.holesN-1); save(); renderHole(); };
   $('#resHome').onclick=()=>{ save(); renderList(); show('#s-list'); };
+  $('#resToRec').onclick=()=>{ const d=new Date(r.created); openRecForm(null,{date:`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`,course:r.name||'',holes:r.holesN,mates:r.players.map(p=>p.name)}); toast('동행자에서 본인은 빼고 저장'); };
   $('#shareBtn').onclick=()=>{ const lines=[`[골프 내기] ${r.name||dateLabel(r.created)} · ${MODES[r.mode].label}`]; order.forEach((o,k)=>lines.push(`${k+1}. ${r.players[o.i].name} ${fmtS(o.v)}`)); if(tr.length){ lines.push('— 송금'); tr.forEach(x=>lines.push(`${r.players[x.from].name} → ${r.players[x.to].name} ${fmt(x.v)}`)); } if(fineTot) lines.push(`— 벌금통 ${fmt(fineTot)}`); const txt=lines.join('\n'); if(navigator.share){ navigator.share({text:txt}).catch(()=>{}); } else { navigator.clipboard&&navigator.clipboard.writeText(txt).then(()=>toast('복사됨')).catch(()=>toast('복사 실패')); } };
   show('#s-result');
 }
 
+
+/* =================== 골프 기록 · 통계 =================== */
+DB.records=DB.records||[];
+const OVERSEAS=['후아힌','방콕','파타야','치앙마이','치앙라이','푸켓','칸차나부리','카오야이','세부','클락','마닐라','보라카이','다낭','하노이','호치민','나트랑','냐짱','달랏','푸꾸옥','하이퐁','하롱','조호바루','쿠알라룸푸르','코타키나발루','페낭','랑카위','싱가포르','빈탄','바탐','발리','자카르타','타이중','타이베이','가오슝','오키나와','후쿠오카','미야자키','가고시마','구마모토','오사카','도쿄','홋카이도','삿포로','하와이','괌','사이판','하이난','칭다오','상해','상하이','웨이하이','연태','다롄','시안','비엔티안','방비엥','시엠립','프놈펜','울란바토르','골드코스트','시드니','오클랜드','라스베가스','팜스프링스','LA','두바이'];
+const DOMESTIC=['안성','여주','이천','용인','포천','가평','양평','춘천','홍천','원주','횡성','평창','강릉','군산','익산','전주','무주','고창','부안','나주','순천','여수','광양','해남','영암','부산','김해','양산','경주','대구','구미','청도','칠곡','청주','충주','제천','음성','진천','천안','아산','세종','대전','공주','부여','보령','태안','서산','당진','제주','서귀포','인천','영종','강화','화성','평택','파주','고양','김포','남양주','하남','곤지암','광주','문경','상주','안동','포항','울산','거제','통영','사천','진주','창원','함안','밀양','고성','홍성','예산','논산','장성','담양','곡성','화순','영광','함평','무안','목포','보성','장흥','강진','완도','진도','남원','정읍','김제'];
+const DOW='일월화수목금토';
+let recYear=null, recFilter='all', statYear=null, F=null, editRec=null, impRows=null;
+const pad=n=>String(n).padStart(2,'0');
+const today=()=>{ const d=new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const ICX='<svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+function eq18(r){ return r.score&&r.holes ? r.score*18/r.holes : null; }
+function recYears(){ return [...new Set(DB.records.map(r=>+r.date.slice(0,4)))].sort((a,b)=>b-a); }
+function recSort(a,b){ return a.date<b.date?1:(a.date>b.date?-1:(b.created||0)-(a.created||0)); }
+function yearOf(r){ return +r.date.slice(0,4); }
+function dowOf(s){ const [y,m,d]=s.split('-').map(Number); return DOW[new Date(y,m-1,d).getDay()]; }
+function countBy(list,keyFn){ const m=new Map(); list.forEach(r=>{ const ks=[].concat(keyFn(r)).filter(Boolean); ks.forEach(k=>m.set(k,(m.get(k)||0)+1)); }); return [...m.entries()].sort((a,b)=>b[1]-a[1]); }
+function yearChips(box,cur,onPick,withAll=true){ const ys=recYears(); if(!ys.length) ys.push(new Date().getFullYear()); const items=ys.map(y=>[y,y+'년']); if(withAll&&ys.length>1) items.push(['all','전체']); box.innerHTML=items.map(([v,l])=>`<button data-v="${v}" class="${String(v)===String(cur)?'on':''}">${l}</button>`).join(''); box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ onPick(b.dataset.v==='all'?'all':+b.dataset.v); vib(6); }); }
+
+/* ---------- ⓐ 기록 목록 ---------- */
+function renderRecords(){
+  const ys=recYears();
+  if(recYear==null||(recYear!=='all'&&!ys.includes(recYear))) recYear=ys[0]||new Date().getFullYear();
+  yearChips($('#recYears'),recYear,v=>{ recYear=v; renderRecords(); });
+  const inYear=DB.records.filter(r=>recYear==='all'||yearOf(r)===recYear);
+  const holes=inYear.reduce((a,r)=>a+(r.holes||0),0); const cad=inYear.filter(r=>r.caddie).length; const abr=inYear.filter(r=>r.abroad).length;
+  const sc=inYear.map(eq18).filter(v=>v!=null); const avg=sc.length?Math.round(sc.reduce((a,b)=>a+b,0)/sc.length*10)/10:null;
+  $('#recSub').textContent=DB.records.length?`전체 ${DB.records.length}회 기록`:'다녀온 라운드를 남겨두자';
+  $('#recHero').innerHTML=`<div class="yhero"><div class="ring"></div><div class="y">${recYear==='all'?'전체 기간':recYear+'년'} 골프</div><div class="big"><b>${inYear.length}<small>회</small></b><b>${holes.toLocaleString('ko-KR')}<small>홀</small></b></div><div class="chips"><span>캐디 ${cad}</span><span>노캐디 ${inYear.length-cad}</span><span>해외 ${abr}</span>${avg!=null?`<span>평균 ${avg}타</span>`:''}</div></div>`;
+  $$('#recFilter button').forEach(b=>{ b.classList.toggle('on',b.dataset.f===recFilter); b.onclick=()=>{ recFilter=b.dataset.f; vib(6); renderRecords(); }; });
+  const list=inYear.filter(r=>recFilter==='all'||(recFilter==='abroad')===!!r.abroad).sort(recSort);
+  const box=$('#recList');
+  if(!DB.records.length){ box.innerHTML=`<div class="emptyc" style="margin-top:14px">아직 기록 없음<br>아래 <b>+</b> 로 라운드 추가하거나<br>메모장 기록을 한 번에 가져오기<button class="btn ghost sm" id="emptyImp">메모 가져오기</button></div>`; $('#emptyImp').onclick=openImport; return; }
+  if(!list.length){ box.innerHTML=`<div class="emptyc" style="margin-top:14px">이 조건엔 기록 없음</div>`; return; }
+  let html='', lastKey='';
+  const groups={}; list.forEach(r=>{ const k=r.date.slice(0,7); (groups[k]=groups[k]||[]).push(r); });
+  Object.keys(groups).sort().reverse().forEach(k=>{ const g=groups[k]; const [y,m]=k.split('-'); const gh=g.reduce((a,r)=>a+(r.holes||0),0);
+    html+=`<div class="mhd"><span>${recYear==='all'?y+'. ':''}${+m}월</span><small>${g.length}회 · ${gh}홀</small></div>`;
+    g.forEach(r=>{ const d=+r.date.slice(8,10); const sub=[r.region, r.holes!==18?r.holes+'홀':'', (r.mates||[]).join(', ')].filter(Boolean).join(' · ');
+      const diff=r.score&&r.holes===18?r.score-72:null;
+      html+=`<button class="rec" data-id="${r.id}"><div class="dt"><b>${d}</b><small>${+m}월 ${dowOf(r.date)}</small></div><div class="mid"><b>${esc(r.course||r.region||'골프장 미입력')}</b>${sub?`<small>${esc(sub)}</small>`:''}<div class="tags">${r.abroad?'<span class="tg abr">해외</span>':''}<span class="tg ${r.caddie?'cad':''}">${r.caddie?'캐디':'노캐디'}</span>${r.memo?'<span class="tg">메모</span>':''}</div></div><div class="rs">${r.score?`<b>${r.score}</b><small>${r.holes!==18?r.holes+'홀':(diff>0?'+'+diff:diff)}</small>`:'<b class="none">—</b>'}</div></button>`; });
+  });
+  box.innerHTML=html;
+  box.querySelectorAll('.rec').forEach(b=>b.onclick=()=>{ const r=DB.records.find(x=>x.id===b.dataset.id); if(r) openRecForm(r); });
+}
+
+/* ---------- ⓑ 기록 입력 ---------- */
+function openRecForm(rec,preset){
+  editRec=rec||null;
+  if(rec) F=JSON.parse(JSON.stringify(rec));
+  else { const last=DB.records.slice().sort(recSort)[0]; F=Object.assign({id:uid(),created:Date.now(),date:today(),abroad:false,region:'',course:'',caddie:last?last.caddie:true,holes:18,mates:[],score:null,memo:''},preset||{}); }
+  $('#rfTitle').textContent=rec?'기록 수정':'새 기록'; $('#rfDel').hidden=!rec;
+  $('#fDate').value=F.date; $('#fRegion').value=F.region||''; $('#fCourse').value=F.course||''; $('#fScore').value=F.score||''; $('#fMemo').value=F.memo||''; $('#fMate').value='';
+  renderFormBits(); show('#s-recform');
+}
+function renderFormBits(){
+  $$('#fAbroad button').forEach(b=>b.classList.toggle('on',+b.dataset.v===(F.abroad?1:0)));
+  $$('#fCaddie button').forEach(b=>b.classList.toggle('on',+b.dataset.v===(F.caddie?1:0)));
+  $('#hVal').innerHTML=`${F.holes}<small>홀</small>`; $$('#hChips button').forEach(b=>b.classList.toggle('on',+b.dataset.h===F.holes));
+  renderSuggRegion(); renderSuggCourse(); renderMates(); scoreHint();
+}
+function renderSuggRegion(){ const q=$('#fRegion').value.trim(); const items=countBy(DB.records.filter(r=>!!r.abroad===!!F.abroad),r=>r.region).filter(([k])=>k!==q&&(!q||k.includes(q))).slice(0,10);
+  const box=$('#sRegion'); box.innerHTML=items.map(([k,c])=>`<button data-k="${esc(k)}">${esc(k)}<small>${c}</small></button>`).join('');
+  box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ $('#fRegion').value=b.dataset.k; F.region=b.dataset.k; vib(5); renderSuggRegion(); renderSuggCourse(); }); }
+function renderSuggCourse(){ const q=$('#fCourse').value.trim(), rg=$('#fRegion').value.trim(); let pool=DB.records.filter(r=>!!r.abroad===!!F.abroad); if(rg) pool=pool.filter(r=>r.region===rg);
+  const items=countBy(pool,r=>r.course).filter(([k])=>k!==q&&(!q||k.includes(q))).slice(0,10);
+  const box=$('#sCourse'); box.innerHTML=items.map(([k,c])=>`<button data-k="${esc(k)}">${esc(k)}<small>${c}</small></button>`).join('');
+  box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const k=b.dataset.k; $('#fCourse').value=k; F.course=k; const ref=DB.records.filter(r=>r.course===k).sort(recSort)[0]; if(ref){ if(!$('#fRegion').value.trim()&&ref.region){ $('#fRegion').value=ref.region; F.region=ref.region; } if(ref.holes) F.holes=ref.holes; F.abroad=!!ref.abroad; } vib(5); renderFormBits(); }); }
+function renderMates(){ const box=$('#mates'); box.innerHTML=F.mates.map((m,i)=>`<span>${esc(m)}<button data-i="${i}" aria-label="빼기">${ICX}</button></span>`).join('');
+  box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ F.mates.splice(+b.dataset.i,1); vib(5); renderMates(); });
+  const q=$('#fMate').value.trim(); const items=countBy(DB.records,r=>r.mates||[]).filter(([k])=>!F.mates.includes(k)&&(!q||k.includes(q))).slice(0,12);
+  const sb=$('#sMates'); sb.innerHTML=items.map(([k,c])=>`<button data-k="${esc(k)}">${esc(k)}<small>${c}</small></button>`).join('');
+  sb.querySelectorAll('button').forEach(b=>b.onclick=()=>{ F.mates.push(b.dataset.k); $('#fMate').value=''; vib(5); renderMates(); }); }
+function addMate(){ const v=$('#fMate').value.trim(); if(!v) return; v.split(/[,，·\/]/).map(s=>s.trim()).filter(Boolean).forEach(s=>{ if(!F.mates.includes(s)) F.mates.push(s); }); $('#fMate').value=''; vib(6); renderMates(); }
+function scoreHint(){ const s=+$('#fScore').value||0; const par=Math.round(72*F.holes/18); $('#shint').textContent=s?`${F.holes}홀 파 ${par} 기준 ${s-par>0?'+':''}${s-par}${F.holes!==18?` · 18홀 환산 ${Math.round(s*18/F.holes)}타`:''}`:''; }
+$$('#fAbroad button').forEach(b=>b.onclick=()=>{ F.abroad=b.dataset.v==='1'; vib(6); renderFormBits(); });
+$$('#fCaddie button').forEach(b=>b.onclick=()=>{ F.caddie=b.dataset.v==='1'; vib(6); renderFormBits(); });
+$('#hMinus').onclick=()=>{ F.holes=Math.max(9,F.holes-9); vib(5); renderFormBits(); };
+$('#hPlus').onclick=()=>{ F.holes=Math.min(72,F.holes+9); vib(5); renderFormBits(); };
+$$('#hChips button').forEach(b=>b.onclick=()=>{ F.holes=+b.dataset.h; vib(5); renderFormBits(); });
+$('#fRegion').oninput=e=>{ F.region=e.target.value.trim(); renderSuggRegion(); renderSuggCourse(); };
+$('#fCourse').oninput=e=>{ F.course=e.target.value.trim(); renderSuggCourse(); };
+$('#fMate').oninput=()=>renderMates();
+$('#fMate').onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); addMate(); } };
+$('#mateAdd').onclick=addMate;
+$('#fScore').oninput=scoreHint;
+$('#sMinus').onclick=()=>{ const v=+$('#fScore').value||Math.round(90*F.holes/18)+1; $('#fScore').value=Math.max(1,v-1); vib(4); scoreHint(); };
+$('#sPlus').onclick=()=>{ const v=+$('#fScore').value||Math.round(90*F.holes/18)-1; $('#fScore').value=v+1; vib(4); scoreHint(); };
+$('#rfClose').onclick=()=>{ renderRecords(); show('#s-rec'); };
+$('#rfSave').onclick=()=>{
+  F.date=$('#fDate').value||today(); F.region=$('#fRegion').value.trim(); F.course=$('#fCourse').value.trim(); F.memo=$('#fMemo').value.trim();
+  if($('#fMate').value.trim()) addMate();
+  const s=parseInt($('#fScore').value,10); F.score=s>0?s:null;
+  if(!F.course&&!F.region){ toast('골프장이나 지역은 넣어줘'); $('#fCourse').focus(); return; }
+  if(editRec) Object.assign(editRec,F); else DB.records.push(F);
+  save(); vib([10,30,10]); recYear=yearOf(F); toast(editRec?'수정됨':'기록 저장'); renderRecords(); show('#s-rec');
+};
+$('#rfDel').onclick=()=>{ sheet(`<h4>이 기록 삭제할까?</h4><div class="mut" style="font-size:13px;font-weight:600;margin-bottom:14px">${esc(F.date)} ${esc(F.course||F.region)}</div><div class="row"><button class="btn ghost sm" id="dno">취소</button><button class="btn danger sm" id="dyes">삭제</button></div>`); $('#dno').onclick=closeSheet; $('#dyes').onclick=()=>{ DB.records=DB.records.filter(r=>r!==editRec); save(); closeSheet(); toast('삭제됨'); renderRecords(); show('#s-rec'); }; };
+$('#recImportBtn').onclick=()=>openImport();
+
+/* ---------- ⓒ 통계 ---------- */
+function renderStats(){
+  const ys=recYears(); if(statYear==null||(statYear!=='all'&&!ys.includes(statYear))) statYear=ys[0]||new Date().getFullYear();
+  yearChips($('#stYears'),statYear,v=>{ statYear=v; renderStats(); });
+  const L=DB.records.filter(r=>statYear==='all'||yearOf(r)===statYear).sort((a,b)=>a.date<b.date?-1:1);
+  $('#stSub').textContent=statYear==='all'?'전체 기간':statYear+'년';
+  const body=$('#stBody');
+  if(!L.length){ body.innerHTML=`<div class="emptyc">기록이 쌓이면 여기 통계가 나옴</div>`; return; }
+  const n=L.length, holes=L.reduce((a,r)=>a+(r.holes||0),0), cad=L.filter(r=>r.caddie).length, abr=L.filter(r=>r.abroad).length;
+  const S=L.filter(r=>r.score); const eqs=S.map(eq18); const avg=eqs.length?eqs.reduce((a,b)=>a+b,0)/eqs.length:null;
+  const best=S.length?S.slice().sort((a,b)=>eq18(a)-eq18(b))[0]:null;
+  const kpi=(t,v,u,sub,hero)=>`<div class="kpi ${hero?'hero':''}"><small>${t}</small><b>${v}${u?`<em>${u}</em>`:''}</b><span>${sub}</span></div>`;
+  let h=`<div class="kpis">${kpi('라운드',n,'회',`국내 ${n-abr} · 해외 ${abr}`,true)}${kpi('총 홀',holes.toLocaleString('ko-KR'),'홀',`라운드당 ${Math.round(holes/n*10)/10}홀`)}${kpi('평균 타수',avg!=null?Math.round(avg*10)/10:'—',avg!=null?'타':'',avg!=null?`18홀 환산 · ${S.length}회 기준`:'타수 기록 없음')}${kpi('베스트',best?best.score:'—',best?'타':'',best?`${best.date.slice(2).replace(/-/g,'.')} ${esc(best.course||best.region)}${best.holes!==18?' · '+best.holes+'홀':''}`:'타수 기록 없음')}</div>`;
+  const split=(t,a,al,b,bl)=>{ const tot=a+b||1; return `<div class="split"><div class="hd"><span>${t}</span><small>${a+b}회</small></div><div class="bar">${a?`<i style="width:${a/tot*100}%;background:var(--c1)"></i>`:''}${b?`<i style="width:${b/tot*100}%;background:var(--c2)"></i>`:''}</div><div class="lg"><span style="--k:var(--c1)">${al} ${a}회 <em>${Math.round(a/tot*100)}%</em></span><span style="--k:var(--c2)">${bl} ${b}회 <em>${Math.round(b/tot*100)}%</em></span></div></div>`; };
+  h+=`<div class="lbl">구성</div>${split('캐디',cad,'캐디',n-cad,'노캐디')}${split('국내 · 해외',n-abr,'국내',abr,'해외')}`;
+  // 월별 (연도 선택) / 연도별 (전체)
+  let cols;
+  if(statYear==='all'){ const yy=[...new Set(L.map(yearOf))].sort(); cols=yy.map(y=>{ const g=L.filter(r=>yearOf(r)===y); return {lab:String(y).slice(2)+'년',full:y+'년',c:g.length,h:g.reduce((a,r)=>a+r.holes,0)}; }); }
+  else cols=[...Array(12)].map((_,i)=>{ const g=L.filter(r=>+r.date.slice(5,7)===i+1); return {lab:(i+1)+'',full:(i+1)+'월',c:g.length,h:g.reduce((a,r)=>a+r.holes,0)}; });
+  const mx=Math.max(1,...cols.map(c=>c.c)); const busiest=cols.slice().sort((a,b)=>b.c-a.c)[0];
+  h+=`<div class="lbl">${statYear==='all'?'연도별':'월별'} 라운드</div><div class="chart" id="colChart"><div class="ttl"><span>${statYear==='all'?'연도별':'월별'} 횟수</span><small>최다 ${busiest.full} ${busiest.c}회</small></div><div class="cols" style="grid-template-columns:repeat(${cols.length},1fr)">${cols.map((c,i)=>`<div class="m" data-i="${i}">${c.c?`<em>${c.c}</em>`:''}<i style="height:${c.c/mx*100}%"></i></div>`).join('')}</div><div class="clab" style="grid-template-columns:repeat(${cols.length},1fr)">${cols.map(c=>`<span>${c.lab}</span>`).join('')}</div><div class="tip" id="colTip"></div></div>`;
+  // 스코어 추이
+  if(S.length>=2) h+=`<div class="lbl">스코어 추이</div><div class="chart" id="trendChart"><div class="ttl"><span>18홀 환산 타수</span><small>낮을수록 좋음</small></div><svg class="trend" id="trendSvg"></svg><div class="tip" id="trendTip"></div></div>`;
+  // 순위
+  const rankBox=(title,items,sub)=>{ const mx2=Math.max(1,...items.map(x=>x.c)); return `<div class="lbl">${title}</div><div class="rank">${items.length?items.map((x,i)=>`<div class="r"><span class="n">${i+1}</span><div class="nm"><div>${esc(x.k)}${x.tag?`<small>${x.tag}</small>`:''}</div><i style="width:${x.c/mx2*100}%"></i></div><div class="v">${x.c}회${x.sub?`<small>${x.sub}</small>`:''}</div></div>`).join(''):'<div class="none">없음</div>'}</div>`; };
+  const avgOf=g=>{ const e=g.map(eq18).filter(v=>v!=null); return e.length?`평균 ${Math.round(e.reduce((a,b)=>a+b,0)/e.length)}타`:''; };
+  const courses=countBy(L,r=>r.course).slice(0,5).map(([k,c])=>{ const g=L.filter(r=>r.course===k); return {k,c,tag:g[0].region||'',sub:avgOf(g)||`${g.reduce((a,r)=>a+r.holes,0)}홀`}; });
+  const regions=countBy(L,r=>r.region).slice(0,5).map(([k,c])=>{ const g=L.filter(r=>r.region===k); return {k,c,tag:g[0].abroad?'해외':'',sub:`${g.reduce((a,r)=>a+r.holes,0)}홀`}; });
+  const mates=countBy(L,r=>r.mates||[]).slice(0,5).map(([k,c])=>{ const g=L.filter(r=>(r.mates||[]).includes(k)); return {k,c,sub:avgOf(g)}; });
+  h+=rankBox('많이 간 골프장',courses)+rankBox('많이 간 지역',regions)+rankBox('같이 많이 친 사람',mates);
+  body.innerHTML=h;
+  // 막대 툴팁
+  const cc=$('#colChart'), tip=$('#colTip');
+  cc.querySelectorAll('.m').forEach(m=>{ const on=()=>{ const c=cols[+m.dataset.i]; const r=m.getBoundingClientRect(), pr=cc.getBoundingClientRect(); const bar=m.querySelector('i'); const br=bar.getBoundingClientRect(); tip.innerHTML=`${c.full} · ${c.c}회<small>${c.h}홀</small>`; tip.style.left=(r.left-pr.left+r.width/2)+'px'; tip.style.top=(Math.min(br.top,r.bottom-4)-pr.top-(c.c?14:0))+'px'; tip.classList.add('show'); cc.querySelectorAll('.m').forEach(x=>x.classList.toggle('on',x===m)); };
+    m.addEventListener('pointerenter',on); m.addEventListener('pointerdown',on); m.addEventListener('pointerleave',()=>{ tip.classList.remove('show'); m.classList.remove('on'); }); });
+  if(S.length>=2) drawTrend(S);
+}
+function drawTrend(S){
+  const svg=$('#trendSvg'), box=$('#trendChart'), tip=$('#trendTip'); const W=svg.clientWidth||320, H=160, pl=28, pr=10, pt=10, pb=18;
+  const vals=S.map(r=>eq18(r)); const lo=Math.floor(Math.min(...vals)/5)*5-2, hi=Math.ceil(Math.max(...vals)/5)*5+2;
+  const x=i=>pl+(S.length===1?0:(W-pl-pr)*i/(S.length-1)), y=v=>pt+(H-pt-pb)*(hi-v)/(hi-lo);
+  const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
+  const ticks=[lo+2,Math.round((lo+hi)/2),hi-2];
+  let g=ticks.map(t=>`<line x1="${pl}" x2="${W-pr}" y1="${y(t)}" y2="${y(t)}" stroke="var(--line)" stroke-width="1"/><text x="${pl-6}" y="${y(t)+3}" text-anchor="end">${t}</text>`).join('');
+  g+=`<line x1="${pl}" x2="${W-pr}" y1="${y(avg)}" y2="${y(avg)}" stroke="var(--mut)" stroke-width="1" stroke-dasharray="4 4"/><text x="${pl+4}" y="${y(avg)+13}" text-anchor="start">평균 ${Math.round(avg)}</text>`;
+  const d=vals.map((v,i)=>`${i?'L':'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  g+=`<path d="${d}" fill="none" stroke="var(--c1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  const bi=vals.indexOf(Math.min(...vals));
+  g+=vals.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="${i===bi?5:4}" fill="${i===bi?'var(--acc)':'var(--c1)'}" stroke="var(--card)" stroke-width="2"/>`).join('');
+  g+=vals.map((v,i)=>`<circle class="hit" data-i="${i}" cx="${x(i)}" cy="${y(v)}" r="14" fill="transparent"/>`).join('');
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`); svg.innerHTML=g;
+  svg.querySelectorAll('.hit').forEach(c=>{ const on=()=>{ const i=+c.dataset.i, r=S[i]; const sr=svg.getBoundingClientRect(), br=box.getBoundingClientRect(); tip.innerHTML=`${r.score}타${r.holes!==18?` (${r.holes}홀)`:''}<small>${r.date.slice(2).replace(/-/g,'.')} ${esc(r.course||r.region)}</small>`; tip.style.left=(sr.left-br.left+x(i)*sr.width/W)+'px'; tip.style.top=(sr.top-br.top+y(vals[i]))+'px'; tip.classList.add('show'); };
+    c.addEventListener('pointerenter',on); c.addEventListener('pointerdown',on); c.addEventListener('pointerleave',()=>tip.classList.remove('show')); });
+}
+
+/* ---------- ⓓ 가져오기 · 백업 ---------- */
+let impYear=new Date().getFullYear();
+function openImport(){ const y=new Date().getFullYear(); const box=$('#impYear'); box.innerHTML=[y,y-1,y-2].map(v=>`<button data-v="${v}" class="${v===impYear?'on':''}">${v}</button>`).join(''); box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ impYear=+b.dataset.v; box.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); }); $('#impOut').innerHTML=''; $('#bakBox').innerHTML=''; impRows=null; show('#s-import'); }
+function parseMemo(text,defYear){
+  let year=defYear; const out=[];
+  for(const raw of text.split(/\r?\n/)){
+    const line=raw.trim(); if(!line) continue;
+    const m=line.match(/^(\d{1,2})\s*[\/.]\s*(\d{1,2})\.?\s+(.+)$/);
+    if(!m){ const ym=line.match(/^(?:20)?(\d{2})\s*년/); if(ym) year=2000+(+ym[1]); continue; }
+    const mo=+m[1], d=+m[2]; if(mo<1||mo>12||d<1||d>31) continue;
+    const rest=m[3];
+    let caddie=true, before=rest, after='';
+    const cm=[...rest.matchAll(/(?<![가-힣])(노캐디|캐디)/g)];
+    if(cm.length){ const last=cm[cm.length-1]; caddie=!/노/.test(last[1]); before=rest.slice(0,last.index); after=rest.slice(last.index+last[0].length); }
+    let holes=18; const hm=before.match(/\(\s*(\d{1,2})\s*\)/); if(hm){ holes=+hm[1]; before=before.replace(hm[0],' '); }
+    const mates=[];
+    for(const g of after.matchAll(/\(([^)]*)\)/g)){ const inner=g[1].trim(); if(/^\d{1,2}$/.test(inner)){ holes=+inner; continue; } inner.split(/[,，·\/]/).map(s=>s.trim()).filter(Boolean).forEach(s=>{ if(!mates.includes(s)) mates.push(s); }); }
+    let score=null; const sm=rest.match(/(\d{2,3})\s*타/); if(sm) score=+sm[1];
+    before=before.replace(/\(.*?\)/g,' ').replace(/\s+/g,' ').trim();
+    const toks=before.split(' ').filter(Boolean);
+    let abroad=false, region='', course=before;
+    if(toks.length&&OVERSEAS.some(o=>toks[0]===o||toks[0].startsWith(o))){ abroad=true; region=toks[0]; course=toks.slice(1).join(' ')||toks[0]; }
+    else { const dom=DOMESTIC.find(n=>before.includes(n)); if(dom) region=dom; }
+    out.push({id:uid(),created:Date.now()+out.length,date:`${year}-${pad(mo)}-${pad(d)}`,abroad,region,course,caddie,holes,mates,score,memo:''});
+  }
+  return out;
+}
+const isDup=r=>DB.records.some(x=>x.date===r.date&&x.course===r.course&&(x.region||'')===(r.region||''));
+$('#impPrev').onclick=()=>{
+  const rows=parseMemo($('#impText').value,impYear); impRows=rows; const out=$('#impOut');
+  if(!rows.length){ out.innerHTML=`<div class="note">읽을 줄이 없음 · "2/16 골프장 캐디" 같은 줄이 있어야 함</div>`; return; }
+  const fresh=rows.filter(r=>!isDup(r)); const ys=[...new Set(rows.map(yearOf))];
+  out.innerHTML=`<div class="prev">${rows.map(r=>`<div class="p ${isDup(r)?'dup':''}"><span class="d">${r.date.slice(2).replace(/-/g,'.')}</span><div class="c"><b>${esc(r.course||r.region)}</b><small>${[r.abroad?'해외':'국내',r.region,r.caddie?'캐디':'노캐디',r.holes+'홀',r.mates.join(', '),isDup(r)?'이미 있음':''].filter(Boolean).map(esc).join(' · ')}</small></div></div>`).join('')}</div><div class="note">${rows.length}줄 읽음 · ${ys.join(', ')}년 · 새로 ${fresh.length}개 · 지역은 아는 지명만 자동으로 채워짐, 나머지는 나중에 기록 눌러서 고치면 됨</div><div style="height:10px"></div><button class="btn" id="impDo" ${fresh.length?'':'disabled'}>${fresh.length}개 추가</button>`;
+  $('#impDo').onclick=()=>{ const add=impRows.filter(r=>!isDup(r)); DB.records.push(...add); save(); vib([10,30,10]); toast(`${add.length}개 추가됨`); recYear=add.length?yearOf(add.sort(recSort)[0]):recYear; $('#impText').value=''; renderRecords(); show('#s-rec'); };
+};
+$('#impBack').onclick=()=>{ renderRecords(); show('#s-rec'); };
+$('#bakCopy').onclick=()=>{ const txt=JSON.stringify({app:'golf',v:1,records:DB.records,rounds:DB.rounds}); const box=$('#bakBox'); box.innerHTML=`<textarea class="inp" id="bakOut" style="min-height:110px;margin-top:10px;font-size:11px" readonly></textarea>`; const ta=$('#bakOut'); ta.value=txt;
+  const ok=()=>toast(`백업 복사됨 · 기록 ${DB.records.length}개`); const fail=()=>{ ta.focus(); ta.select(); try{ document.execCommand('copy'); ok(); }catch(e){ toast('길게 눌러서 전체 복사'); } };
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok).catch(fail); else fail(); };
+$('#bakLoad').onclick=()=>{ const box=$('#bakBox'); box.innerHTML=`<textarea class="inp" id="bakIn" style="min-height:110px;margin-top:10px;font-size:11px" placeholder="백업 복사한 내용 붙여넣기"></textarea><div style="height:8px"></div><button class="btn sm" id="bakDo">복원 (합치기)</button>`;
+  $('#bakDo').onclick=()=>{ try{ const j=JSON.parse($('#bakIn').value); const recs=Array.isArray(j)?j:(j.records||[]); const have=new Set(DB.records.map(r=>r.id)); let add=0; recs.forEach(r=>{ if(r&&r.date&&!have.has(r.id)){ DB.records.push(r); add++; } }); let ra=0; if(j.rounds){ const hr=new Set(DB.rounds.map(r=>r.id)); j.rounds.forEach(r=>{ if(r&&!hr.has(r.id)){ DB.rounds.push(r); ra++; } }); } save(); toast(`기록 ${add}개 · 내기 ${ra}개 복원`); renderRecords(); show('#s-rec'); }catch(e){ toast('백업 형식이 아님'); } }; };
+
+/* ---------- 탭 ---------- */
+$$('#tabbar button').forEach(b=>b.onclick=()=>{ const t=b.dataset.t; vib(6); if(t==='rec'){ renderRecords(); show('#s-rec'); } else if(t==='stats'){ show('#s-stats'); renderStats(); } else { renderList(); show('#s-list'); } });
+$('#recFab').onclick=()=>openRecForm(null);
+window.addEventListener('resize',()=>{ if($('#s-stats').classList.contains('active')) renderStats(); });
+
 /* =================== 시작 =================== */
-renderList();
+renderRecords(); show('#s-rec');
 window.addEventListener('beforeunload',save);
 document.addEventListener('visibilitychange',()=>{ if(document.hidden) save(); });
 </script>
