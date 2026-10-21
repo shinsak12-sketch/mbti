@@ -507,6 +507,19 @@
   /* 동행자 관리 */
   .mlist .r{cursor:pointer}
   .mlist .r:active{opacity:.7}
+  .lbl .more{font-size:11.5px;font-weight:800;color:var(--acc);letter-spacing:0;padding:3px 8px;border-radius:999px;background:var(--accs)}
+  .rank.tap{cursor:pointer} .rank .r.go{cursor:pointer} .rank .r.go:active{opacity:.65}
+  .rfull .r{grid-template-columns:24px 1fr auto}
+  .rank .r .nm .meta{display:block;font-size:10.5px;font-weight:700;color:var(--mut);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .kpi.go,.split .go,.cols .m{cursor:pointer}
+  .kpi.go:active{transform:scale(.98)}
+  .split .lg span.go{padding:4px 6px;margin:-4px -6px;border-radius:8px}
+  .split .lg span.go:active{background:var(--chip)}
+  .split .bar i.go:active{filter:brightness(1.2)}
+  .rlhead{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 14px;margin-bottom:12px;display:flex;gap:14px;flex-wrap:wrap;box-shadow:var(--sh)}
+  .rlhead div{min-width:64px} .rlhead small{display:block;font-size:10.5px;font-weight:800;color:var(--mut)} .rlhead b{font-size:19px;font-weight:900;letter-spacing:-.5px}
+  .rec .rk2{position:absolute;left:-6px;top:-6px;min-width:22px;height:22px;border-radius:999px;background:var(--ink);color:var(--bg);font-size:11px;font-weight:900;display:grid;place-items:center;padding:0 6px}
+  .rec{position:relative}
   .sugg button.on{background:var(--acc);color:var(--accink)} .sugg button.on small{color:var(--accink);opacity:.7}
   .toast.top{top:calc(18px + env(safe-area-inset-top))!important;bottom:auto!important}
 </style>
@@ -655,6 +668,23 @@
   <div class="top"><div><h1>통계</h1><div class="sm" id="stSub"></div></div></div>
   <div class="yrchips" id="stYears"></div>
   <div id="stBody"></div>
+</section>
+
+<!-- ⓕ 전체 순위 -->
+<section class="screen" id="s-rank">
+  <button class="back" id="rankBack"><svg class="i" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>통계</button>
+  <div class="top"><div><h1 id="rankTitle"></h1><div class="sm" id="rankSub"></div></div></div>
+  <div class="yrchips" id="rankYears"></div>
+  <div class="seg" id="rankSort"><button data-s="count">횟수</button><button data-s="recent">최근</button><button data-s="avg">평균 타수</button></div>
+  <div style="height:10px"></div>
+  <div class="rank rfull" id="rankList"></div>
+</section>
+
+<!-- ⓖ 라운드 목록 (통계에서 들어옴) -->
+<section class="screen" id="s-rlist">
+  <button class="back" id="rlBack"><svg class="i" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg><span id="rlBackLab">통계</span></button>
+  <div class="top"><div><h1 id="rlTitle"></h1><div class="sm" id="rlSub"></div></div></div>
+  <div id="rlBody"></div>
 </section>
 
 <!-- ⓔ 동행자 관리 -->
@@ -1019,7 +1049,7 @@ function recCard(r){
   const dd=r.plan?dday(r.date):null; const diff=r.score&&r.holes===18?r.score-72:null;
   const SB=`<span class="sbtn" data-score="${r.id}" role="button"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>타수</span>`;
   const right = r.plan ? (dd>=0?`<b class="dd">${dd===0?'오늘':'D-'+dd}</b><small>예정</small>`:SB) : (r.score?`<b>${r.score}</b><small>${r.holes!==18?r.holes+'홀':(diff>0?'+'+diff:diff)}</small>`:SB);
-  return `<button class="rec ${r.plan?'plan':''} ${r.plan&&dd<0?'past':''}" data-id="${r.id}"><div class="dt"><b>${d}</b><small>${m}월 ${dowOf(r.date)}</small></div><div class="mid"><b>${esc(r.course||r.region||'골프장 미입력')}</b>${sub?`<small>${esc(sub)}</small>`:''}<div class="tags">${r.tee?`<span class="tg tee">${esc(r.tee)} 티오프</span>`:''}${r.plan?'<span class="tg pln">예정</span>':''}${r.abroad?'<span class="tg abr">해외</span>':''}<span class="tg ${r.caddie?'cad':''}">${r.caddie?'캐디':'노캐디'}</span>${r.memo?'<span class="tg">메모</span>':''}</div></div><div class="rs">${right}</div></button>`;
+  return `<button class="rec ${r.plan?'plan':''} ${r.plan&&dd<0?'past':''}" data-id="${r.id}"><div class="dt"><b>${d}</b><small>${+r.date.slice(0,4)===new Date().getFullYear()?m+'월':"'"+r.date.slice(2,4)+'.'+m}${' '+dowOf(r.date)}</small></div><div class="mid"><b>${esc(r.course||r.region||'골프장 미입력')}</b>${sub?`<small>${esc(sub)}</small>`:''}<div class="tags">${r.tee?`<span class="tg tee">${esc(r.tee)} 티오프</span>`:''}${r.plan?'<span class="tg pln">예정</span>':''}${r.abroad?'<span class="tg abr">해외</span>':''}<span class="tg ${r.caddie?'cad':''}">${r.caddie?'캐디':'노캐디'}</span>${r.memo?'<span class="tg">메모</span>':''}</div></div><div class="rs">${right}</div></button>`;
 }
 function bindRecCards(box,before){ box.querySelectorAll('.rec').forEach(b=>{ const r=DB.records.find(x=>x.id===b.dataset.id); if(!r) return; const sb=b.querySelector('.sbtn'); if(sb){ sb.addEventListener('pointerdown',e=>e.stopPropagation()); sb.addEventListener('click',e=>{ e.stopPropagation(); e.preventDefault(); before&&before(); scoreSheet(r); }); } b.onclick=()=>{ before&&before(); openRecForm(r); }; longPress(b,()=>{ before&&before(); recMenu(r); }); }); }
 function longPress(el,fn){ let t=null,sx=0,sy=0,fired=false;
@@ -1036,7 +1066,7 @@ function recMenu(r){ const title=esc(r.course||r.region||'라운드'); const sub
   const items=[{label:'수정',icon:SV.edit,fn:()=>{ closeSheet(); openRecForm(r); }}];
   if(r.plan) items.push({label:'다녀옴으로 바꾸기',icon:SV.done,cls:'blue',fn:()=>{ closeSheet(); openRecForm(r); F.plan=false; renderFormBits(); toast('타수 넣고 저장하면 끝'); }});
   items.push({label:'같은 곳 새로 추가',icon:SV.copy,fn:()=>{ closeSheet(); openRecForm(null,{abroad:r.abroad,country:r.country||'',region:r.region,course:r.course,caddie:r.caddie,holes:r.holes,mates:(r.mates||[]).slice()}); }});
-  items.push({label:'삭제',icon:SV.del,cls:'danger',fn:()=>confirmSheet('이 기록 삭제할까?',sub+' '+title,'삭제',()=>{ DB.records=DB.records.filter(x=>x!==r); save(); vib(20); toast('삭제됨'); renderRecords(); })});
+  items.push({label:'삭제',icon:SV.del,cls:'danger',fn:()=>confirmSheet('이 기록 삭제할까?',sub+' '+title,'삭제',()=>{ DB.records=DB.records.filter(x=>x!==r); save(); vib(20); toast('삭제됨'); refreshCurrent(); })});
   actionSheet(title,sub,items); }
 let calY=null, calM=null, selDay=null, recView='month';
 function renderCal(dx){
@@ -1099,7 +1129,7 @@ function scoreSheet(r){ let v=r.score?String(r.score):''; const par=Math.round(7
   $('#sheet .pad').querySelectorAll('button').forEach(b=>b.onclick=()=>{ const k=b.dataset.k; if(k==='C') v=''; else if(k==='⌫') v=v.slice(0,-1); else if(v.length<3) v=(v+k).replace(/^0+/,''); vib(4); draw(); });
   $('#ssM').onclick=()=>{ v=String(Math.max(1,(+v||par+18)-1)); vib(4); draw(); }; $('#ssP').onclick=()=>{ v=String((+v||par+16)+1); vib(4); draw(); };
   $('#ssX').onclick=()=>closeSheet();
-  $('#ssOk').onclick=()=>{ const n=+v; if(!n) return; r.score=n; if(r.plan) r.plan=false; save(); vib([10,30,10]); toast(`${n}타 저장`); if(!POPUP){ renderRecords(); } closeSheet(); };
+  $('#ssOk').onclick=()=>{ const n=+v; if(!n) return; r.score=n; if(r.plan) r.plan=false; save(); vib([10,30,10]); toast(`${n}타 저장`); if(!POPUP){ refreshCurrent(); } closeSheet(); };
   draw(); }
 function mateStats(){ const m=new Map(); DB.records.forEach(r=>(r.mates||[]).forEach(k=>{ const o=m.get(k)||{k,c:0,last:''}; o.c++; if(r.date>o.last) o.last=r.date; m.set(k,o); })); return [...m.values()].sort((a,b)=>b.c-a.c||a.k.localeCompare(b.k)); }
 function renderMateMgr(){ const q=($('#mateQ').value||'').trim(); const all=mateStats(); const list=all.filter(x=>!q||x.k.includes(q));
@@ -1201,56 +1231,92 @@ $('#mateAdd').onclick=addMate;
 $('#fScore').oninput=scoreHint;
 $('#sMinus').onclick=()=>{ const v=+$('#fScore').value||Math.round(90*F.holes/18)+1; $('#fScore').value=Math.max(1,v-1); vib(4); scoreHint(); };
 $('#sPlus').onclick=()=>{ const v=+$('#fScore').value||Math.round(90*F.holes/18)-1; $('#fScore').value=v+1; vib(4); scoreHint(); };
-$('#rfClose').onclick=()=>{ if(POPUP){ popupClose(); return; } renderRecords(); show('#s-rec'); };
+$('#rfClose').onclick=()=>{ if(POPUP){ popupClose(); return; } if(formReturn&&RL){ formReturn(); return; } renderRecords(); show('#s-rec'); };
 $('#rfSave').onclick=()=>{
   F.date=F.date||today(); F.tee=normTee($('#fTee').value); F.country=F.abroad?$('#fCountry').value.trim():''; F.region=$('#fRegion').value.trim(); F.course=$('#fCourse').value.trim(); F.memo=$('#fMemo').value.trim();
   if($('#fMate').value.trim()) addMate();
   const s=parseInt($('#fScore').value,10); F.score=(!F.plan&&s>0)?s:null; F.plan=!!F.plan; delete F._kindTouched;
   if(!F.course&&!F.region){ toast('골프장이나 지역은 넣어줘'); $('#fCourse').focus(); return; }
   if(editRec) Object.assign(editRec,F); else DB.records.push(F);
-  save(); vib([10,30,10]); if(POPUP){ popupClose(); return; } recYear=yearOf(F); calY=+F.date.slice(0,4); calM=+F.date.slice(5,7); selDay=null; recView='month'; toast(editRec?'수정됨':(F.plan?'예정 저장':'기록 저장')); renderRecords(); show('#s-rec');
+  save(); vib([10,30,10]); if(POPUP){ popupClose(); return; } if(formReturn&&RL){ toast(editRec?'수정됨':'저장'); formReturn(); return; } recYear=yearOf(F); calY=+F.date.slice(0,4); calM=+F.date.slice(5,7); selDay=null; recView='month'; toast(editRec?'수정됨':(F.plan?'예정 저장':'기록 저장')); renderRecords(); show('#s-rec');
 };
 $('#rfDel').onclick=()=>{ sheet(`<h4>이 기록 삭제할까?</h4><div class="mut" style="font-size:13px;font-weight:600;margin-bottom:14px">${esc(F.date)} ${esc(F.course||F.region)}</div><div class="row"><button class="btn ghost sm" id="dno">취소</button><button class="btn danger sm" id="dyes">삭제</button></div>`); $('#dno').onclick=closeSheet; $('#dyes').onclick=()=>{ DB.records=DB.records.filter(r=>r!==editRec); save(); closeSheet(); toast('삭제됨'); renderRecords(); show('#s-rec'); }; };
 $('#recImportBtn').onclick=()=>openImport();
 
 /* ---------- ⓒ 통계 ---------- */
+function statList(year){ return DB.records.filter(r=>!r.plan&&(year==='all'||yearOf(r)===year)); }
+const periodLab=y=>y==='all'?'전체 기간':y+'년';
 function renderStats(){
   const ys=recYears(); if(statYear==null||(statYear!=='all'&&!ys.includes(statYear))) statYear=ys[0]||new Date().getFullYear();
   yearChips($('#stYears'),statYear,v=>{ statYear=v; renderStats(); });
-  const L=DB.records.filter(r=>!r.plan&&(statYear==='all'||yearOf(r)===statYear)).sort((a,b)=>a.date<b.date?-1:1);
-  $('#stSub').textContent=statYear==='all'?'전체 기간':statYear+'년';
+  const L=statList(statYear).sort((a,b)=>a.date<b.date?-1:1);
+  $('#stSub').textContent=periodLab(statYear)+' · 눌러서 자세히';
   const body=$('#stBody');
   if(!L.length){ body.innerHTML=`<div class="emptyc">기록이 쌓이면 여기 통계가 나옴</div>`; return; }
   const n=L.length, holes=L.reduce((a,r)=>a+(r.holes||0),0), cad=L.filter(r=>r.caddie).length, abr=L.filter(r=>r.abroad).length;
   const S=L.filter(r=>r.score); const eqs=S.map(eq18); const avg=eqs.length?eqs.reduce((a,b)=>a+b,0)/eqs.length:null;
   const best=S.length?S.slice().sort((a,b)=>eq18(a)-eq18(b))[0]:null;
-  const kpi=(t,v,u,sub,hero)=>`<div class="kpi ${hero?'hero':''}"><small>${t}</small><b>${v}${u?`<em>${u}</em>`:''}</b><span>${sub}</span></div>`;
-  let h=`<div class="kpis">${kpi('라운드',n,'회',`국내 ${n-abr} · 해외 ${abr}`,true)}${kpi('총 홀',holes.toLocaleString('ko-KR'),'홀',`라운드당 ${Math.round(holes/n*10)/10}홀`)}${kpi('평균 타수',avg!=null?Math.round(avg*10)/10:'—',avg!=null?'타':'',avg!=null?`18홀 환산 · ${S.length}회 기준`:'타수 기록 없음')}${kpi('베스트',best?best.score:'—',best?'타':'',best?`${best.date.slice(2).replace(/-/g,'.')} ${esc(best.course||best.region)}${best.holes!==18?' · '+best.holes+'홀':''}`:'타수 기록 없음')}</div>`;
-  const split=(t,a,al,b,bl)=>{ const tot=a+b||1; return `<div class="split"><div class="hd"><span>${t}</span><small>${a+b}회</small></div><div class="bar">${a?`<i style="width:${a/tot*100}%;background:var(--c1)"></i>`:''}${b?`<i style="width:${b/tot*100}%;background:var(--c2)"></i>`:''}</div><div class="lg"><span style="--k:var(--c1)">${al} ${a}회 <em>${Math.round(a/tot*100)}%</em></span><span style="--k:var(--c2)">${bl} ${b}회 <em>${Math.round(b/tot*100)}%</em></span></div></div>`; };
-  h+=`<div class="lbl">구성</div>${split('캐디',cad,'캐디',n-cad,'노캐디')}${split('국내 · 해외',n-abr,'국내',abr,'해외')}`;
-  // 월별 (연도 선택) / 연도별 (전체)
+  const kpi=(go,t,v,u,sub,hero)=>`<div class="kpi go ${hero?'hero':''}" data-go="${go}"><small>${t}</small><b>${v}${u?`<em>${u}</em>`:''}</b><span>${sub}</span></div>`;
+  let h=`<div class="kpis">${kpi('all','라운드',n,'회',`국내 ${n-abr} · 해외 ${abr}`,true)}${kpi('all','총 홀',holes.toLocaleString('ko-KR'),'홀',`라운드당 ${Math.round(holes/n*10)/10}홀`)}${kpi('score','평균 타수',avg!=null?Math.round(avg*10)/10:'—',avg!=null?'타':'',avg!=null?`18홀 환산 · ${S.length}회 기준`:'타수 기록 없음')}${kpi('score','베스트',best?best.score:'—',best?'타':'',best?`${best.date.slice(2).replace(/-/g,'.')} ${esc(best.course||best.region)}${best.holes!==18?' · '+best.holes+'홀':''}`:'타수 기록 없음')}</div>`;
+  const split=(t,a,al,fa,b,bl,fb)=>{ const tot=a+b||1; return `<div class="split"><div class="hd"><span>${t}</span><small>${a+b}회</small></div><div class="bar">${a?`<i class="go" data-f="${fa}" style="width:${a/tot*100}%;background:var(--c1)"></i>`:''}${b?`<i class="go" data-f="${fb}" style="width:${b/tot*100}%;background:var(--c2)"></i>`:''}</div><div class="lg"><span class="go" data-f="${fa}" style="--k:var(--c1)">${al} ${a}회 <em>${Math.round(a/tot*100)}%</em></span><span class="go" data-f="${fb}" style="--k:var(--c2)">${bl} ${b}회 <em>${Math.round(b/tot*100)}%</em></span></div></div>`; };
+  h+=`<div class="lbl">구성</div>${split('캐디',cad,'캐디','cad',n-cad,'노캐디','nocad')}${split('국내 · 해외',n-abr,'국내','dom',abr,'해외','abr')}`;
   let cols;
-  if(statYear==='all'){ const yy=[...new Set(L.map(yearOf))].sort(); cols=yy.map(y=>{ const g=L.filter(r=>yearOf(r)===y); return {lab:String(y).slice(2)+'년',full:y+'년',c:g.length,h:g.reduce((a,r)=>a+r.holes,0)}; }); }
-  else cols=[...Array(12)].map((_,i)=>{ const g=L.filter(r=>+r.date.slice(5,7)===i+1); return {lab:(i+1)+'',full:(i+1)+'월',c:g.length,h:g.reduce((a,r)=>a+r.holes,0)}; });
+  if(statYear==='all'){ const yy=[...new Set(L.map(yearOf))].sort(); cols=yy.map(y=>{ const g=L.filter(r=>yearOf(r)===y); return {lab:String(y).slice(2)+'년',full:y+'년',c:g.length,h:g.reduce((a,r)=>a+r.holes,0),pre:y+'-'}; }); }
+  else cols=[...Array(12)].map((_,i)=>{ const g=L.filter(r=>+r.date.slice(5,7)===i+1); return {lab:(i+1)+'',full:`${statYear}년 ${i+1}월`,c:g.length,h:g.reduce((a,r)=>a+r.holes,0),pre:`${statYear}-${pad(i+1)}-`}; });
   const mx=Math.max(1,...cols.map(c=>c.c)); const busiest=cols.slice().sort((a,b)=>b.c-a.c)[0];
-  h+=`<div class="lbl">${statYear==='all'?'연도별':'월별'} 라운드</div><div class="chart" id="colChart"><div class="ttl"><span>${statYear==='all'?'연도별':'월별'} 횟수</span><small>최다 ${busiest.full} ${busiest.c}회</small></div><div class="cols" style="grid-template-columns:repeat(${cols.length},1fr)">${cols.map((c,i)=>`<div class="m" data-i="${i}">${c.c?`<em>${c.c}</em>`:''}<i style="height:${c.c/mx*100}%"></i></div>`).join('')}</div><div class="clab" style="grid-template-columns:repeat(${cols.length},1fr)">${cols.map(c=>`<span>${c.lab}</span>`).join('')}</div><div class="tip" id="colTip"></div></div>`;
-  // 스코어 추이
-  if(S.length>=2) h+=`<div class="lbl">스코어 추이</div><div class="chart" id="trendChart"><div class="ttl"><span>18홀 환산 타수</span><small>낮을수록 좋음</small></div><svg class="trend" id="trendSvg"></svg><div class="tip" id="trendTip"></div></div>`;
-  // 순위
-  const rankBox=(title,items,sub)=>{ const mx2=Math.max(1,...items.map(x=>x.c)); return `<div class="lbl">${title}</div><div class="rank">${items.length?items.map((x,i)=>`<div class="r"><span class="n">${i+1}</span><div class="nm"><div>${esc(x.k)}${x.tag?`<small>${x.tag}</small>`:''}</div><i style="width:${x.c/mx2*100}%"></i></div><div class="v">${x.c}회${x.sub?`<small>${x.sub}</small>`:''}</div></div>`).join(''):'<div class="none">없음</div>'}</div>`; };
-  const avgOf=g=>{ const e=g.map(eq18).filter(v=>v!=null); return e.length?`평균 ${Math.round(e.reduce((a,b)=>a+b,0)/e.length)}타`:''; };
-  const courses=countBy(L,r=>r.course).slice(0,5).map(([k,c])=>{ const g=L.filter(r=>r.course===k); return {k,c,tag:g[0].region||'',sub:avgOf(g)||`${g.reduce((a,r)=>a+r.holes,0)}홀`}; });
-  const regions=countBy(L,r=>r.region).slice(0,5).map(([k,c])=>{ const g=L.filter(r=>r.region===k); return {k,c,tag:g[0].abroad?(g[0].country||'해외'):'',sub:`${g.reduce((a,r)=>a+r.holes,0)}홀`}; });
-  const ctrs=countBy(L.filter(r=>r.abroad),r=>r.country||'기타').slice(0,5).map(([k,c])=>{ const g=L.filter(r=>r.abroad&&(r.country||'기타')===k); return {k,c,sub:`${g.reduce((a,r)=>a+r.holes,0)}홀`}; });
-  const mates=countBy(L,r=>r.mates||[]).slice(0,5).map(([k,c])=>{ const g=L.filter(r=>(r.mates||[]).includes(k)); return {k,c,sub:avgOf(g)}; });
-  h+=rankBox('많이 간 골프장',courses)+rankBox('많이 간 지역',regions)+(ctrs.length?rankBox('해외 · 나라별',ctrs):'')+rankBox('같이 많이 친 사람',mates);
+  h+=`<div class="lbl">${statYear==='all'?'연도별':'월별'} 라운드 <small class="mut">막대 누르면 목록</small></div><div class="chart" id="colChart"><div class="ttl"><span>${statYear==='all'?'연도별':'월별'} 횟수</span><small>최다 ${busiest.full} ${busiest.c}회</small></div><div class="cols" style="grid-template-columns:repeat(${cols.length},1fr)">${cols.map((c,i)=>`<div class="m" data-i="${i}">${c.c?`<em>${c.c}</em>`:''}<i style="height:${c.c/mx*100}%"></i></div>`).join('')}</div><div class="clab" style="grid-template-columns:repeat(${cols.length},1fr)">${cols.map(c=>`<span>${c.lab}</span>`).join('')}</div><div class="tip" id="colTip"></div></div>`;
+  if(S.length>=2) h+=`<div class="lbl">스코어 추이 <small class="mut">점 누르면 그 라운드</small></div><div class="chart" id="trendChart"><div class="ttl"><span>18홀 환산 타수</span><small>낮을수록 좋음</small></div><svg class="trend" id="trendSvg"></svg><div class="tip" id="trendTip"></div></div>`;
+  const rankBox=(kind,title)=>{ const items=rankItems(kind,statYear).slice(0,5); if(kind==='country'&&!items.length) return ''; const mx2=Math.max(1,...items.map(x=>x.c));
+    return `<div class="lbl"><span>${title}</span><button class="more" data-kind="${kind}">전체 ›</button></div><div class="rank tap" data-kind="${kind}">${items.length?items.map((x,i)=>`<div class="r go" data-kind="${kind}" data-k="${esc(x.k)}"><span class="n">${i+1}</span><div class="nm"><div>${esc(x.k)}${x.tag?`<small>${esc(x.tag)}</small>`:''}</div><i style="width:${x.c/mx2*100}%"></i></div><div class="v">${x.c}회<small>${x.avg!=null?`평균 ${Math.round(x.avg)}타`:x.h+'홀'}</small></div></div>`).join(''):'<div class="none">없음</div>'}</div>`; };
+  h+=rankBox('course','많이 간 골프장')+rankBox('region','많이 간 지역')+rankBox('country','해외 · 나라별')+rankBox('mate','같이 많이 친 사람');
   body.innerHTML=h;
-  // 막대 툴팁
+  // 누르면 들어가기
+  body.querySelectorAll('.kpi.go').forEach(k=>k.onclick=()=>{ vib(6); if(k.dataset.go==='score') openScoreRank(); else { recYear=statYear; recView='year'; recFilter='all'; renderRecords(); show('#s-rec'); setTimeout(()=>$('#recView').scrollIntoView({behavior:'smooth',block:'start'}),60); } });
+  const SF={cad:['캐디 라운드',r=>r.caddie],nocad:['노캐디 라운드',r=>!r.caddie],dom:['국내 라운드',r=>!r.abroad],abr:['해외 라운드',r=>r.abroad]};
+  body.querySelectorAll('.split .go').forEach(el=>el.onclick=()=>{ const [t,f]=SF[el.dataset.f]; vib(6); openRecList({title:t,sub:periodLab(statYear),filter:r=>!r.plan&&(statYear==='all'||yearOf(r)===statYear)&&f(r),back:'stats'}); });
+  body.querySelectorAll('.lbl .more').forEach(b=>b.onclick=e=>{ e.stopPropagation(); vib(6); openRank(b.dataset.kind); });
+  body.querySelectorAll('.rank.tap').forEach(b=>b.onclick=()=>{ vib(6); openRank(b.dataset.kind); });
+  body.querySelectorAll('.rank .r.go').forEach(r=>r.onclick=e=>{ e.stopPropagation(); vib(6); openRankItem(r.dataset.kind,r.dataset.k,statYear,'stats'); });
   const cc=$('#colChart'), tip=$('#colTip');
-  cc.querySelectorAll('.m').forEach(m=>{ const on=()=>{ const c=cols[+m.dataset.i]; const r=m.getBoundingClientRect(), pr=cc.getBoundingClientRect(); const bar=m.querySelector('i'); const br=bar.getBoundingClientRect(); tip.innerHTML=`${c.full} · ${c.c}회<small>${c.h}홀</small>`; tip.style.left=(r.left-pr.left+r.width/2)+'px'; tip.style.top=(Math.min(br.top,r.bottom-4)-pr.top-(c.c?14:0))+'px'; tip.classList.add('show'); cc.querySelectorAll('.m').forEach(x=>x.classList.toggle('on',x===m)); };
-    m.addEventListener('pointerenter',on); m.addEventListener('pointerdown',on); m.addEventListener('pointerleave',()=>{ tip.classList.remove('show'); m.classList.remove('on'); }); });
+  cc.querySelectorAll('.m').forEach(m=>{ const c=cols[+m.dataset.i]; const on=()=>{ const r=m.getBoundingClientRect(), pr=cc.getBoundingClientRect(); const br=m.querySelector('i').getBoundingClientRect(); tip.innerHTML=`${c.full} · ${c.c}회<small>${c.h}홀</small>`; tip.style.left=(r.left-pr.left+r.width/2)+'px'; tip.style.top=(Math.min(br.top,r.bottom-4)-pr.top-(c.c?14:0))+'px'; tip.classList.add('show'); };
+    m.addEventListener('pointerenter',on); m.addEventListener('pointerleave',()=>tip.classList.remove('show'));
+    m.onclick=()=>{ if(!c.c){ toast(`${c.full}은 기록 없음`); return; } vib(6); openRecList({title:c.full+' 라운드',sub:`${c.c}회 · ${c.h}홀`,filter:r=>!r.plan&&r.date.startsWith(c.pre),back:'stats'}); }; });
   if(S.length>=2) drawTrend(S);
 }
+/* ---------- 전체 순위 ---------- */
+const RK={course:{t:'골프장 순위',key:r=>r.course||r.region,tag:g=>g[0].region||''},region:{t:'지역 순위',key:r=>r.region,tag:g=>g[0].abroad?(g[0].country||'해외'):''},country:{t:'해외 · 나라별',key:r=>r.abroad?(r.country||'기타'):null,tag:()=>''},mate:{t:'같이 친 사람',key:r=>r.mates||[],tag:()=>''}};
+function rankItems(kind,year){ const K=RK[kind]; const m=new Map(); statList(year).forEach(r=>{ [].concat(K.key(r)).filter(Boolean).forEach(k=>{ if(!m.has(k)) m.set(k,[]); m.get(k).push(r); }); });
+  return [...m.entries()].map(([k,g])=>{ const e=g.map(eq18).filter(v=>v!=null); return {k,c:g.length,h:g.reduce((a,r)=>a+(r.holes||0),0),avg:e.length?e.reduce((a,b)=>a+b,0)/e.length:null,last:g.reduce((a,r)=>r.date>a?r.date:a,''),tag:K.tag(g)}; })
+    .sort((a,b)=>b.c-a.c||(a.last<b.last?1:-1)); }
+let rankKind='course', rankYear=null, rankSort='count';
+function openRank(kind){ rankKind=kind; rankYear=statYear; rankSort='count'; renderRank(); show('#s-rank'); }
+function renderRank(){ const K=RK[rankKind]; $('#rankTitle').textContent=K.t;
+  yearChips($('#rankYears'),rankYear,v=>{ rankYear=v; renderRank(); });
+  let items=rankItems(rankKind,rankYear);
+  if(rankSort==='recent') items.sort((a,b)=>a.last<b.last?1:-1); else if(rankSort==='avg') items.sort((a,b)=>(a.avg==null)-(b.avg==null)||(a.avg-b.avg)||b.c-a.c);
+  $('#rankSub').textContent=`${periodLab(rankYear)} · ${items.length}${rankKind==='mate'?'명':'곳'} · 누르면 그 라운드 목록`;
+  $$('#rankSort button').forEach(b=>{ b.classList.toggle('on',b.dataset.s===rankSort); b.onclick=()=>{ rankSort=b.dataset.s; vib(5); renderRank(); }; });
+  const mx=Math.max(1,...items.map(x=>x.c));
+  $('#rankList').innerHTML=items.length?items.map((x,i)=>`<div class="r go" data-k="${esc(x.k)}"><span class="n">${i+1}</span><div class="nm"><div>${esc(x.k)}${x.tag?`<small>${esc(x.tag)}</small>`:''}</div><span class="meta">${x.h}홀${x.avg!=null?` · 평균 ${Math.round(x.avg)}타`:''} · 마지막 ${x.last.slice(2).replace(/-/g,'.')}</span><i style="width:${x.c/mx*100}%"></i></div><div class="v">${x.c}회</div></div>`).join(''):'<div class="none">없음</div>';
+  $('#rankList').querySelectorAll('.r.go').forEach(r=>r.onclick=()=>{ vib(6); openRankItem(rankKind,r.dataset.k,rankYear,'rank'); }); }
+function openRankItem(kind,k,year,back){ const K=RK[kind]; const g=statList(year).filter(r=>[].concat(K.key(r)).includes(k));
+  const e=g.map(eq18).filter(v=>v!=null); openRecList({title:k,sub:(kind==='mate'?'같이 친 라운드 · ':'')+periodLab(year),filter:r=>!r.plan&&(year==='all'||yearOf(r)===year)&&[].concat(K.key(r)).includes(k),back,head:true}); }
+function openScoreRank(){ openRecList({title:'타수 순위',sub:`${periodLab(statYear)} · 좋은 순 · 18홀 환산`,filter:r=>!r.plan&&r.score&&(statYear==='all'||yearOf(r)===statYear),sort:(a,b)=>eq18(a)-eq18(b)||(a.date<b.date?1:-1),rankNo:true,back:'stats',head:true}); }
+/* ---------- 라운드 목록 (통계 · 순위에서) ---------- */
+let RL=null, formReturn=null;
+function openRecList(o){ RL=o; renderRlist(); show('#s-rlist'); }
+function renderRlist(){ if(!RL) return; const list=DB.records.filter(RL.filter).sort(RL.sort||recSort);
+  $('#rlTitle').textContent=RL.title; $('#rlBackLab').textContent=RL.back==='rank'?RK[rankKind].t:'통계';
+  const holes=list.reduce((a,r)=>a+(r.holes||0),0); const e=list.map(eq18).filter(v=>v!=null); const avg=e.length?Math.round(e.reduce((a,b)=>a+b,0)/e.length*10)/10:null; const bestR=e.length?list.filter(r=>r.score).sort((a,b)=>eq18(a)-eq18(b))[0]:null;
+  $('#rlSub').textContent=`${RL.sub||''}${RL.sub?' · ':''}${list.length}회`;
+  const head=RL.head?`<div class="rlhead"><div><small>라운드</small><b>${list.length}회</b></div><div><small>홀</small><b>${holes}</b></div><div><small>평균 타수</small><b>${avg!=null?avg:'—'}</b></div><div><small>베스트</small><b>${bestR?bestR.score:'—'}</b></div></div>`:'';
+  const body=$('#rlBody'); body.innerHTML=head+(list.length?list.map(recCard).join(''):'<div class="emptyc">기록 없음</div>');
+  if(RL.rankNo) body.querySelectorAll('.rec').forEach((c,i)=>c.insertAdjacentHTML('afterbegin',`<span class="rk2">${i+1}</span>`));
+  formReturn=()=>{ renderRlist(); show('#s-rlist'); };
+  bindRecCards(body); }
+function refreshCurrent(){ const a=$('.screen.active'); const id=a?a.id:''; if(id==='s-rlist') renderRlist(); else if(id==='s-rank') renderRank(); else if(id==='s-stats') renderStats(); else renderRecords(); }
+$('#rankBack').onclick=()=>{ renderStats(); show('#s-stats'); };
+$('#rlBack').onclick=()=>{ formReturn=null; if(RL&&RL.back==='rank'){ renderRank(); show('#s-rank'); } else { renderStats(); show('#s-stats'); } };
 function drawTrend(S){
   const svg=$('#trendSvg'), box=$('#trendChart'), tip=$('#trendTip'); const W=svg.clientWidth||320, H=160, pl=28, pr=10, pt=10, pb=18;
   const vals=S.map(r=>eq18(r)); const lo=Math.floor(Math.min(...vals)/5)*5-2, hi=Math.ceil(Math.max(...vals)/5)*5+2;
@@ -1266,7 +1332,7 @@ function drawTrend(S){
   g+=vals.map((v,i)=>`<circle class="hit" data-i="${i}" cx="${x(i)}" cy="${y(v)}" r="14" fill="transparent"/>`).join('');
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`); svg.innerHTML=g;
   svg.querySelectorAll('.hit').forEach(c=>{ const on=()=>{ const i=+c.dataset.i, r=S[i]; const sr=svg.getBoundingClientRect(), br=box.getBoundingClientRect(); tip.innerHTML=`${r.score}타${r.holes!==18?` (${r.holes}홀)`:''}<small>${r.date.slice(2).replace(/-/g,'.')} ${esc(r.course||r.region)}</small>`; tip.style.left=(sr.left-br.left+x(i)*sr.width/W)+'px'; tip.style.top=(sr.top-br.top+y(vals[i]))+'px'; tip.classList.add('show'); };
-    c.addEventListener('pointerenter',on); c.addEventListener('pointerdown',on); c.addEventListener('pointerleave',()=>tip.classList.remove('show')); });
+    c.addEventListener('pointerenter',on); c.addEventListener('pointerleave',()=>tip.classList.remove('show')); c.addEventListener('click',()=>{ const r=S[+c.dataset.i]; vib(6); openRecList({title:r.course||r.region||'라운드',sub:r.date.replace(/-/g,'.'),filter:x=>x===r,back:'stats'}); }); });
 }
 
 /* ---------- ⓓ 가져오기 · 백업 ---------- */
@@ -1313,8 +1379,8 @@ $('#bakLoad').onclick=()=>{ const box=$('#bakBox'); box.innerHTML=`<textarea cla
   $('#bakDo').onclick=()=>{ try{ const j=JSON.parse($('#bakIn').value); const recs=Array.isArray(j)?j:(j.records||[]); const have=new Set(DB.records.map(r=>r.id)); let add=0; recs.forEach(r=>{ if(r&&r.date&&!have.has(r.id)){ DB.records.push(r); add++; } }); let ra=0; if(j.rounds){ const hr=new Set(DB.rounds.map(r=>r.id)); j.rounds.forEach(r=>{ if(r&&!hr.has(r.id)){ DB.rounds.push(r); ra++; } }); } save(); toast(`기록 ${add}개 · 내기 ${ra}개 복원`); renderRecords(); show('#s-rec'); }catch(e){ toast('백업 형식이 아님'); } }; };
 
 /* ---------- 탭 ---------- */
-$$('#tabbar button').forEach(b=>b.onclick=()=>{ const t=b.dataset.t; vib(6); if(t==='rec'){ renderRecords(); show('#s-rec'); } else if(t==='stats'){ show('#s-stats'); renderStats(); } else { renderList(); show('#s-list'); } });
-$('#recFab').onclick=()=>openRecForm(null);
+$$('#tabbar button').forEach(b=>b.onclick=()=>{ const t=b.dataset.t; vib(6); formReturn=null; if(t==='rec'){ renderRecords(); show('#s-rec'); } else if(t==='stats'){ show('#s-stats'); renderStats(); } else { renderList(); show('#s-list'); } });
+$('#recFab').onclick=()=>{ formReturn=null; openRecForm(null); };
 window.addEventListener('resize',()=>{ if($('#s-stats').classList.contains('active')) renderStats(); });
 
 /* =================== 시작 =================== */
@@ -1334,7 +1400,10 @@ window.appBack=function(){
   if($('#sheetBg').classList.contains('show')){ closeSheet(); return true; }
   if(POPUP) return false;
   const a=$('.screen.active'); const id=a?'#'+a.id:'';
+  if(id==='#s-recform'&&formReturn&&RL){ formReturn(); return true; }
   if(id==='#s-recform'||id==='#s-import'||id==='#s-stats'||id==='#s-list'||id==='#s-mates'){ renderRecords(); show('#s-rec'); return true; }
+  if(id==='#s-rank'){ renderStats(); show('#s-stats'); return true; }
+  if(id==='#s-rlist'){ $('#rlBack').click(); return true; }
   if(id==='#s-rule'){ renderSetup(); show('#s-setup'); return true; }
   if(id==='#s-setup'){ $('#setupClose').click(); return true; }
   if(id==='#s-hole'||id==='#s-result'){ save(); renderList(); show('#s-list'); return true; }
