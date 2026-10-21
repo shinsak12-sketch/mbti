@@ -61,7 +61,7 @@ public class GolfListService extends RemoteViewsService {
         v.setTextViewText(id("rright"), score > 0 ? String.valueOf(score) : "—");
         v.setTextColor(id("rright"), Color.parseColor(score > 0 ? "#f3f4f6" : "#8b919e"));
         int diff = score - 72;
-        v.setTextViewText(id("rright2"), score > 0 ? (holes != 18 ? holes + "홀" : (diff > 0 ? "+" + diff : String.valueOf(diff))) : "");
+        v.setTextViewText(id("rright2"), score > 0 ? (diff > 0 ? "+" + diff : String.valueOf(diff)) : "");
       }
       Intent fill = new Intent();
       fill.putExtra("a", "menu"); fill.putExtra("id", r.optString("i")); fill.putExtra("d", d);
