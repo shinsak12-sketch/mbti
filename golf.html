@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0e1014">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>골프 내기</title>
+<title>버디로그</title>
 <link rel="manifest" href="golf.webmanifest">
 <link rel="apple-touch-icon" href="icons/golf-180.png">
 <link rel="icon" href="icons/golf-192.png">
@@ -749,7 +749,7 @@
 
 <!-- ⓐ 기록 목록 -->
 <section class="screen" id="s-rec">
-  <div class="top"><div><h1>골프 기록</h1><div class="sm" id="recSub"></div></div>
+  <div class="top"><div><h1>버디로그</h1><div class="sm" id="recSub"></div></div>
     <div class="row" style="gap:8px">
       <button class="ic" id="remBtn" aria-label="라운드 알림"><svg class="i" viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg></button>
       <button class="ic" id="matesBtn" aria-label="동행자 관리"><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16.5 14.6c2.6.1 4.5 1.8 5 4.6"/></svg></button>
@@ -1176,7 +1176,7 @@ function renderResult(){
   $('#resEdit').onclick=()=>{ if(r.done){ r.done=false; } r.cur=Math.min(r.cur,r.holesN-1); save(); renderHole(); };
   $('#resHome').onclick=()=>{ save(); renderList(); show('#s-list'); };
   $('#resToRec').onclick=()=>{ const d=new Date(r.created); openRecForm(null,{date:`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`,course:r.name||'',holes:r.holesN,mates:r.players.map(p=>p.name)}); toast('동행자에서 본인은 빼고 저장'); };
-  $('#shareBtn').onclick=()=>{ const lines=[`[골프 내기] ${r.name||dateLabel(r.created)} · ${MODES[r.mode].label}`]; order.forEach((o,k)=>lines.push(`${k+1}. ${r.players[o.i].name} ${fmtS(o.v)}`)); if(tr.length){ lines.push('— 송금'); tr.forEach(x=>lines.push(`${r.players[x.from].name} → ${r.players[x.to].name} ${fmt(x.v)}`)); } if(fineTot) lines.push(`— 벌금통 ${fmt(fineTot)}`); const txt=lines.join('\n'); if(navigator.share){ navigator.share({text:txt}).catch(()=>{}); } else { navigator.clipboard&&navigator.clipboard.writeText(txt).then(()=>toast('복사됨')).catch(()=>toast('복사 실패')); } };
+  $('#shareBtn').onclick=()=>{ const lines=[`[버디로그 내기] ${r.name||dateLabel(r.created)} · ${MODES[r.mode].label}`]; order.forEach((o,k)=>lines.push(`${k+1}. ${r.players[o.i].name} ${fmtS(o.v)}`)); if(tr.length){ lines.push('— 송금'); tr.forEach(x=>lines.push(`${r.players[x.from].name} → ${r.players[x.to].name} ${fmt(x.v)}`)); } if(fineTot) lines.push(`— 벌금통 ${fmt(fineTot)}`); const txt=lines.join('\n'); if(navigator.share){ navigator.share({text:txt}).catch(()=>{}); } else { navigator.clipboard&&navigator.clipboard.writeText(txt).then(()=>toast('복사됨')).catch(()=>toast('복사 실패')); } };
   show('#s-result');
 }
 
@@ -1557,7 +1557,7 @@ const bLab=m=>m%60?`${Math.floor(m/60)}시간 ${m%60}분`:`${m/60}시간`;
 function remSheet(){ const c=remCfg(); const st=nativeNotify();
   const nx=nextAlarm(); const nd=nx?new Date(nx.t):null;
   sheet(`<div class="amenu remsh"><div class="ah"><b>라운드 알림</b><small>예정으로 넣은 라운드만 · ${st==='web'?'폰 앱(APK)에서 울림':'폰 알림으로 울림'}</small></div>
-  ${st==='ask'?`<button class="perm" id="remPerm"><div><b>알림 권한이 꺼져 있음</b><small>눌러서 허용 · 창이 안 뜨면 폰 설정 › 앱 › 골프 기록 › 알림</small></div><em>허용</em></button>`:''}
+  ${st==='ask'?`<button class="perm" id="remPerm"><div><b>알림 권한이 꺼져 있음</b><small>눌러서 허용 · 창이 안 뜨면 폰 설정 › 앱 › 버디로그 › 알림</small></div><em>허용</em></button>`:''}
   <div class="nxt"><i></i><div>${nx?`${nd.getMonth()+1}/${nd.getDate()} (${DOW[nd.getDay()]}) ${pad(nd.getHours())}:${pad(nd.getMinutes())} · ${nx.k}<small>${esc(nx.r.course||nx.r.region||'')}${nx.r.tee?' · '+nx.r.tee+' 티오프':''}</small>`:`다음 알림 없음<small>예정 라운드를 넣으면 여기 보임</small>`}</div></div>
   <div class="sub"><div class="it"><div class="tx">전날 알림<small>"내일 라운드" · 골프장 · 티 시간 · 동행자</small></div><span class="sw ${c.eve?'on':''}" data-sw="eve"></span></div>
   <div class="it ${c.eve?'':'off'}"><div class="chips">${['18:00','19:00','20:00','21:00','22:00'].map(t=>`<button data-t="${t}" class="${c.eveTime===t?'on':''}">${t}</button>`).join('')}</div></div>
@@ -1675,7 +1675,7 @@ function renderOnline(){ const box=$('#onBody');
   <div class="lbl">폰 바꿀 때</div><button class="opt" id="onKey"><span>복구 키 복사<small>새 폰에서 이 키 넣으면 친구 · 백업 그대로</small></span><em>복사</em></button>
   <div class="note">복구 키는 <b>카톡 나에게 보내기</b> 같은 데 저장해두기 · 남한테 주면 내 계정처럼 쓸 수 있으니 주의 · 동행자한테 보이는 건 예정 일정만</div>
   <div style="height:8px"></div><button class="btn ghost sm" id="onOff" style="color:var(--red)">이 폰에서 같이 보기 끄기</button>`;
-  const code=`골프 기록 앱 같이 보기 코드: ${S.me.code} (${S.me.name})`;
+  const code=`버디로그 같이 보기 코드: ${S.me.code} (${S.me.name})`;
   $('#onCopy').onclick=()=>{ copyText(S.me.code); toast('코드 복사됨'); };
   $('#onKey').onclick=()=>{ copyText('GOLFKEY:'+S.token); vib(8); toast('복구 키 복사됨 · 나에게 보내두기'); };
   $('#onShare').onclick=()=>{ try{ if(window.GolfNative&&GolfNative.shareText){ GolfNative.shareText(code); return; } }catch(e){} if(navigator.share) navigator.share({text:code}).catch(()=>{}); else { copyText(code); toast('복사됨 · 카톡에 붙여넣기'); } };

@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 
-/** 골프 내기: 로컬 assets/www 를 https://app.local 로 서빙하는 WebView 껍데기. */
+/** 버디로그: 로컬 assets/www 를 https://app.local 로 서빙하는 WebView 껍데기. */
 public class MainActivity extends Activity {
   private WebView wv;
   private GolfChrome chrome;

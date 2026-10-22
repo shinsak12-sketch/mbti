@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 골프 내기 APK 빌드 (Android SDK 없이: javac + dx + apktool + uber-apk-signer) · 도구는 ../android/tools 공유
+# 버디로그 APK 빌드 (Android SDK 없이: javac + dx + apktool + uber-apk-signer) · 도구는 ../android/tools 공유
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 TOOLS="${APK_TOOLS:-$HERE/../android/tools}"
@@ -31,6 +31,6 @@ PY
 fi
 java -jar "$TOOLS/apktool.jar" b "$WORK/apk" --use-aapt2 -o "$WORK/unsigned.apk" -p "$TOOLS/framework" >/dev/null
 java -jar "$TOOLS/uber-apk-signer.jar" -a "$WORK/unsigned.apk" -o "$OUT" --allowResign >/dev/null
-mv -f "$OUT"/unsigned-aligned-debugSigned.apk "$OUT/golf-naegi.apk"
+mv -f "$OUT"/unsigned-aligned-debugSigned.apk "$OUT/buddylog.apk"
 rm -f "$OUT"/unsigned-aligned-debugSigned.apk.idsig
-ls -la "$OUT/golf-naegi.apk"
+ls -la "$OUT/buddylog.apk"

@@ -1,6 +1,6 @@
 {
-  "name": "골프 내기",
-  "short_name": "골프내기",
+  "name": "버디로그",
+  "short_name": "버디로그",
   "start_url": "./golf.html",
   "scope": "./",
   "display": "standalone",
