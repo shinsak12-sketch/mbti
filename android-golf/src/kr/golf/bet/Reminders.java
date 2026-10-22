@@ -28,10 +28,12 @@ public class Reminders {
     }
   }
 
-  static PendingIntent alarmPi(Context c, String key, String title, String text, String id) {
+  static PendingIntent alarmPi(Context c, String key, String title, String text, String id) { return alarmPi(c, key, title, text, id, null); }
+  static PendingIntent alarmPi(Context c, String key, String title, String text, String id, JSONObject r) {
     Intent i = new Intent(c, ReminderReceiver.class);
     i.setData(Uri.parse("golfr://" + key));
     i.putExtra("title", title); i.putExtra("text", text); i.putExtra("id", id);
+    if (r != null) { i.putExtra("d", r.optString("d")); i.putExtra("t", r.optString("t")); if (r.has("la")) { i.putExtra("la", r.optDouble("la")); i.putExtra("lo", r.optDouble("lo")); } }
     return PendingIntent.getBroadcast(c, key.hashCode(), i, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
   }
 
@@ -62,7 +64,7 @@ public class Reminders {
           Calendar k = Calendar.getInstance(); k.clear(); k.set(y, mo - 1, dd); k.add(Calendar.DAY_OF_MONTH, -1);
           try { k.set(Calendar.HOUR_OF_DAY, Integer.parseInt(eveTime.substring(0, 2))); k.set(Calendar.MINUTE, Integer.parseInt(eveTime.substring(3, 5))); } catch (Exception e) { k.set(Calendar.HOUR_OF_DAY, 20); }
           if (k.getTimeInMillis() > now) {
-            String key = id + "/eve"; am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, k.getTimeInMillis(), alarmPi(c, key, "내일 라운드", body, id)); keys.append(key).append("\n");
+            String key = id + "/eve"; am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, k.getTimeInMillis(), alarmPi(c, key, "내일 라운드", body, id, r)); keys.append(key).append("\n");
           }
         }
         if (day && tee.length() == 5) {
@@ -70,7 +72,7 @@ public class Reminders {
           k.add(Calendar.MINUTE, -before);
           if (k.getTimeInMillis() > now) {
             String t = before % 60 == 0 ? (before / 60) + "시간" : before + "분";
-            String key = id + "/day"; am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, k.getTimeInMillis(), alarmPi(c, key, t + " 뒤 티오프", body, id)); keys.append(key).append("\n");
+            String key = id + "/day"; am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, k.getTimeInMillis(), alarmPi(c, key, t + " 뒤 티오프", body, id, r)); keys.append(key).append("\n");
           }
         }
       }
