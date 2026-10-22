@@ -133,6 +133,9 @@ async function handle(req) {
     const path = `bk/${uid}/data.json`;
     if (req.method === 'POST') {
       const s = JSON.stringify(body); if (s.length > 3_000_000) return bad('too big', 413);
+      // 기록이 절반 넘게 줄어드는 자동 백업은 막음 (새 폰 빈 상태로 덮어쓰기 방지) · 직접 누른 백업(force)만 통과
+      if (!body.force) { const { data: old } = await readJ(path, true); const was = old && Array.isArray(old.records) ? old.records.length : 0, now = Array.isArray(body.records) ? body.records.length : 0;
+        if (was >= 10 && now < was * 0.5) return json({ error: 'shrink', was, now }, 409); }
       await writeJ(path, { ...body, at: Date.now() }); return json({ ok: true, at: Date.now() });
     }
     const { data } = await readJ(path, true); return json(data || {});
