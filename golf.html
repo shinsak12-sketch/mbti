@@ -905,6 +905,9 @@
   <div class="row"><button class="btn ghost sm" id="bakCopy">백업 복사</button><button class="btn ghost sm" id="bakLoad">백업 붙여넣기</button></div>
   <div class="note">폰 바꾸거나 앱 지우기 전에 <b>백업 복사</b> 해서 카톡 나에게 보내기 같은 데 붙여두면 됨 · 사진은 이 글 백업에 안 들어감</div>
   <div id="bakBox"></div>
+  <div class="lbl" style="margin-top:28px">처음 상태로</div>
+  <button class="btn ghost sm" id="wipeAll" style="color:var(--red)">모든 기록 지우기</button>
+  <div class="note">기록 · 예정 · 내기 · 사진 · 동행자 · 알림이 전부 지워지고 처음 깐 상태가 됨 · 되돌릴 수 없으니 필요하면 먼저 <b>백업 복사</b></div>
 </section>
 
 </div>
@@ -1477,6 +1480,17 @@ $('#rfSave').onclick=()=>{
 };
 $('#rfDel').onclick=()=>{ sheet(`<h4>이 기록 삭제할까?</h4><div class="mut" style="font-size:13px;font-weight:600;margin-bottom:14px">${esc(F.date)} ${esc(F.course||F.region)}</div><div class="row"><button class="btn ghost sm" id="dno">취소</button><button class="btn danger sm" id="dyes">삭제</button></div>`); $('#dno').onclick=closeSheet; $('#dyes').onclick=()=>{ DB.records=DB.records.filter(r=>r!==editRec); PH.del((editRec.photos||[]).concat(F._newPh||[])); dropShared(editRec); save(); closeSheet(); toast('삭제됨'); renderRecords(); show('#s-rec'); }; };
 $('#recImportBtn').onclick=()=>openImport();
+/* 처음 상태로: 남이 쓰던 폰 · 다른 사람 기록이 들어간 앱 정리 */
+$('#wipeAll').onclick=()=>{ const n=DB.records.length, g=(DB.rounds||[]).length;
+  sheet(`<div class="amenu"><div class="ah"><b>모든 기록 지울까?</b><small>기록 ${n}개 · 내기 ${g}개 · 사진 · 동행자 · 알림 전부 · 되돌릴 수 없음</small></div><div class="mut" style="font-size:12.5px;font-weight:800;margin:6px 2px 8px">확인하려면 <b style="color:var(--red)">지우기</b> 라고 쓰기</div><input class="inp" id="wpIn" autocomplete="off" placeholder="지우기"><div class="row" style="margin-top:12px"><button class="btn ghost sm" id="wpNo">취소</button><button class="btn danger sm" id="wpOk" disabled>전부 지우기</button></div></div>`);
+  $('#wpIn').oninput=e=>{ $('#wpOk').disabled=e.target.value.trim()!=='지우기'; };
+  $('#wpNo').onclick=closeSheet;
+  $('#wpOk').onclick=async()=>{ const keep={theme:DB.theme,seeds:DB.seeds||[],migs:DB.migs||[]};
+    Object.keys(DB).forEach(k=>delete DB[k]); Object.assign(DB,{rounds:[],records:[],names:[]},keep);
+    try{ const d=await PH.db(); d.close(); }catch(e){} PH._db=null; PH.url.forEach(u=>URL.revokeObjectURL(u)); PH.url.clear(); try{ indexedDB.deleteDatabase('golf-photos'); }catch(e){}
+    try{ localStorage.removeItem(WXK); }catch(e){} WX={};
+    save(); syncNative(); try{ if(window.GolfNative&&GolfNative.markSeen) GolfNative.markSeen('{}'); }catch(e){}
+    closeSheet(); vib([20,40,20]); recYear=null; statYear=null; calY=null; selDay=null; recView='month'; renderRecords(); show('#s-rec'); toast('처음 상태가 됨'); }; };
 $('#remBtn').onclick=()=>{ vib(6); remSheet(); };
 
 
