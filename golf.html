@@ -695,6 +695,51 @@
   .lchips button{flex:none;max-width:210px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 12px;box-shadow:0 3px 0 var(--line);transition:transform .08s,box-shadow .08s}
   .lchips button:active{transform:translateY(3px);box-shadow:none}
   .lchips b{display:block;font-size:13.5px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .lchips small{display:block;font-size:11px;color:var(--mut);font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* ===== 정산 계산기 ===== */
+  .stl-sec{display:flex;align-items:center;gap:8px;margin:22px 2px 10px}
+  .stl-sec i{font-style:normal;width:22px;height:22px;border-radius:8px;background:var(--acc);color:var(--accink);font-size:12px;font-weight:900;display:grid;place-items:center;box-shadow:0 2px 0 color-mix(in srgb,var(--acc) 55%,#000)}
+  .stl-sec b{font-size:14px;font-weight:900;flex:1} .stl-sec small{font-size:11px;color:var(--mut);font-weight:700}
+  .ppl{display:flex;flex-direction:column;gap:8px}
+  .pp{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:9px 10px 9px 12px;box-shadow:var(--sh)}
+  .pp .av{width:34px;height:34px;font-size:13px}
+  .pp .nm{flex:1;min-width:0;font-weight:900;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pp .tm{display:flex;gap:4px;background:var(--chip);padding:3px;border-radius:11px}
+  .pp .tm button{min-width:38px;height:30px;border-radius:9px;font-size:12px;font-weight:900;color:var(--mut);transition:.15s}
+  .pp .tm button.on.w{background:var(--blue);color:#fff} .pp .tm button.on.l{background:var(--red);color:#fff} .pp .tm button.on.r{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.25)}
+  .pp .x{width:28px;height:28px;border-radius:9px;color:var(--mut);display:grid;place-items:center} .pp .x svg{width:15px;height:15px}
+  .itm{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 14px;margin-bottom:8px;box-shadow:var(--sh);transition:transform .1s}
+  .itm:active{transform:scale(.985)}
+  .itm .ic2{width:38px;height:38px;border-radius:12px;background:var(--chip);display:grid;place-items:center;flex:none;font-size:11px;font-weight:900;color:var(--acc);box-shadow:inset 0 2px 4px rgba(0,0,0,.25)}
+  .itm .tx{flex:1;min-width:0} .itm .tx b{display:block;font-size:14.5px;font-weight:900} .itm .tx small{display:block;font-size:11.5px;color:var(--mut);font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .itm .am{font-size:16px;font-weight:900;letter-spacing:-.4px} .itm.warn{border-color:var(--red)} .itm.warn small{color:var(--red)}
+  .paid{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)} .paid:last-child{border:none}
+  .paid .nm{width:64px;font-weight:900;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:none}
+  .paid label{flex:1;min-width:0;display:flex;align-items:center;gap:6px;height:42px;border-radius:12px;background:var(--bg);border:1px solid var(--line);box-shadow:inset 0 2px 5px rgba(0,0,0,.28);padding:0 12px}
+  html[data-theme=light] .paid label{box-shadow:inset 0 2px 4px rgba(0,0,0,.08)}
+  .paid input{flex:1;min-width:0;background:none;border:0;outline:none;text-align:right;font-size:16px;font-weight:800;color:var(--ink)}
+  .paid em{font-style:normal;font-size:12px;color:var(--mut);font-weight:800}
+  .paid .full{flex:none;height:36px;padding:0 10px;border-radius:11px;background:var(--chip);font-size:12px;font-weight:900;border:1px solid var(--line);box-shadow:0 2px 0 var(--line)}
+  .paid .full:active{transform:translateY(2px);box-shadow:none}
+  .chk{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding:10px 14px;border-radius:14px;font-size:12.5px;font-weight:800;background:var(--card2);border:1px solid var(--line)}
+  .chk.bad{background:var(--reds);border-color:var(--red);color:var(--red)} .chk.ok{background:var(--accs);border-color:transparent;color:var(--acc)}
+  .units{display:flex;gap:6px;flex-wrap:wrap}
+  .units button{padding:9px 13px;border-radius:999px;font-weight:800;font-size:12.5px;background:var(--chip);color:var(--mut);transition:.15s}
+  .units button.on{background:var(--acc);color:var(--accink)}
+  .burden{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:4px 14px;box-shadow:var(--sh)}
+  .burden .r{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px;font-weight:800}
+  .burden .r:last-child{border:none} .burden .r small{display:block;font-size:10.5px;color:var(--mut);font-weight:700}
+  .burden .r .v{text-align:right;min-width:72px} .burden .r .v.up{color:var(--acc)} .burden .r .v.dn{color:var(--red)}
+  .sopt{margin-top:10px}
+  .sopt .ratio{display:grid;grid-template-columns:repeat(auto-fit,minmax(64px,1fr));gap:6px}
+  .sopt .ratio label{display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 4px}
+  .sopt .ratio small{font-size:10.5px;color:var(--mut);font-weight:800}
+  .sopt .ratio input{width:100%;text-align:center;background:none;border:0;outline:none;font-size:16px;font-weight:900;color:var(--ink)}
+  .prev{margin-top:12px;background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:8px 12px}
+  .prev .r{display:flex;justify-content:space-between;font-size:12.5px;font-weight:800;padding:4px 0}
+  .prev .r b{font-weight:900}
+  .fixr{display:flex;align-items:center;gap:8px;margin-top:6px} .fixr span{width:60px;font-size:13px;font-weight:800;flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fixr input{flex:1;min-width:0;height:40px;border-radius:12px;background:var(--bg);border:1px solid var(--line);box-shadow:inset 0 2px 5px rgba(0,0,0,.25);padding:0 12px;text-align:right;font-size:15px;font-weight:800;color:var(--ink);outline:none}
 </style>
 </head>
 <body>
@@ -707,6 +752,17 @@
   <div id="heroWrap"></div>
   <div class="lbl">라운드</div>
   <div class="grid2" id="tiles"></div>
+</section>
+
+<!-- 정산 계산기 -->
+<section class="screen" id="s-setl">
+  <div class="top"><div><h1>정산</h1><div class="sm" id="setlSub">그린피 · 식비 · 상품 나누고 송금까지</div></div></div>
+  <div class="grid2" id="setlTiles"></div>
+</section>
+<section class="screen" id="s-setled">
+  <div class="top"><div><h1 id="seTitle">새 정산</h1><div class="sm" id="seSub"></div></div><button class="ic" id="seShare" aria-label="공유"><svg class="i" viewBox="0 0 24 24"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M12 3v12M8 7l4-4 4 4"/></svg></button></div>
+  <input class="inp" id="seName" placeholder="이름 (예: 10/24 레이크사이드)" maxlength="24">
+  <div id="seBody"></div>
 </section>
 
 <!-- ② 설정 -->
@@ -911,7 +967,7 @@
 </section>
 
 </div>
-<nav class="tabbar" id="tabbar"><div class="in"><button data-t="rec"><svg class="i" viewBox="0 0 24 24"><path d="M7 3h10a2 2 0 0 1 2 2v16l-7-4-7 4V5a2 2 0 0 1 2-2z"/></svg>기록</button><button data-t="stats"><svg class="i" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>통계</button><button data-t="bet"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9v.01M18 15v.01"/></svg>내기</button></div></nav>
+<nav class="tabbar" id="tabbar"><div class="in"><button data-t="rec"><svg class="i" viewBox="0 0 24 24"><path d="M7 3h10a2 2 0 0 1 2 2v16l-7-4-7 4V5a2 2 0 0 1 2-2z"/></svg>기록</button><button data-t="stats"><svg class="i" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>통계</button><button data-t="bet"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9v.01M18 15v.01"/></svg>내기</button><button data-t="settle"><svg class="i" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8 7h8M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M15.5 14.5h.01M8.5 18h.01M12 18h3.5"/></svg>정산</button></div></nav>
 <button class="fab" id="recFab" aria-label="새 기록"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
 <div class="toast" id="toast"></div>
 <div class="phv" id="phv"></div>
@@ -941,7 +997,7 @@ const fmt=n=>{ const a=Math.abs(Math.round(n)); return (n<0?'−':'')+a.toLocale
 const fmtS=n=>n>0?'+'+fmt(n):(n<0?fmt(n):'0');
 const vib=p=>{ try{ navigator.vibrate&&navigator.vibrate(p); }catch(e){} };
 function toast(m,ms=1600){ const t=$('#toast'); t.textContent=m; t.classList.toggle('top',$('#sheetBg').classList.contains('show')||$('#s-recform').classList.contains('active')); t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),ms); }
-const TABS={'#s-rec':'rec','#s-stats':'stats','#s-list':'bet'};
+const TABS={'#s-rec':'rec','#s-stats':'stats','#s-list':'bet','#s-setl':'settle'};
 function show(id){ $$('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); window.scrollTo({top:0}); const t=TABS[id]||''; document.body.classList.toggle('has-tabs',!!t); document.body.dataset.tab=t; $$('#tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.t===t)); }
 function applyTheme(){ document.documentElement.setAttribute('data-theme',DB.theme==='light'?'light':'dark'); document.querySelector('meta[name=theme-color]').content=DB.theme==='light'?'#f2f3f5':'#0e1014'; }
 applyTheme();
@@ -1481,12 +1537,12 @@ $('#rfSave').onclick=()=>{
 $('#rfDel').onclick=()=>{ sheet(`<h4>이 기록 삭제할까?</h4><div class="mut" style="font-size:13px;font-weight:600;margin-bottom:14px">${esc(F.date)} ${esc(F.course||F.region)}</div><div class="row"><button class="btn ghost sm" id="dno">취소</button><button class="btn danger sm" id="dyes">삭제</button></div>`); $('#dno').onclick=closeSheet; $('#dyes').onclick=()=>{ DB.records=DB.records.filter(r=>r!==editRec); PH.del((editRec.photos||[]).concat(F._newPh||[])); dropShared(editRec); save(); closeSheet(); toast('삭제됨'); renderRecords(); show('#s-rec'); }; };
 $('#recImportBtn').onclick=()=>openImport();
 /* 처음 상태로: 남이 쓰던 폰 · 다른 사람 기록이 들어간 앱 정리 */
-$('#wipeAll').onclick=()=>{ const n=DB.records.length, g=(DB.rounds||[]).length;
+$('#wipeAll').onclick=()=>{ const n=DB.records.length, g=(DB.rounds||[]).length+(DB.settles||[]).length;
   sheet(`<div class="amenu"><div class="ah"><b>모든 기록 지울까?</b><small>기록 ${n}개 · 내기 ${g}개 · 사진 · 동행자 · 알림 전부 · 되돌릴 수 없음</small></div><div class="mut" style="font-size:12.5px;font-weight:800;margin:6px 2px 8px">확인하려면 <b style="color:var(--red)">지우기</b> 라고 쓰기</div><input class="inp" id="wpIn" autocomplete="off" placeholder="지우기"><div class="row" style="margin-top:12px"><button class="btn ghost sm" id="wpNo">취소</button><button class="btn danger sm" id="wpOk" disabled>전부 지우기</button></div></div>`);
   $('#wpIn').oninput=e=>{ $('#wpOk').disabled=e.target.value.trim()!=='지우기'; };
   $('#wpNo').onclick=closeSheet;
   $('#wpOk').onclick=async()=>{ const keep={theme:DB.theme,seeds:DB.seeds||[],migs:DB.migs||[]};
-    Object.keys(DB).forEach(k=>delete DB[k]); Object.assign(DB,{rounds:[],records:[],names:[]},keep);
+    Object.keys(DB).forEach(k=>delete DB[k]); Object.assign(DB,{rounds:[],records:[],names:[],settles:[]},keep);
     try{ const d=await PH.db(); d.close(); }catch(e){} PH._db=null; PH.url.forEach(u=>URL.revokeObjectURL(u)); PH.url.clear(); try{ indexedDB.deleteDatabase('golf-photos'); }catch(e){}
     try{ localStorage.removeItem(WXK); }catch(e){} WX={};
     save(); syncNative(); try{ if(window.GolfNative&&GolfNative.markSeen) GolfNative.markSeen('{}'); }catch(e){}
@@ -1847,6 +1903,132 @@ function statBets(kpi){ const y=statYear; const G=(DB.rounds||[]).filter(g=>g.me
   const tot=G.reduce((a,x)=>a+x.v,0), w=G.filter(x=>x.v>0).length, l=G.filter(x=>x.v<0).length;
   return `<div class="lbl"><span>내기</span><small class="mut">'나' 정해진 ${G.length}판</small></div><div class="kpis">${kpi('bet','내기 손익',(tot>0?'+':tot<0?'−':'')+manwon(Math.abs(tot)),'만원',`${G.length}판 합계`,false)}${kpi('bet','이긴 판',w,'판',`진 판 ${l} · 비김 ${G.length-w-l}`,false)}</div>`; }
 
+
+/* ---------- 정산 계산기 (내기와 따로) ----------
+   명단(팀 승·패 / 개인 등수) → 항목마다 나누는 방식 → 선불 → 끝전 → 송금 */
+const RULE_LAB={eq:'1/n',all:'몰빵',rank:'등수 비율',man:'직접 입력'};
+const ITEM_PRESET=['그린피','캐디피','카트비','캐디팁','식비','음료','상품','기타'];
+let SE=null;
+function rankDefault(n){ if(n<=1) return [100]; if(n===2) return [0,100]; if(n===3) return [0,40,60]; if(n===4) return [0,20,30,50]; if(n===5) return [0,10,20,30,40]; const w=[...Array(n)].map((_,i)=>i); const t=w.reduce((a,b)=>a+b,0); return w.map(x=>Math.round(x/t*100)); }
+function newSettle(){ const ms=myName(); const names=[ms||'나']; const t=today(); const rec=DB.records.filter(r=>r.date<=t).sort(recSort)[0];
+  return {id:'s'+uid(),created:Date.now(),name:'',mode:'team',people:names.map(n=>({id:uid(),name:n,team:null,rank:null})),items:[],paid:{},unit:100,absorb:null}; }
+const pName=(st,id)=>(st.people.find(p=>p.id===id)||{name:'?'}).name;
+/* 한 항목을 사람별로 나눔 → {id:금액(소수 그대로)} · 문제 있으면 err */
+function splitItem(st,it){ const P=st.people, amt=+it.amount||0, out={}; P.forEach(p=>out[p.id]=0); let err='';
+  const fixed=it.fixed||{}; let fsum=0; Object.keys(fixed).forEach(k=>{ if(out[k]==null) return; const v=+fixed[k]||0; if(v>0){ out[k]+=v; fsum+=v; } });
+  if(it.rule==='man'){ if(Math.abs(fsum-amt)>0.5) err=`직접 넣은 합 ${fmt(fsum)} · 금액과 ${fmt(amt-fsum)} 차이`; return {out,err}; }
+  let rest=amt-fsum; if(rest<-0.5) return {out,err:'고정 금액이 항목 금액보다 큼'};
+  const skipFixed=it.keepFixed?false:true; const free=P.filter(p=>!(skipFixed&&(+fixed[p.id]||0)>0));
+  if(it.rule==='eq'){ const ex=new Set(it.ex||[]); const who=free.filter(p=>!ex.has(p.id)); if(!who.length) return {out,err:'나눌 사람이 없음'}; who.forEach(p=>out[p.id]+=rest/who.length); }
+  else if(it.rule==='all'){ let who=[]; if(it.to==='L'||it.to==='W'){ who=free.filter(p=>p.team===it.to); if(!who.length) return {out,err:it.to==='L'?'진 팀이 안 정해짐':'이긴 팀이 안 정해짐'}; } else { const p=P.find(x=>x.id===it.to); if(!p) return {out,err:'낼 사람을 골라줘'}; who=[p]; } who.forEach(p=>out[p.id]+=rest/who.length); }
+  else if(it.rule==='rank'){ const who=free.filter(p=>p.rank>0); if(who.length!==free.length) return {out,err:'등수 안 정한 사람이 있음'}; const R=it.ratio&&it.ratio.length?it.ratio:rankDefault(P.length);
+    // 같은 등수는 그 자리들 비율을 평균
+    const sorted=who.slice().sort((a,b)=>a.rank-b.rank); const w={}; let i=0; while(i<sorted.length){ let j=i; while(j<sorted.length&&sorted[j].rank===sorted[i].rank) j++; const avg=R.slice(i,j).reduce((a,b)=>a+(+b||0),0)/(j-i); for(let k=i;k<j;k++) w[sorted[k].id]=avg; i=j; }
+    const tw=Object.values(w).reduce((a,b)=>a+b,0); if(tw<=0) return {out,err:'비율 합이 0'}; who.forEach(p=>out[p.id]+=rest*w[p.id]/tw); }
+  return {out,err}; }
+function settleCalc(st){ const P=st.people; const burden={}, paid={}; P.forEach(p=>{ burden[p.id]=0; paid[p.id]=+(st.paid||{})[p.id]||0; }); const errs=[]; let total=0;
+  st.items.forEach(it=>{ const {out,err}=splitItem(st,it); if(err) errs.push(`${it.name||'항목'}: ${err}`); total+=+it.amount||0; Object.keys(out).forEach(k=>burden[k]+=out[k]); });
+  const U=+st.unit||1; const rb={}; P.forEach(p=>rb[p.id]=Math.round(burden[p.id]/U)*U); const diff=total-Object.values(rb).reduce((a,b)=>a+b,0);
+  const ab=st.absorb&&rb[st.absorb]!=null?st.absorb:(P.slice().sort((a,b)=>paid[b.id]-paid[a.id])[0]||{}).id; if(ab&&diff) rb[ab]+=diff;
+  const paidSum=Object.values(paid).reduce((a,b)=>a+b,0); const bal=P.map(p=>paid[p.id]-rb[p.id]);
+  return {burden,rb,paid,total,paidSum,diff,absorb:ab,errs,tr:transfers(bal)}; }
+function renderSetlList(){ DB.settles=DB.settles||[]; const box=$('#setlTiles'); box.innerHTML='';
+  $('#setlSub').textContent=DB.settles.length?`${DB.settles.length}건 · 길게 누르면 메뉴`:'그린피 · 식비 · 상품 나누고 송금까지';
+  const nb=document.createElement('button'); nb.className='tile new'; nb.innerHTML=`<div>${SV.plus}새 정산</div>`; nb.onclick=()=>{ SE=newSettle(); openSettle(true); }; box.appendChild(nb);
+  DB.settles.slice().sort((a,b)=>b.created-a.created).forEach(st=>{ const c=settleCalc(st); const b=document.createElement('button'); b.className='tile';
+    b.innerHTML=`<div class="d">${dateLabel(st.created)}</div><b>${esc(st.name)||'정산'}</b><span class="kind ${c.errs.length||Math.abs(c.paidSum-c.total)>0.5?'':'live'}">${fmt(c.total)}원 · ${st.people.length}명</span>`;
+    b.onclick=()=>{ SE=st; openSettle(false); }; longPress(b,()=>actionSheet(esc(st.name)||'정산',dateLabel(st.created),[{label:'복사해서 새로',icon:SV.copy,fn:()=>{ closeSheet(); const cp=JSON.parse(JSON.stringify(st)); cp.id='s'+uid(); cp.created=Date.now(); cp.name=(st.name||'정산')+' 복사'; cp.paid={}; SE=cp; openSettle(true); }},{label:'삭제',icon:SV.del,cls:'danger',fn:()=>confirmSheet('이 정산 지울까?',esc(st.name)||'','삭제',()=>{ DB.settles=DB.settles.filter(x=>x!==st); save(); renderSetlList(); toast('삭제됨'); })}])); box.appendChild(b); }); }
+let seNew=false;
+function openSettle(isNew){ seNew=isNew; $('#seTitle').textContent=isNew?'새 정산':'정산'; $('#seName').value=SE.name||''; renderSettle(); show('#s-setled'); }
+function seSave(){ DB.settles=DB.settles||[]; if(!DB.settles.includes(SE)) DB.settles.push(SE); seNew=false; save(); }
+$('#seName').oninput=e=>{ SE.name=e.target.value.trim(); seSave(); };
+function renderSettle(){ if(renderSettle._busy) return; renderSettle._busy=1; try{ renderSettle0(); } finally{ renderSettle._busy=0; } }
+function renderSettle0(){ const st=SE, P=st.people; const c=settleCalc(st); const box=$('#seBody');
+  $('#seSub').textContent=`${P.length}명 · 항목 ${st.items.length}개 · ${fmt(c.total)}원`;
+  const tm=p=>st.mode==='team'?`<div class="tm"><button class="w ${p.team==='W'?'on':''}" data-t="W">승</button><button class="l ${p.team==='L'?'on':''}" data-t="L">패</button></div>`:st.mode==='rank'?`<div class="tm">${P.map((_,i)=>`<button class="r ${p.rank===i+1?'on':''}" data-r="${i+1}">${i+1}</button>`).join('')}</div>`:'';
+  const imp=linkCands().concat(DB.records.filter(r=>!r.plan).sort(recSort).slice(0,3)).filter((r,i,a)=>a.indexOf(r)===i&&(r.mates||[]).length).slice(0,4);
+  let h=`<div class="stl-sec"><i>1</i><b>명단</b><small>${P.length}명</small></div>
+  <div class="seg" id="seMode"><button data-m="team">팀전 승·패</button><button data-m="rank">개인전 등수</button><button data-m="none">없음</button></div><div style="height:10px"></div>
+  <div class="ppl">${P.map(p=>`<div class="pp" data-id="${p.id}"><span class="av">${esc(p.name.slice(0,1))}</span><span class="nm">${esc(p.name)}</span>${tm(p)}<button class="x" aria-label="빼기">${ICX}</button></div>`).join('')}</div>
+  <div class="inrow" style="margin-top:8px"><input class="inp" id="sePn" placeholder="이름 쓰고 추가 · 쉼표로 여러 명" maxlength="40" autocomplete="off"><button class="btn sm" id="sePadd">추가</button></div>
+  <div class="sugg" id="sePsug"></div>${imp.length?`<div class="lchips" style="margin-top:6px">${imp.map(r=>`<button data-r="${r.id}"><b>${esc(recShort(r))}</b><small>${esc([myName()||'나'].concat(r.mates).join(', '))}</small></button>`).join('')}</div>`:''}
+  <div class="stl-sec"><i>2</i><b>항목</b><small>눌러서 나누는 방식</small></div>
+  ${st.items.map((it,i)=>{ const r=splitItem(st,it); const how=it.rule==='all'?(it.to==='L'?'진 팀 몰빵':it.to==='W'?'이긴 팀 몰빵':esc(pName(st,it.to))+' 몰빵'):it.rule==='rank'?'등수 비율 '+(it.ratio&&it.ratio.length?it.ratio:rankDefault(P.length)).join(':'):RULE_LAB[it.rule]; const fx=Object.entries(it.fixed||{}).filter(([k,v])=>+v>0&&it.rule!=='man').map(([k,v])=>`${pName(st,k)} ${won(+v)}`);
+    return `<button class="itm ${r.err?'warn':''}" data-i="${i}"><span class="ic2">${it.rule==='eq'?'1/n':it.rule==='all'?'몰빵':it.rule==='rank'?'등수':'직접'}</span><div class="tx"><b>${esc(it.name||'항목')}</b><small>${r.err?esc(r.err):how+(fx.length?' · 고정 '+esc(fx.join(', ')):'')}</small></div><span class="am">${won(+it.amount||0)}</span></button>`; }).join('')}
+  <button class="btn ghost sm" id="seIadd">${SV.plus}항목 추가</button>
+  <div class="stl-sec"><i>3</i><b>먼저 낸 돈</b><small>카드 긁은 사람 · 현금 낸 사람</small></div>
+  <div class="card" style="padding:4px 12px">${P.map(p=>`<div class="paid" data-id="${p.id}"><span class="nm">${esc(p.name)}</span><label><input inputmode="numeric" placeholder="0" value="${(st.paid||{})[p.id]?(+st.paid[p.id]).toLocaleString('ko-KR'):''}"><em>원</em></label><button class="full">전액</button></div>`).join('')}</div>
+  <div class="chk ${Math.abs(c.paidSum-c.total)<0.5?(c.total?'ok':''):'bad'}" id="sePchk"><span>낸 돈 합 ${fmt(c.paidSum)}원</span><span>항목 합 ${fmt(c.total)}원${Math.abs(c.paidSum-c.total)<0.5?'':' · '+(c.paidSum>c.total?'더 냄 ':'모자람 ')+fmt(Math.abs(c.total-c.paidSum))}</span></div>
+  <div class="stl-sec"><i>4</i><b>끝전</b><small>맞출 단위 · 남는 돈 안고 갈 사람</small></div>
+  <div class="units" id="seUnit">${[1,10,100,1000,10000].map(u=>`<button data-u="${u}" class="${(+st.unit||1)===u?'on':''}">${u===1?'1원 그대로':u.toLocaleString('ko-KR')+'원'}</button>`).join('')}</div>
+  <div class="units" id="seAbs" style="margin-top:8px">${P.map(p=>`<button data-id="${p.id}" class="${c.absorb===p.id?'on':''}">${esc(p.name)}</button>`).join('')}</div>
+  <div class="note" style="margin-top:6px">${c.diff?`끝전 ${fmtS(c.diff)}원 → <b>${esc(pName(st,c.absorb))}</b> 부담에 더함`:'끝전 없음'} · 처음엔 제일 많이 낸 사람</div>
+  <div class="stl-sec"><i>5</i><b>결과</b><small>${c.errs.length?'항목 확인 필요':'누가 누구한테'}</small></div>
+  ${c.errs.length?`<div class="chk bad" style="margin-bottom:10px">${c.errs.map(esc).join('<br>')}</div>`:''}
+  <div class="burden">${P.map(p=>{ const v=c.paid[p.id]-c.rb[p.id]; return `<div class="r"><div>${esc(p.name)}${p.team?`<small>${p.team==='W'?'이긴 팀':'진 팀'}</small>`:p.rank?`<small>${p.rank}등</small>`:''}</div><div class="v">${fmt(c.rb[p.id])}<small>부담</small></div><div class="v ${v>0.5?'up':v<-0.5?'dn':''}">${v>0.5?'+'+fmt(v):v<-0.5?fmt(v):'0'}<small>${v>0.5?'받을 돈':v<-0.5?'보낼 돈':'끝'}</small></div></div>`; }).join('')}</div>
+  <div class="lbl">송금</div><div class="flow">${c.tr.length?flowsHTML(c.tr,P):'<div class="none" style="padding:14px 0;text-align:center;color:var(--mut);font-weight:700;font-size:13px">주고받을 돈 없음</div>'}</div>
+  <div style="height:14px"></div>${!seNew?'<button class="btn ghost sm" id="seDel" style="color:var(--red)">이 정산 삭제</button>':''}`;
+  box.innerHTML=h;
+  $$('#seMode button').forEach(b=>{ b.classList.toggle('on',b.dataset.m===st.mode); b.onclick=()=>{ st.mode=b.dataset.m; vib(6); seSave(); renderSettle(); }; });
+  box.querySelectorAll('.pp').forEach(el=>{ const p=P.find(x=>x.id===el.dataset.id);
+    el.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{ p.team=p.team===b.dataset.t?null:b.dataset.t; vib(5); seSave(); renderSettle(); });
+    el.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{ p.rank=p.rank===+b.dataset.r?null:+b.dataset.r; vib(5); seSave(); renderSettle(); });
+    el.querySelector('.x').onclick=()=>{ st.people=P.filter(x=>x!==p); delete st.paid[p.id]; st.items.forEach(it=>{ if(it.fixed) delete it.fixed[p.id]; if(it.to===p.id) it.to=null; if(it.ex) it.ex=it.ex.filter(x=>x!==p.id); }); if(st.absorb===p.id) st.absorb=null; vib(8); seSave(); renderSettle(); };
+    el.querySelector('.nm').onclick=()=>{ sheet(`<div class="amenu"><div class="ah"><b>이름 바꾸기</b></div><input class="inp" id="spn" maxlength="10" value="${esc(p.name)}"><div class="row" style="margin-top:10px"><button class="btn ghost sm" id="spX">취소</button><button class="btn sm" id="spO">확인</button></div></div>`); $('#spX').onclick=closeSheet; $('#spO').onclick=()=>{ const v=$('#spn').value.trim(); if(v){ p.name=v; seSave(); } closeSheet(); renderSettle(); }; }; });
+  const addNames=list=>{ list.forEach(n=>{ n=n.trim(); if(n&&!st.people.some(p=>p.name===n)) st.people.push({id:uid(),name:n,team:null,rank:null}); }); seSave(); renderSettle(); };
+  $('#sePadd').onclick=()=>{ const v=$('#sePn').value; if(!v.trim()) return; vib(6); addNames(v.split(/[,，·\/]/)); };
+  $('#sePn').onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); $('#sePadd').click(); } };
+  const sug=[myName()].concat(countBy(DB.records,r=>r.mates||[]).map(x=>x[0])).concat(DB.names||[]).filter((n,i,a)=>n&&a.indexOf(n)===i&&!P.some(p=>p.name===n)).slice(0,14);
+  $('#sePsug').innerHTML=sug.map(n=>`<button data-k="${esc(n)}">${esc(n)}</button>`).join(''); $('#sePsug').querySelectorAll('button').forEach(b=>b.onclick=()=>{ vib(5); addNames([b.dataset.k]); });
+  box.querySelectorAll('.lchips button').forEach(b=>b.onclick=()=>{ const r=DB.records.find(x=>x.id===b.dataset.r); if(!r) return; if(!st.name){ st.name=`${+r.date.slice(5,7)}/${+r.date.slice(8,10)} ${r.course||r.region}`; $('#seName').value=st.name; } vib(8); addNames([myName()||'나'].concat(r.mates)); toast('명단 불러옴'); });
+  box.querySelectorAll('.itm').forEach(b=>b.onclick=()=>itemSheet(+b.dataset.i));
+  $('#seIadd').onclick=()=>{ st.items.push({id:uid(),name:'',amount:0,rule:'eq',fixed:{},ex:[]}); itemSheet(st.items.length-1,true); };
+  box.querySelectorAll('.paid').forEach(el=>{ const id=el.dataset.id; const inp=el.querySelector('input');
+    inp.oninput=()=>{ const d=inp.value.replace(/\D/g,'').slice(0,9); st.paid=st.paid||{}; if(+d) st.paid[id]=+d; else delete st.paid[id]; inp.value=d?(+d).toLocaleString('ko-KR'):''; seSave(); };
+    inp.onchange=()=>renderSettle();
+    el.querySelector('.full').onclick=()=>{ const t=settleCalc(st).total; st.paid={[id]:t}; vib(8); seSave(); renderSettle(); }; });
+  $$('#seUnit button').forEach(b=>b.onclick=()=>{ st.unit=+b.dataset.u; vib(5); seSave(); renderSettle(); });
+  $$('#seAbs button').forEach(b=>b.onclick=()=>{ st.absorb=b.dataset.id; vib(5); seSave(); renderSettle(); });
+  const del=$('#seDel'); if(del) del.onclick=()=>confirmSheet('이 정산 지울까?',esc(st.name)||'','삭제',()=>{ DB.settles=(DB.settles||[]).filter(x=>x!==st); save(); renderSetlList(); show('#s-setl'); toast('삭제됨'); });
+  $('#seShare').onclick=()=>shareSettle(st); }
+function itemSheet(i,isNew){ const st=SE, P=st.people; const it=st.items[i]; it.fixed=it.fixed||{}; it.ex=it.ex||[];
+  const draw=()=>{ if(draw._b) return; draw._b=1; try{ draw0(); } finally{ draw._b=0; } };
+  const draw0=()=>{ const r=splitItem(st,it); const rk=it.ratio&&it.ratio.length===P.length?it.ratio:rankDefault(P.length);
+    let opt='';
+    if(it.rule==='eq') opt=`<div class="mut" style="font-size:12px;font-weight:800;margin:2px 2px 6px">나눌 사람 (빼려면 누르기)</div><div class="sugg" id="isEx">${P.map(p=>`<button data-id="${p.id}" class="${it.ex.includes(p.id)?'':'on'}">${esc(p.name)}</button>`).join('')}</div>`;
+    else if(it.rule==='all') opt=`<div class="mut" style="font-size:12px;font-weight:800;margin:2px 2px 6px">누가 다 내나</div><div class="sugg" id="isTo">${st.mode==='team'?`<button data-to="L" class="${it.to==='L'?'on':''}">진 팀</button><button data-to="W" class="${it.to==='W'?'on':''}">이긴 팀</button>`:''}${P.map(p=>`<button data-to="${p.id}" class="${it.to===p.id?'on':''}">${esc(p.name)}</button>`).join('')}</div>`;
+    else if(it.rule==='rank') opt=`<div class="mut" style="font-size:12px;font-weight:800;margin:2px 2px 6px">등수별 비율 · 합 ${rk.reduce((a,b)=>a+(+b||0),0)} · 같은 등수는 평균</div><div class="ratio" id="isRk">${rk.map((v,k)=>`<label><small>${k+1}등</small><input inputmode="numeric" data-k="${k}" value="${v}"></label>`).join('')}</div>`;
+    else opt=`<div class="mut" style="font-size:12px;font-weight:800;margin:2px 2px 6px">사람마다 낼 돈 직접</div>`;
+    const showFix=it.rule==='man'||it._fix||Object.values(it.fixed).some(v=>+v>0);
+    const fix=showFix?`${it.rule==='man'?'':`<div class="mut" style="font-size:12px;font-weight:800;margin:12px 2px 2px">고정 금액 (예: 파3 니어 2만) · 낸 사람은 나머지에서 빠짐</div>`}${P.map(p=>`<div class="fixr"><span>${esc(p.name)}</span><input inputmode="numeric" data-id="${p.id}" placeholder="0" value="${+it.fixed[p.id]?(+it.fixed[p.id]).toLocaleString('ko-KR'):''}"></div>`).join('')}`:`<button class="lk" id="isFixOn" style="margin-top:12px;font-size:12.5px;font-weight:900;color:var(--acc)">+ 고정 금액 넣기 (파3 니어처럼)</button>`;
+    sheet(`<div class="amenu"><div class="ah"><b>${isNew?'항목 추가':'항목'}</b><small>이름 · 금액 · 나누는 방식</small></div>
+      <div class="sugg" id="isPre" style="margin-bottom:8px">${ITEM_PRESET.map(n=>`<button data-n="${n}" class="${it.name===n?'on':''}">${n}</button>`).join('')}</div>
+      <div class="inrow"><input class="inp" id="isName" placeholder="항목 이름" maxlength="14" value="${esc(it.name)}"><input class="inp" id="isAmt" inputmode="numeric" placeholder="금액" style="text-align:right;font-weight:900" value="${it.amount?(+it.amount).toLocaleString('ko-KR'):''}"></div>
+      <div class="seg" id="isRule" style="margin-top:10px">${Object.entries(RULE_LAB).map(([k,l])=>`<button data-r="${k}" class="${it.rule===k?'on':''}">${l}</button>`).join('')}</div>
+      <div class="sopt">${opt}${fix}</div>
+      <div class="prev">${r.err?`<div class="r" style="color:var(--red)">${esc(r.err)}</div>`:P.map(p=>`<div class="r"><span>${esc(p.name)}</span><b>${fmt(Math.round(r.out[p.id]))}</b></div>`).join('')}</div>
+      <div class="row" style="margin-top:12px">${isNew?'<button class="btn ghost sm" id="isX">취소</button>':'<button class="btn ghost sm" id="isDel" style="color:var(--red)">항목 삭제</button>'}<button class="btn sm" id="isOk">확인</button></div></div>`);
+    const num=v=>+String(v).replace(/\D/g,'').slice(0,9)||0;
+    $('#isName').oninput=e=>{ it.name=e.target.value.trim(); };
+    $('#isAmt').oninput=e=>{ const n=num(e.target.value); it.amount=n; e.target.value=n?n.toLocaleString('ko-KR'):''; };
+    $('#isAmt').onchange=()=>draw();
+    $$('#isPre button').forEach(b=>b.onclick=()=>{ it.name=b.dataset.n; vib(5); draw(); });
+    $$('#isRule button').forEach(b=>b.onclick=()=>{ it.rule=b.dataset.r; if(it.rule==='all'&&!it.to) it.to=st.mode==='team'?'L':null; vib(6); draw(); });
+    $$('#isEx button').forEach(b=>b.onclick=()=>{ const id=b.dataset.id; it.ex=it.ex.includes(id)?it.ex.filter(x=>x!==id):it.ex.concat(id); vib(5); draw(); });
+    $$('#isTo button').forEach(b=>b.onclick=()=>{ it.to=b.dataset.to; vib(5); draw(); });
+    $$('#isRk input').forEach(inp=>{ inp.oninput=()=>{ const a=(it.ratio&&it.ratio.length===P.length?it.ratio:rankDefault(P.length)).slice(); a[+inp.dataset.k]=num(inp.value); it.ratio=a; }; inp.onchange=()=>draw(); });
+    const fo=$('#isFixOn'); if(fo) fo.onclick=()=>{ it._fix=true; draw(); };
+    $$('.fixr input').forEach(inp=>{ inp.oninput=()=>{ const n=num(inp.value); if(n) it.fixed[inp.dataset.id]=n; else delete it.fixed[inp.dataset.id]; inp.value=n?n.toLocaleString('ko-KR'):''; }; inp.onchange=()=>draw(); });
+    const x=$('#isX'); if(x) x.onclick=()=>{ st.items.splice(st.items.indexOf(it),1); closeSheet(); renderSettle(); };
+    const dl=$('#isDel'); if(dl) dl.onclick=()=>{ st.items.splice(st.items.indexOf(it),1); seSave(); closeSheet(); renderSettle(); toast('항목 삭제'); };
+    $('#isOk').onclick=()=>{ if(!it.amount){ toast('금액 넣어줘'); $('#isAmt').focus(); return; } if(!it.name) it.name='항목'; delete it._fix; seSave(); vib([10,30,10]); closeSheet(); renderSettle(); }; };
+  draw(); }
+function shareSettle(st){ const c=settleCalc(st); const L=[`[버디로그 정산] ${st.name||dateLabel(st.created)}`];
+  st.items.forEach(it=>{ const how=it.rule==='all'?(it.to==='L'?'진 팀':it.to==='W'?'이긴 팀':pName(st,it.to))+' 몰빵':it.rule==='rank'?'등수 비율':RULE_LAB[it.rule]; L.push(`· ${it.name} ${fmt(+it.amount)} (${how})`); });
+  L.push('— 각자 부담'); st.people.forEach(p=>L.push(`${p.name} ${fmt(c.rb[p.id])}`));
+  if(c.tr.length){ L.push('— 송금'); c.tr.forEach(x=>L.push(`${st.people[x.from].name} → ${st.people[x.to].name} ${fmt(x.v)}`)); }
+  const txt=L.join('\n'); try{ if(window.GolfNative&&GolfNative.shareText){ GolfNative.shareText(txt); return; } }catch(e){} if(navigator.share) navigator.share({text:txt}).catch(()=>{}); else { copyText(txt); toast('복사됨 · 카톡에 붙여넣기'); } }
+
 /* ---------- ⓒ 통계 ---------- */
 function statList(year){ return DB.records.filter(r=>!r.plan&&(year==='all'||yearOf(r)===year)); }
 const periodLab=y=>y==='all'?'전체 기간':y+'년';
@@ -1987,7 +2169,7 @@ $('#bakLoad').onclick=()=>{ const box=$('#bakBox'); box.innerHTML=`<textarea cla
       const hr=new Set(DB.rounds.map(r=>r.id)); const addB=rds.filter(r=>r&&r.id&&Array.isArray(r.players)&&!hr.has(r.id)); addR.forEach(r=>DB.records.push(r)); addB.forEach(r=>DB.rounds.push(r)); const add=addR.length, ra=addB.length; save(); toast(`기록 ${add}개 · 내기 ${ra}개 복원`); renderRecords(); show('#s-rec'); }catch(e){ toast('백업 형식이 아님'); } }; };
 
 /* ---------- 탭 ---------- */
-$$('#tabbar button').forEach(b=>b.onclick=()=>{ const t=b.dataset.t; vib(6); formReturn=null; if(t==='rec'){ renderRecords(); show('#s-rec'); } else if(t==='stats'){ show('#s-stats'); renderStats(); } else { renderList(); show('#s-list'); } });
+$$('#tabbar button').forEach(b=>b.onclick=()=>{ const t=b.dataset.t; vib(6); formReturn=null; if(t==='settle'){ renderSetlList(); show('#s-setl'); return; } if(t==='rec'){ renderRecords(); show('#s-rec'); } else if(t==='stats'){ show('#s-stats'); renderStats(); } else { renderList(); show('#s-list'); } });
 $('#recFab').onclick=()=>{ formReturn=null; openRecForm(null); };
 window.addEventListener('resize',()=>{ if($('#s-stats').classList.contains('active')) renderStats(); });
 
@@ -2011,7 +2193,8 @@ window.appBack=function(){
   const a=$('.screen.active'); const id=a?'#'+a.id:'';
   if(id==='#s-recform'){ $('#rfClose').click(); return true; }
   if(POPUP) return false;
-  if(id==='#s-import'||id==='#s-stats'||id==='#s-list'||id==='#s-mates'){ renderRecords(); show('#s-rec'); return true; }
+  if(id==='#s-setled'){ save(); renderSetlList(); show('#s-setl'); return true; }
+  if(id==='#s-import'||id==='#s-stats'||id==='#s-list'||id==='#s-mates'||id==='#s-setl'){ renderRecords(); show('#s-rec'); return true; }
   if(id==='#s-rank'){ renderStats(); show('#s-stats'); return true; }
   if(id==='#s-online'){ $('#onBack').click(); return true; }
   if(id==='#s-rlist'){ $('#rlBack').click(); return true; }
