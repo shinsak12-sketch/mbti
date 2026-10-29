@@ -27,7 +27,7 @@ public class PhotoProvider extends ContentProvider {
     c.addRow(new Object[]{f.getName(), f.length()});
     return c;
   }
-  @Override public String getType(Uri uri) { return "image/jpeg"; }
+  @Override public String getType(Uri uri) { String n = uri.getLastPathSegment(); return n != null && n.endsWith(".png") ? "image/png" : "image/jpeg"; }
   @Override public Uri insert(Uri uri, ContentValues v) { return null; }
   @Override public int delete(Uri uri, String s, String[] a) { return 0; }
   @Override public int update(Uri uri, ContentValues v, String s, String[] a) { return 0; }

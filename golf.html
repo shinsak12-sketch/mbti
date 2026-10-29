@@ -697,6 +697,7 @@
   .lchips b{display:block;font-size:13.5px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .lchips small{display:block;font-size:11px;color:var(--mut);font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
   /* ===== 정산 계산기 ===== */
+  .tg.setl{background:var(--chip);color:var(--ink);cursor:pointer}
   .stl-sec{display:flex;align-items:center;gap:8px;margin:22px 2px 10px}
   .stl-sec i{font-style:normal;width:22px;height:22px;border-radius:8px;background:var(--acc);color:var(--accink);font-size:12px;font-weight:900;display:grid;place-items:center;box-shadow:0 2px 0 color-mix(in srgb,var(--acc) 55%,#000)}
   .stl-sec b{font-size:14px;font-weight:900;flex:1} .stl-sec small{font-size:11px;color:var(--mut);font-weight:700}
@@ -761,6 +762,7 @@
 </section>
 <section class="screen" id="s-setled">
   <div class="top"><div><h1 id="seTitle">새 정산</h1><div class="sm" id="seSub"></div></div><button class="ic" id="seShare" aria-label="공유"><svg class="i" viewBox="0 0 24 24"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M12 3v12M8 7l4-4 4 4"/></svg></button></div>
+  <div id="seLink"></div>
   <input class="inp" id="seName" placeholder="이름 (예: 10/24 레이크사이드)" maxlength="24">
   <div id="seBody"></div>
 </section>
@@ -1313,9 +1315,9 @@ function recCard(r){
   const SB=`<span class="sbtn" data-score="${r.id}" role="button"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>타수</span>`;
   const right = r.plan ? (dd>=0?`<b class="dd">${dd===0?'오늘':'D-'+dd}</b><small>예정</small>`:SB) : (r.score?`<b>${r.score}</b><small>${diff>0?'+'+diff:diff}</small>`:SB);
   const ct=costTotal(r);
-  return `<button class="rec ${r.plan?'plan':''} ${r.plan&&dd<0?'past':''}" data-id="${r.id}"><div class="dt"><b>${d}</b><small>${+r.date.slice(0,4)===new Date().getFullYear()?m+'월':"'"+r.date.slice(2,4)+'.'+m}${' '+dowOf(r.date)}</small></div>${phThumb(r)}<div class="mid"><b>${esc(r.course||r.region||'골프장 미입력')}</b>${sub?`<small>${esc(sub)}</small>`:''}<div class="tags">${r.tee?`<span class="tg tee">${esc(r.tee)} 티오프</span>`:''}${r.plan?'<span class="tg pln">예정</span>':''}${r.shared?`<span class="tg shr">${esc(r.shared.fromName)} 공유</span>`:(r.plan&&shareTargets(r).length?'<span class="tg shr">같이 봄</span>':'')}${r.abroad?'<span class="tg abr">해외</span>':''}<span class="tg ${r.caddie?'cad':''}">${r.caddie?'캐디':'노캐디'}</span>${wxTag(r)}${betTag(r)}${hsDone(r)?'<span class="tg hs">홀별</span>':''}${ct?`<span class="tg won">${won(ct)}</span>`:''}${r.memo?'<span class="tg">메모</span>':''}</div></div><div class="rs">${right}</div></button>`;
+  return `<button class="rec ${r.plan?'plan':''} ${r.plan&&dd<0?'past':''}" data-id="${r.id}"><div class="dt"><b>${d}</b><small>${+r.date.slice(0,4)===new Date().getFullYear()?m+'월':"'"+r.date.slice(2,4)+'.'+m}${' '+dowOf(r.date)}</small></div>${phThumb(r)}<div class="mid"><b>${esc(r.course||r.region||'골프장 미입력')}</b>${sub?`<small>${esc(sub)}</small>`:''}<div class="tags">${r.tee?`<span class="tg tee">${esc(r.tee)} 티오프</span>`:''}${r.plan?'<span class="tg pln">예정</span>':''}${r.shared?`<span class="tg shr">${esc(r.shared.fromName)} 공유</span>`:(r.plan&&shareTargets(r).length?'<span class="tg shr">같이 봄</span>':'')}${r.abroad?'<span class="tg abr">해외</span>':''}<span class="tg ${r.caddie?'cad':''}">${r.caddie?'캐디':'노캐디'}</span>${wxTag(r)}${betTag(r)}${setlTag(r)}${hsDone(r)?'<span class="tg hs">홀별</span>':''}${ct?`<span class="tg won">${won(ct)}</span>`:''}${r.memo?'<span class="tg">메모</span>':''}</div></div><div class="rs">${right}</div></button>`;
 }
-function bindRecCards(box,before){ hydrateThumbs(box); box.querySelectorAll('.rec').forEach(b=>{ const r=DB.records.find(x=>x.id===b.dataset.id); if(!r) return; const bt=b.querySelector('.tg.bet'); if(bt){ bt.addEventListener('pointerdown',e=>e.stopPropagation()); bt.addEventListener('click',e=>{ e.stopPropagation(); e.preventDefault(); before&&before(); const g=DB.rounds.find(x=>x.id===bt.dataset.bet); if(g){ show('#s-list'); openRound(g); } }); } const ph=b.querySelector('.ph'); if(ph){ ph.addEventListener('pointerdown',e=>e.stopPropagation()); ph.addEventListener('click',e=>{ e.stopPropagation(); e.preventDefault(); before&&before(); photoViewer(r,0); }); } const sb=b.querySelector('.sbtn'); if(sb){ sb.addEventListener('pointerdown',e=>e.stopPropagation()); sb.addEventListener('click',e=>{ e.stopPropagation(); e.preventDefault(); before&&before(); scoreSheet(r); }); } b.onclick=()=>{ before&&before(); openRecForm(r); }; longPress(b,()=>{ before&&before(); recMenu(r); }); }); }
+function bindRecCards(box,before){ hydrateThumbs(box); box.querySelectorAll('.rec').forEach(b=>{ const r=DB.records.find(x=>x.id===b.dataset.id); if(!r) return; const sg=b.querySelector('.tg.setl'); if(sg){ sg.addEventListener('pointerdown',e=>e.stopPropagation()); sg.addEventListener('click',e=>{ e.stopPropagation(); e.preventDefault(); before&&before(); const st=(DB.settles||[]).find(x=>x.id===sg.dataset.st); if(st){ SE=st; openSettle(false); } }); } const bt=b.querySelector('.tg.bet'); if(bt){ bt.addEventListener('pointerdown',e=>e.stopPropagation()); bt.addEventListener('click',e=>{ e.stopPropagation(); e.preventDefault(); before&&before(); const g=DB.rounds.find(x=>x.id===bt.dataset.bet); if(g){ show('#s-list'); openRound(g); } }); } const ph=b.querySelector('.ph'); if(ph){ ph.addEventListener('pointerdown',e=>e.stopPropagation()); ph.addEventListener('click',e=>{ e.stopPropagation(); e.preventDefault(); before&&before(); photoViewer(r,0); }); } const sb=b.querySelector('.sbtn'); if(sb){ sb.addEventListener('pointerdown',e=>e.stopPropagation()); sb.addEventListener('click',e=>{ e.stopPropagation(); e.preventDefault(); before&&before(); scoreSheet(r); }); } b.onclick=()=>{ before&&before(); openRecForm(r); }; longPress(b,()=>{ before&&before(); recMenu(r); }); }); }
 function longPress(el,fn){ let t=null,sx=0,sy=0,fired=false;
   const cancel=()=>{ clearTimeout(t); el.classList.remove('pressing'); };
   el.addEventListener('pointerdown',e=>{ fired=false; sx=e.clientX; sy=e.clientY; el.classList.add('pressing'); t=setTimeout(()=>{ fired=true; el.classList.remove('pressing'); vib(28); fn(); },480); });
@@ -1332,6 +1334,7 @@ function recMenu(r){ const title=esc(r.course||r.region||'라운드'); const sub
   items.push({label:(r.photos||[]).length?`사진 추가 · ${(r.photos||[]).length}장 있음`:'사진 추가 (촬영 · 앨범)',icon:SV.cam,fn:()=>{ closeSheet(); addPhotosTo(r,false); }});
   if(!r.plan||dday(r.date)<=0) items.push({label:hsAny(r)?'홀별 타수 고치기':'홀별 타수 넣기',icon:SV.grid,fn:()=>holeForRec(r)});
   { const g=betOf(r), d=dday(r.date); if(g) items.push({label:'내기 정산 보기',icon:SV.coin,fn:()=>{ closeSheet(); show('#s-list'); openRound(g); }}); else if(!POPUP&&((r.plan&&d>=-1)||(!r.plan&&d>=-7))) items.push({label:'이 라운드로 내기 시작',icon:SV.coin,cls:'blue',fn:()=>{ closeSheet(); cur=newRound(); openSetup(true); linkRound(r); }}); }
+  if(!POPUP){ const st=setlOf(r); items.push(st?{label:'정산 보기',icon:SV.calc,fn:()=>{ closeSheet(); SE=st; openSettle(false); }}:{label:'이 라운드 정산하기',icon:SV.calc,fn:()=>{ closeSheet(); SE=newSettle(); linkSettle(r); openSettle(true); }}); }
   items.push({label:'같은 곳 새로 추가',icon:SV.copy,fn:()=>{ closeSheet(); openRecForm(null,{abroad:r.abroad,country:r.country||'',region:r.region,course:r.course,caddie:r.caddie,holes:r.holes,mates:(r.mates||[]).slice()}); }});
   items.push({label:'삭제',icon:SV.del,cls:'danger',fn:()=>confirmSheet('이 기록 삭제할까?',sub+' '+title,'삭제',()=>{ DB.records=DB.records.filter(x=>x!==r); PH.del(r.photos||[]); dropShared(r); save(); vib(20); toast('삭제됨'); refreshCurrent(); })});
   actionSheet(title,sub,items); }
@@ -1600,14 +1603,14 @@ function closeViewer(keep){ if(PV){ PV.urls.forEach(u=>URL.revokeObjectURL(u)); 
 window.addEventListener('resize',()=>{ if(PV){ const tr=$('#pvTrack'); if(tr) tr.style.transform=`translateX(${-PV.i*$('#pvStage').clientWidth}px)`; } });
 
 /* ---------- 비용 (선택 · 내가 낸 돈) ---------- */
-const COSTS=[['green','그린피'],['caddie','캐디피'],['cart','카트비'],['tip','캐디팁']];
+const COSTS=[['green','그린피'],['caddie','캐디피'],['cart','카트비'],['tip','캐디팁'],['etc','기타']];
 function costTotal(r){ const c=r&&r.cost; if(!c) return 0; return COSTS.reduce((a,[k])=>a+(+c[k]||0),0); }
 function manwon(n){ const m=Math.round(n/1000)/10; return Number.isInteger(m)?String(m):m.toFixed(1); }
 function won(n){ n=Math.round(n||0); return n>=10000?manwon(n)+'만원':n.toLocaleString('ko-KR')+'원'; }
 function cleanCost(r){ if(!r.cost) return; if(!r.caddie){ delete r.cost.caddie; delete r.cost.tip; } COSTS.forEach(([k])=>{ if(!(+r.cost[k]>0)) delete r.cost[k]; }); if(!Object.keys(r.cost).length) delete r.cost; }
 let costOpen=false;
 function renderCosts(){ const box=$('#fCosts');
-  if(!costOpen){ box.innerHTML=`<button class="opt" type="button" id="costOpen"><span>그린피 · 캐디피 · 카트비 · 캐디팁<small>안 넣어도 됨</small></span><em>넣기 +</em></button>`; $('#costOpen').onclick=()=>{ costOpen=true; vib(6); renderCosts(); const i=$('#fCosts input'); if(i) setTimeout(()=>i.focus(),60); }; return; }
+  if(!costOpen){ box.innerHTML=`<button class="opt" type="button" id="costOpen"><span>그린피 · 캐디피 · 카트비 · 캐디팁 · 기타<small>안 넣어도 됨</small></span><em>넣기 +</em></button>`; $('#costOpen').onclick=()=>{ costOpen=true; vib(6); renderCosts(); const i=$('#fCosts input'); if(i) setTimeout(()=>i.focus(),60); }; return; }
   const c=F.cost||(F.cost={}); const n=(F.mates||[]).length+1; const rows=COSTS.filter(([k])=>F.caddie||(k!=='caddie'&&k!=='tip'));
   box.innerHTML=`<div class="costs">${rows.map(([k,l])=>`<div class="cr"><span>${l}</span><label><input data-k="${k}" inputmode="numeric" autocomplete="off" placeholder="0" value="${c[k]?(+c[k]).toLocaleString('ko-KR'):''}"><em>원</em></label>${n>1?`<button class="dv" type="button" data-k="${k}" aria-label="${n}명으로 나누기">1/${n}</button>`:''}</div>`).join('')}<div class="ct"><div>내 비용 합계<small>${n>1?`팀 금액 넣었으면 1/${n} 눌러 내 몫으로`:'혼자 낸 금액 그대로'}</small></div><b id="costTot"></b></div></div>`;
   const tot=()=>{ $('#costTot').textContent=costTotal(F)?won(costTotal(F)):'0원'; }; tot();
@@ -1943,7 +1946,7 @@ function openSettle(isNew){ seNew=isNew; $('#seTitle').textContent=isNew?'새 �
 function seSave(){ DB.settles=DB.settles||[]; if(!DB.settles.includes(SE)) DB.settles.push(SE); seNew=false; save(); }
 $('#seName').oninput=e=>{ SE.name=e.target.value.trim(); seSave(); };
 function renderSettle(){ if(renderSettle._busy) return; renderSettle._busy=1; try{ renderSettle0(); } finally{ renderSettle._busy=0; } }
-function renderSettle0(){ const st=SE, P=st.people; const c=settleCalc(st); const box=$('#seBody');
+function renderSettle0(){ const st=SE, P=st.people; renderSeLink(); const c=settleCalc(st); const box=$('#seBody');
   $('#seSub').textContent=`${P.length}명 · 항목 ${st.items.length}개 · ${fmt(c.total)}원`;
   const tm=p=>st.mode==='team'?`<div class="tm"><button class="w ${p.team==='W'?'on':''}" data-t="W">승</button><button class="l ${p.team==='L'?'on':''}" data-t="L">패</button></div>`:st.mode==='rank'?`<div class="tm">${P.map((_,i)=>`<button class="r ${p.rank===i+1?'on':''}" data-r="${i+1}">${i+1}</button>`).join('')}</div>`:'';
   const imp=linkCands().concat(DB.records.filter(r=>!r.plan).sort(recSort).slice(0,3)).filter((r,i,a)=>a.indexOf(r)===i&&(r.mates||[]).length).slice(0,4);
@@ -1967,6 +1970,7 @@ function renderSettle0(){ const st=SE, P=st.people; const c=settleCalc(st); cons
   ${c.errs.length?`<div class="chk bad" style="margin-bottom:10px">${c.errs.map(esc).join('<br>')}</div>`:''}
   <div class="burden">${P.map(p=>{ const v=c.paid[p.id]-c.rb[p.id]; return `<div class="r"><div>${esc(p.name)}${p.team?`<small>${p.team==='W'?'이긴 팀':'진 팀'}</small>`:p.rank?`<small>${p.rank}등</small>`:''}</div><div class="v">${fmt(c.rb[p.id])}<small>부담</small></div><div class="v ${v>0.5?'up':v<-0.5?'dn':''}">${v>0.5?'+'+fmt(v):v<-0.5?fmt(v):'0'}<small>${v>0.5?'받을 돈':v<-0.5?'보낼 돈':'끝'}</small></div></div>`; }).join('')}</div>
   <div class="lbl">송금</div><div class="flow">${c.tr.length?flowsHTML(c.tr,P):'<div class="none" style="padding:14px 0;text-align:center;color:var(--mut);font-weight:700;font-size:13px">주고받을 돈 없음</div>'}</div>
+  ${(()=>{ const lr=st.rec&&DB.records.find(x=>x.id===st.rec); return `<div style="height:12px"></div><div class="row"><button class="btn sm" id="seImg">${SV.share}이미지로 보내기</button>${lr?'<button class="btn ghost sm" id="seCost">내 비용 기록에 넣기</button>':''}</div>`; })()}
   <div style="height:14px"></div>${!seNew?'<button class="btn ghost sm" id="seDel" style="color:var(--red)">이 정산 삭제</button>':''}`;
   box.innerHTML=h;
   $$('#seMode button').forEach(b=>{ b.classList.toggle('on',b.dataset.m===st.mode); b.onclick=()=>{ st.mode=b.dataset.m; vib(6); seSave(); renderSettle(); }; });
@@ -1990,7 +1994,9 @@ function renderSettle0(){ const st=SE, P=st.people; const c=settleCalc(st); cons
   $$('#seUnit button').forEach(b=>b.onclick=()=>{ st.unit=+b.dataset.u; vib(5); seSave(); renderSettle(); });
   $$('#seAbs button').forEach(b=>b.onclick=()=>{ st.absorb=b.dataset.id; vib(5); seSave(); renderSettle(); });
   const del=$('#seDel'); if(del) del.onclick=()=>confirmSheet('이 정산 지울까?',esc(st.name)||'','삭제',()=>{ DB.settles=(DB.settles||[]).filter(x=>x!==st); save(); renderSetlList(); show('#s-setl'); toast('삭제됨'); });
-  $('#seShare').onclick=()=>shareSettle(st); }
+  $('#seShare').onclick=()=>actionSheet('정산 보내기',esc(st.name)||'',[{label:'이미지로 보내기 (보고서)',icon:SV.img,cls:'blue',fn:()=>{ closeSheet(); shareSettleImage(st); }},{label:'글로 보내기',icon:SV.copy,fn:()=>{ closeSheet(); shareSettle(st); }}]);
+  $('#seImg').onclick=()=>shareSettleImage(st);
+  const sc=$('#seCost'); if(sc) sc.onclick=()=>settleToCost(st); }
 function itemSheet(i,isNew){ const st=SE, P=st.people; const it=st.items[i]; it.fixed=it.fixed||{}; it.ex=it.ex||[];
   const draw=()=>{ if(draw._b) return; draw._b=1; try{ draw0(); } finally{ draw._b=0; } };
   const draw0=()=>{ const r=splitItem(st,it); const rk=it.ratio&&it.ratio.length===P.length?it.ratio:rankDefault(P.length);
@@ -2028,6 +2034,77 @@ function shareSettle(st){ const c=settleCalc(st); const L=[`[버디로그 정산
   L.push('— 각자 부담'); st.people.forEach(p=>L.push(`${p.name} ${fmt(c.rb[p.id])}`));
   if(c.tr.length){ L.push('— 송금'); c.tr.forEach(x=>L.push(`${st.people[x.from].name} → ${st.people[x.to].name} ${fmt(x.v)}`)); }
   const txt=L.join('\n'); try{ if(window.GolfNative&&GolfNative.shareText){ GolfNative.shareText(txt); return; } }catch(e){} if(navigator.share) navigator.share({text:txt}).catch(()=>{}); else { copyText(txt); toast('복사됨 · 카톡에 붙여넣기'); } }
+
+
+/* ---------- 정산 ↔ 라운드 기록 · 보고서 이미지 ---------- */
+SV.calc='<svg class="i" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8 7h8M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M15.5 14.5h.01M8.5 18h.01M12 18h3.5"/></svg>';
+function setlOf(rec){ return (DB.settles||[]).find(st=>st.rec===rec.id)||null; }
+function setlMe(st){ const nm=myName(); return st.people.find(p=>p.name===nm)||st.people.find(p=>p.name==='나')||null; }
+function setlTag(r){ const st=setlOf(r); if(!st) return ''; const me=setlMe(st); let v=null; if(me){ try{ v=settleCalc(st).rb[me.id]; }catch(e){} } return `<span class="tg setl" data-st="${st.id}" role="button">정산${v!=null?' '+won(v):''}</span>`; }
+function linkSettle(rec){ const st=SE; st.rec=rec.id; if(!st.name) st.name=`${+rec.date.slice(5,7)}/${+rec.date.slice(8,10)} ${rec.course||rec.region||''}`.trim(); const [y,m,d]=rec.date.split('-').map(Number); st.created=new Date(y,m-1,d,12).getTime();
+  [myName()||'나'].concat(rec.mates||[]).forEach(n=>{ if(n&&!st.people.some(p=>p.name===n)) st.people.push({id:uid(),name:n,team:null,rank:null}); }); }
+function renderSeLink(){ const box=$('#seLink'); const st=SE; const rec=st.rec&&DB.records.find(x=>x.id===st.rec);
+  if(rec){ box.innerHTML=`<div class="lnkcard"><span class="ico">${SV.link}</span><div class="tx"><b>${esc(recShort(rec))}</b><small>${rec.plan?'예정':'다녀온'} 라운드와 연결 · 기록 카드에 정산 표시</small></div><button class="lk" id="seUnlink">풀기</button></div>`; $('#seUnlink').onclick=()=>{ delete st.rec; vib(6); seSave(); renderSettle(); }; return; }
+  const t0=today(); const cs=DB.records.filter(r=>!setlOf(r)&&dday(r.date)>=-14&&dday(r.date)<=30).sort((a,b)=>Math.abs(dday(a.date))-Math.abs(dday(b.date))).slice(0,6);
+  if(!cs.length){ box.innerHTML=''; return; }
+  box.innerHTML=`<div class="lbl" style="margin-top:0"><span>라운드에서 불러오기</span><small class="mut">이름 · 날짜 · 명단 채움</small></div><div class="lchips">${cs.map(x=>{ const d=dday(x.date); return `<button data-id="${x.id}"><b>${+x.date.slice(5,7)}/${+x.date.slice(8,10)} ${esc(x.course||x.region)}</b><small>${x.plan?(d===0?'오늘':d>0?'D-'+d:'지난 예정'):'다녀옴'}${(x.mates||[]).length?' · '+esc(x.mates.join(', ')):''}</small></button>`; }).join('')}</div>`;
+  box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const r=DB.records.find(x=>x.id===b.dataset.id); if(!r) return; linkSettle(r); $('#seName').value=st.name; vib([10,30,10]); toast(`${recShort(r)} 연결`); seSave(); renderSettle(); }); }
+const COST_OF={그린피:'green',캐디피:'caddie',카트비:'cart',캐디팁:'tip'};
+function settleToCost(st){ const rec=st.rec&&DB.records.find(x=>x.id===st.rec); if(!rec) return;
+  const go=me=>{ const add={}; st.items.forEach(it=>{ const {out,err}=splitItem(st,it); if(err) return; const v=Math.round(out[me.id]||0); if(!v) return; const k=COST_OF[(it.name||'').replace(/\s/g,'')]||'etc'; add[k]=(add[k]||0)+v; });
+    const keys=COSTS.filter(([k])=>add[k]); if(!keys.length){ toast(`${me.name} 몫이 없음`); return; }
+    sheet(`<div class="amenu"><div class="ah"><b>${esc(recShort(rec))} 비용</b><small>${esc(me.name)} 몫 · 이 칸들은 정산 금액으로 바뀜</small></div><div class="sub">${keys.map(([k,l])=>`<div class="it"><div class="tx">${l}${(rec.cost||{})[k]?`<small>지금 ${won(rec.cost[k])}</small>`:''}</div><b>${won(add[k])}</b></div>`).join('')}<div class="it"><div class="tx">합계</div><b>${won(Object.values(add).reduce((a,b)=>a+b,0))}</b></div></div><div class="row"><button class="btn ghost sm" id="scX">취소</button><button class="btn sm" id="scOk">넣기</button></div></div>`);
+    $('#scX').onclick=closeSheet; $('#scOk').onclick=()=>{ rec.cost=Object.assign({},rec.cost||{},add); save(); closeSheet(); vib([10,30,10]); toast('기록 비용에 들어감'); }; };
+  const me=setlMe(st); if(me){ go(me); return; }
+  actionSheet('이 중에 누가 나?','한 번 고르면 기억',st.people.map(p=>({label:esc(p.name),fn:()=>{ DB.myName=p.name; save(); closeSheet(); setTimeout(()=>go(p),60); }}))); }
+/* 보고서 이미지 (흰 바탕 · 카톡용 세로 한 장) */
+function settleImage(st){ const c=settleCalc(st), P=st.people; const W=1080, PADX=64, S=2; const F="'Noto Sans KR','Inter','Apple SD Gothic Neo',sans-serif";
+  const C={bg:'#ffffff',ink:'#0f1115',mut:'#6b7280',line:'#e5e7eb',soft:'#f4f6f8',acc:'#16a34a',accs:'#e8f6ee',red:'#e5484d',reds:'#fdecec',blue:'#2f6fed',blues:'#eaf1fe'};
+  const rec=st.rec&&DB.records.find(x=>x.id===st.rec);
+  const ruleTxt=it=>{ const fx=Object.entries(it.fixed||{}).filter(([k,v])=>+v>0&&it.rule!=='man').map(([k,v])=>`${pName(st,k)} ${won(+v)} 고정`); const base=it.rule==='all'?(it.to==='L'?'진 팀 몰빵':it.to==='W'?'이긴 팀 몰빵':pName(st,it.to)+' 몰빵'):it.rule==='rank'?'등수 비율 '+(it.ratio&&it.ratio.length===P.length?it.ratio:rankDefault(P.length)).join(':'):it.rule==='eq'?((it.ex||[]).length?`1/n · ${it.ex.map(id=>pName(st,id)).join(', ')} 빼고`:'1/n'):'직접 입력'; return fx.length?fx.join(' · ')+' · 나머지 '+base:base; };
+  const rows=st.items.length, ppl=P.length, trn=Math.max(1,c.tr.length);
+  const H=290+(70+trn*96+24)+(70+ppl*84+46)+(70+rows*84+26)+(c.diff?40:0)+110;
+  const cv=document.createElement('canvas'); cv.width=W*S/2; cv.height=H*S/2; const x=cv.getContext('2d'); x.scale(S/2,S/2);
+  const T=(t,px,py,o={})=>{ x.font=`${o.w||700} ${o.s||30}px ${F}`; x.fillStyle=o.c||C.ink; x.textAlign=o.a||'left'; x.textBaseline='middle'; let s2=String(t); if(o.max){ while(x.measureText(s2).width>o.max&&s2.length>1) s2=s2.slice(0,-1); if(s2!==String(t)) s2=s2.slice(0,-1)+'…'; } x.fillText(s2,px,py); return x.measureText(s2).width; };
+  const R=(rx,ry,rw,rh,r,fill)=>{ x.beginPath(); if(x.roundRect) x.roundRect(rx,ry,rw,rh,r); else x.rect(rx,ry,rw,rh); x.fillStyle=fill; x.fill(); };
+  x.fillStyle=C.bg; x.fillRect(0,0,W,H);
+  // 머리
+  R(0,0,W,250,0,C.acc); x.fillStyle='rgba(255,255,255,.12)'; x.beginPath(); x.arc(W-90,40,170,0,7); x.fill();
+  T('버디로그 정산',PADX,62,{s:28,w:800,c:'rgba(255,255,255,.85)'});
+  T(st.name||'정산',PADX,128,{s:58,w:900,c:'#fff',max:W-PADX*2});
+  const cn=rec&&(rec.course||rec.region); const sub=[dateLabel(st.created),cn&&!(st.name||'').includes(cn)?cn:'',`${ppl}명`,`총 ${fmt(c.total)}원`].filter(Boolean).join('  ·  ');
+  T(sub,PADX,196,{s:28,w:700,c:'rgba(255,255,255,.9)',max:W-PADX*2});
+  let y=290;
+  const sec=(t,n)=>{ T(t,PADX,y+20,{s:34,w:900}); if(n) T(n,W-PADX,y+20,{s:24,w:700,c:C.mut,a:'right'}); y+=70; };
+  // 송금 먼저 (제일 중요)
+  sec('송금',c.tr.length?`${c.tr.length}번이면 끝`:'');
+  if(!c.tr.length){ R(PADX,y,W-PADX*2,80,20,C.soft); T('주고받을 돈 없음',W/2,y+40,{s:30,w:800,c:C.mut,a:'center'}); y+=96; }
+  c.tr.forEach(t=>{ R(PADX,y,W-PADX*2,80,20,C.soft); const fn=P[t.from].name, tn=P[t.to].name;
+    R(PADX+16,y+16,48,48,24,C.red); T(fn.slice(0,1),PADX+40,y+40,{s:24,w:900,c:'#fff',a:'center'}); const w1=T(fn,PADX+80,y+40,{s:32,w:900,max:230});
+    T('→',PADX+100+Math.min(w1,230),y+40,{s:32,w:900,c:C.acc}); T(tn,PADX+150+Math.min(w1,230),y+40,{s:32,w:900,max:230});
+    T(fmt(t.v)+'원',W-PADX-24,y+40,{s:38,w:900,a:'right'}); y+=96; });
+  y+=24;
+  // 사람별
+  sec('사람별','부담 · 낸 돈 · 차액');
+  P.forEach((p,i)=>{ const bal=c.paid[p.id]-c.rb[p.id]; if(i) { x.fillStyle=C.line; x.fillRect(PADX,y-2,W-PADX*2,2); }
+    T(p.name,PADX,y+40,{s:31,w:900,max:250}); if(p.team||p.rank){ const tag=p.team?(p.team==='W'?'승':'패'):p.rank+'등'; const tc=p.team==='W'?C.blue:p.team==='L'?C.red:C.mut; R(PADX+260,y+24,64,34,17,p.team==='W'?C.blues:p.team==='L'?C.reds:C.soft); T(tag,PADX+292,y+41,{s:20,w:900,c:tc,a:'center'}); }
+    T(fmt(c.rb[p.id]),W-PADX-430,y+30,{s:28,w:800,a:'right'}); T('부담',W-PADX-430,y+60,{s:18,w:700,c:C.mut,a:'right'});
+    T(fmt(c.paid[p.id]),W-PADX-240,y+30,{s:28,w:800,a:'right'}); T('낸 돈',W-PADX-240,y+60,{s:18,w:700,c:C.mut,a:'right'});
+    T(bal>0.5?'+'+fmt(bal):bal<-0.5?fmt(bal):'0',W-PADX,y+30,{s:30,w:900,a:'right',c:bal>0.5?C.acc:bal<-0.5?C.red:C.mut}); T(bal>0.5?'받을 돈':bal<-0.5?'보낼 돈':'끝',W-PADX,y+60,{s:18,w:700,c:C.mut,a:'right'});
+    y+=84; });
+  y+=46;
+  // 항목
+  sec('항목',`합계 ${fmt(c.total)}원`);
+  st.items.forEach((it,i)=>{ if(i){ x.fillStyle=C.line; x.fillRect(PADX,y-2,W-PADX*2,2); } T(it.name||'항목',PADX,y+28,{s:30,w:900,max:520}); T(ruleTxt(it),PADX,y+60,{s:21,w:700,c:C.mut,max:W-PADX*2-260}); T(fmt(+it.amount||0)+'원',W-PADX,y+40,{s:31,w:900,a:'right'}); y+=84; });
+  y+=26; if(c.diff){ T(`끝전 ${fmtS(c.diff)}원은 ${pName(st,c.absorb)} 부담에 포함 · ${(+st.unit||1).toLocaleString('ko-KR')}원 단위`,PADX,y,{s:22,w:700,c:C.mut}); y+=40; }
+  x.fillStyle=C.line; x.fillRect(PADX,H-90,W-PADX*2,2); T('버디로그로 계산함',W/2,H-48,{s:22,w:700,c:C.mut,a:'center'});
+  return cv; }
+function shareSettleImage(st){ const c=settleCalc(st); if(c.errs.length){ toast('항목 확인부터: '+c.errs[0],2600); return; } if(!st.items.length){ toast('항목부터 넣기'); return; }
+  const go=()=>{ const cv=settleImage(st); const text=`[버디로그 정산] ${st.name||''}`.trim();
+    try{ if(window.GolfNative&&GolfNative.shareImage){ GolfNative.shareImage(cv.toDataURL('image/png').split(',')[1],text); return; } }catch(e){}
+    cv.toBlob(async b=>{ const f=new File([b],'정산.png',{type:'image/png'}); try{ if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f],text}); return; } }catch(e){}
+      const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`${st.name||'정산'}.png`; document.body.appendChild(a); a.click(); a.remove(); toast('이미지 저장됨'); },'image/png'); };
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(go); else go(); }
 
 /* ---------- ⓒ 통계 ---------- */
 function statList(year){ return DB.records.filter(r=>!r.plan&&(year==='all'||yearOf(r)===year)); }

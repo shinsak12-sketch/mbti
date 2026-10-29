@@ -26,6 +26,26 @@ public class GolfBridge {
     ctx.getSharedPreferences("golf", Context.MODE_PRIVATE).edit().putString("nseen", json == null ? "{}" : json).apply();
   }
 
+  /** 정산 보고서 이미지 보내기: PNG(base64) → 앱 캐시에 저장 → 공유 창 */
+  @JavascriptInterface public void shareImage(final String b64, final String text) {
+    try {
+      byte[] png = android.util.Base64.decode(b64, android.util.Base64.DEFAULT);
+      java.io.File d = new java.io.File(ctx.getCacheDir(), "cam"); d.mkdirs();
+      java.io.File[] old = d.listFiles(); if (old != null) for (java.io.File f : old) if (f.getName().startsWith("share_")) f.delete();
+      final String name = "share_" + System.currentTimeMillis() + ".png";
+      java.io.FileOutputStream o = new java.io.FileOutputStream(new java.io.File(d, name)); o.write(png); o.close();
+      act.runOnUiThread(new Runnable() { @Override public void run() {
+        android.net.Uri u = android.net.Uri.parse("content://kr.golf.bet.photos/" + name);
+        android.content.Intent i = new android.content.Intent(android.content.Intent.ACTION_SEND);
+        i.setType("image/png"); i.putExtra(android.content.Intent.EXTRA_STREAM, u);
+        if (text != null && text.length() > 0) i.putExtra(android.content.Intent.EXTRA_TEXT, text);
+        i.setClipData(android.content.ClipData.newRawUri("정산", u));
+        i.addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        try { act.startActivity(android.content.Intent.createChooser(i, "정산 보내기")); } catch (Exception ignored) {}
+      } });
+    } catch (Exception ignored) {}
+  }
+
   /** 친구 코드 보내기: 카톡 등 공유 창 */
   @JavascriptInterface public void shareText(final String text) {
     act.runOnUiThread(new Runnable() { @Override public void run() {
