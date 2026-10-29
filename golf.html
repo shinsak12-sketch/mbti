@@ -2065,7 +2065,7 @@ function itemSheet(i,isNew){ const st=SE, P=st.people; const it=st.items[i]; it.
     $('#isOk').onclick=()=>{ if(!it.amount){ toast('금액 넣어줘'); $('#isAmt').focus(); return; } if(!it.name) it.name='항목'; delete it._fix; seSave(); vib([10,30,10]); closeSheet(); renderSettle(); }; };
   draw(); }
 function shareSettle(st){ const c=settleCalc(st); const L=[`[버디로그 정산] ${st.name||dateLabel(st.created)}`];
-  st.items.forEach(it=>L.push(`· ${it.name} ${fmt(+it.amount)} (${ruleDesc(st,it)})`));
+  st.items.forEach(it=>{ L.push(`· ${it.name} ${fmt(+it.amount)} (${ruleDesc(st,it)})`); const {out}=splitItem(st,it); const ps=st.people.filter(p=>(out[p.id]||0)>0.5).map(p=>`${p.name} ${fmt(Math.round(out[p.id]))}`); if(ps.length) L.push('   '+ps.join(' · ')); });
   L.push('— 각자 부담'); st.people.forEach(p=>L.push(`${p.name} ${fmt(c.rb[p.id])}`));
   if(c.onePayer&&c.tr.length) L.push(`— 모두 ${c.onePayer.name}에게 각자 부담만큼 보내기`);
   else if(c.tr.length){ L.push('— 송금'); c.tr.forEach(x=>L.push(`${st.people[x.from].name} → ${st.people[x.to].name} ${fmt(x.v)}`)); }
@@ -2094,12 +2094,11 @@ function settleToCost(st){ const rec=st.rec&&DB.records.find(x=>x.id===st.rec); 
   const me=setlMe(st); if(me){ go(me); return; }
   actionSheet('이 중에 누가 나?','한 번 고르면 기억',st.people.map(p=>({label:esc(p.name),fn:()=>{ DB.myName=p.name; save(); closeSheet(); setTimeout(()=>go(p),60); }}))); }
 /* 보고서 이미지 (흰 바탕 · 카톡용 세로 한 장) */
-function settleImage(st){ const c=settleCalc(st), P=st.people; const W=1080, PADX=64, S=2; const F="'Noto Sans KR','Inter','Apple SD Gothic Neo',sans-serif";
+function settleImage(st){ const c=settleCalc(st), P=st.people; const W=Math.max(1080,64*2+200+190+st.items.length*150), PADX=64, S=2; const F="'Noto Sans KR','Inter','Apple SD Gothic Neo',sans-serif";
   const C={bg:'#ffffff',ink:'#0f1115',mut:'#6b7280',line:'#e5e7eb',soft:'#f4f6f8',acc:'#16a34a',accs:'#e8f6ee',red:'#e5484d',reds:'#fdecec',blue:'#2f6fed',blues:'#eaf1fe'};
   const rec=st.rec&&DB.records.find(x=>x.id===st.rec);
   const ruleTxt=it=>ruleDesc(st,it);
-  const rows=st.items.length, ppl=P.length, one=!!(c.onePayer&&c.tr.length), trn=one?1:Math.max(1,c.tr.length);
-  const H=290+(70+trn*96+24)+(70+ppl*84+46)+(70+rows*84+26)+(c.diff?40:0)+110;
+  const ppl=P.length, one=!!(c.onePayer&&c.tr.length); const H=9000;
   const cv=document.createElement('canvas'); cv.width=W*S/2; cv.height=H*S/2; const x=cv.getContext('2d'); x.scale(S/2,S/2);
   const T=(t,px,py,o={})=>{ x.font=`${o.w||700} ${o.s||30}px ${F}`; x.fillStyle=o.c||C.ink; x.textAlign=o.a||'left'; x.textBaseline='middle'; let s2=String(t); if(o.max){ while(x.measureText(s2).width>o.max&&s2.length>1) s2=s2.slice(0,-1); if(s2!==String(t)) s2=s2.slice(0,-1)+'…'; } x.fillText(s2,px,py); return x.measureText(s2).width; };
   const R=(rx,ry,rw,rh,r,fill)=>{ x.beginPath(); if(x.roundRect) x.roundRect(rx,ry,rw,rh,r); else x.rect(rx,ry,rw,rh); x.fillStyle=fill; x.fill(); };
@@ -2114,28 +2113,48 @@ function settleImage(st){ const c=settleCalc(st), P=st.people; const W=1080, PAD
   const sec=(t,n)=>{ T(t,PADX,y+20,{s:34,w:900}); if(n) T(n,W-PADX,y+20,{s:24,w:700,c:C.mut,a:'right'}); y+=70; };
   // 송금 먼저 (제일 중요)
   sec('송금',one?'':c.tr.length?`${c.tr.length}번이면 끝`:'');
-  if(one){ R(PADX,y,W-PADX*2,80,20,C.accs); R(PADX+16,y+16,48,48,24,C.acc); T(c.onePayer.name.slice(0,1),PADX+40,y+40,{s:24,w:900,c:'#fff',a:'center'}); T(`모두 ${c.onePayer.name}에게`,PADX+80,y+40,{s:34,w:900,max:520}); T('각자 보낼 돈은 아래',W-PADX-24,y+40,{s:24,w:800,c:C.mut,a:'right'}); y+=96; }
+  if(one){ R(PADX,y,W-PADX*2,80,20,C.accs); R(PADX+16,y+16,48,48,24,C.acc); T(c.onePayer.name.slice(0,1),PADX+40,y+40,{s:24,w:900,c:'#fff',a:'center'}); T(`모두 ${c.onePayer.name}에게`,PADX+80,y+40,{s:34,w:900,max:520}); T('각자 합계만큼',W-PADX-24,y+40,{s:24,w:800,c:C.mut,a:'right'}); y+=96; }
   else if(!c.tr.length){ R(PADX,y,W-PADX*2,80,20,C.soft); T('주고받을 돈 없음',W/2,y+40,{s:30,w:800,c:C.mut,a:'center'}); y+=96; }
   if(!one) c.tr.forEach(t=>{ R(PADX,y,W-PADX*2,80,20,C.soft); const fn=P[t.from].name, tn=P[t.to].name;
     R(PADX+16,y+16,48,48,24,C.red); T(fn.slice(0,1),PADX+40,y+40,{s:24,w:900,c:'#fff',a:'center'}); const w1=T(fn,PADX+80,y+40,{s:32,w:900,max:230});
     T('→',PADX+100+Math.min(w1,230),y+40,{s:32,w:900,c:C.acc}); T(tn,PADX+150+Math.min(w1,230),y+40,{s:32,w:900,max:230});
     T(fmt(t.v)+'원',W-PADX-24,y+40,{s:38,w:900,a:'right'}); y+=96; });
   y+=24;
-  // 사람별
-  sec('사람별','부담 · 낸 돈 · 차액');
-  P.forEach((p,i)=>{ const bal=c.paid[p.id]-c.rb[p.id]; if(i) { x.fillStyle=C.line; x.fillRect(PADX,y-2,W-PADX*2,2); }
-    T(p.name,PADX,y+40,{s:31,w:900,max:250}); const tr=st.mode==='team'?tRank(st,p):null, rk=st.mode==='rank'?p.rank:null; if(tr||rk){ const K=teamN(st); const tag=tr?teamLab(st,tr,true):rk+'등'; const tc=tr===1?C.blue:tr===K?C.red:C.mut; R(PADX+260,y+24,64,34,17,tr===1?C.blues:tr===K?C.reds:C.soft); T(tag,PADX+292,y+41,{s:20,w:900,c:tc,a:'center'}); }
-    T(fmt(c.rb[p.id]),W-PADX-430,y+30,{s:28,w:800,a:'right'}); T('부담',W-PADX-430,y+60,{s:18,w:700,c:C.mut,a:'right'});
-    T(fmt(c.paid[p.id]),W-PADX-240,y+30,{s:28,w:800,a:'right'}); T('낸 돈',W-PADX-240,y+60,{s:18,w:700,c:C.mut,a:'right'});
-    T(bal>0.5?'+'+fmt(bal):bal<-0.5?fmt(bal):'0',W-PADX,y+30,{s:30,w:900,a:'right',c:bal>0.5?C.acc:bal<-0.5?C.red:C.mut}); T(bal>0.5?'받을 돈':bal<-0.5?'보낼 돈':'끝',W-PADX,y+60,{s:18,w:700,c:C.mut,a:'right'});
-    y+=84; });
-  y+=46;
-  // 항목
-  sec('항목',`합계 ${fmt(c.total)}원`);
-  st.items.forEach((it,i)=>{ if(i){ x.fillStyle=C.line; x.fillRect(PADX,y-2,W-PADX*2,2); } T(it.name||'항목',PADX,y+28,{s:30,w:900,max:520}); T(ruleTxt(it),PADX,y+60,{s:21,w:700,c:C.mut,max:W-PADX*2-260}); T(fmt(+it.amount||0)+'원',W-PADX,y+40,{s:31,w:900,a:'right'}); y+=84; });
-  y+=26; if(c.diff){ T(`끝전 ${fmtS(c.diff)}원은 ${pName(st,c.absorb)} 부담에 포함 · ${(+st.unit||1).toLocaleString('ko-KR')}원 단위`,PADX,y,{s:22,w:700,c:C.mut}); y+=40; }
-  x.fillStyle=C.line; x.fillRect(PADX,H-90,W-PADX*2,2); T('버디로그로 계산함',W/2,H-48,{s:22,w:700,c:C.mut,a:'center'});
-  return cv; }
+  // 정산표: 행 = 사람 · 열 = 합계 + 항목 · 맨 윗행 = 총액
+  sec('정산표',`${(+st.unit||1)===1?'1원 그대로':(+st.unit).toLocaleString('ko-KR')+'원 단위'}`);
+  const NW=200, SW=190, items=st.items, CW=items.length?(W-PADX*2-NW-SW)/items.length:0;
+  const splits=items.map(it=>splitItem(st,it).out);
+  const short=it=>{ const k=teamN(st); const tg=teamTo(st,it.to); const fx=Object.values(it.fixed||{}).filter(v=>+v>0).length&&it.rule!=='man';
+    const b=it.rule==='eq'?'1/n':it.rule==='all'?(tg?teamLab(st,tg):pName(st,it.to))+' 몰빵':it.rule==='rank'?'등수 '+(it.ratio&&it.ratio.length===P.length?it.ratio:rankDefault(P.length)).join(':'):it.rule==='trank'?'팀 '+(it.tratio&&it.tratio.length===k?it.tratio:rankDefault(k)).join(':'):'직접 입력';
+    return fx?'고정+'+b:b; };
+  const fs=Math.max(18,Math.min(26,CW/6.2));
+  // 머리행
+  const HH=92; R(PADX,y,W-PADX*2,HH,18,C.ink);
+  T('성명',PADX+20,y+HH/2,{s:22,w:800,c:'rgba(255,255,255,.7)'});
+  T('합계',PADX+NW+SW-18,y+HH/2,{s:26,w:900,c:'#fff',a:'right'});
+  items.forEach((it,i)=>{ const cx=PADX+NW+SW+CW*(i+1)-14; T(it.name||'항목',cx,y+32,{s:Math.min(26,fs+2),w:900,c:'#fff',a:'right',max:CW-20}); T(short(it),cx,y+64,{s:Math.max(15,fs-6),w:700,c:'#9be7b4',a:'right',max:CW-16}); });
+  y+=HH+6;
+  // 총액행
+  const TH=62; R(PADX,y,W-PADX*2,TH,14,C.accs);
+  T('총액',PADX+20,y+TH/2,{s:24,w:900,c:C.acc});
+  T(fmt(c.total),PADX+NW+SW-18,y+TH/2,{s:fs+1,w:900,c:C.acc,a:'right'});
+  items.forEach((it,i)=>T(fmt(+it.amount||0),PADX+NW+SW+CW*(i+1)-14,y+TH/2,{s:fs,w:900,c:C.acc,a:'right',max:CW-16}));
+  y+=TH+6;
+  // 사람행
+  const RH=64;
+  P.forEach((p,r)=>{ if(r%2===1) R(PADX,y,W-PADX*2,RH,12,C.soft);
+    const tr=st.mode==='team'?tRank(st,p):null, rk=st.mode==='rank'?p.rank:null, K=teamN(st);
+    const nw=T(p.name,PADX+20,y+RH/2,{s:24,w:900,max:NW-70});
+    const tag=(c.onePayer&&c.onePayer.id===p.id)?'결제':tr?teamLab(st,tr,true):rk?rk+'등':''; if(tag){ const tc=tag==='결제'?C.acc:tr===1?C.blue:tr===K?C.red:C.mut; T(tag,PADX+20+Math.min(nw,NW-70)+10,y+RH/2+1,{s:17,w:900,c:tc}); }
+    T(fmt(c.rb[p.id]),PADX+NW+SW-18,y+RH/2,{s:fs+1,w:900,a:'right'});
+    items.forEach((it,i)=>{ const v=Math.round(splits[i][p.id]||0); T(v?fmt(v):'–',PADX+NW+SW+CW*(i+1)-14,y+RH/2,{s:fs,w:v?800:600,c:v?C.ink:'#c4c8cf',a:'right',max:CW-16}); });
+    y+=RH; });
+  // 세로 구분선 (합계 | 항목)
+  x.fillStyle=C.line; x.fillRect(PADX+NW+SW,y-RH*P.length-TH-6,2,RH*P.length+TH+6);
+  y+=26;
+  y+=12; if(c.diff){ T(`끝전 ${fmtS(c.diff)}원은 ${pName(st,c.absorb)} 부담에 포함 · ${(+st.unit||1).toLocaleString('ko-KR')}원 단위`,PADX,y,{s:22,w:700,c:C.mut}); y+=40; }
+  y+=20; x.fillStyle=C.line; x.fillRect(PADX,y,W-PADX*2,2); T('버디로그로 계산함',W/2,y+42,{s:22,w:700,c:C.mut,a:'center'}); y+=90;
+  const outc=document.createElement('canvas'); outc.width=W; outc.height=Math.min(H,y); outc.getContext('2d').drawImage(cv,0,0); return outc; }
 function shareSettleImage(st){ const c=settleCalc(st); if(c.errs.length){ toast('항목 확인부터: '+c.errs[0],2600); return; } if(!st.items.length){ toast('항목부터 넣기'); return; }
   const go=()=>{ const cv=settleImage(st); const text=`[버디로그 정산] ${st.name||''}`.trim();
     try{ if(window.GolfNative&&GolfNative.shareImage){ GolfNative.shareImage(cv.toDataURL('image/png').split(',')[1],text); return; } }catch(e){}
