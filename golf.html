@@ -698,6 +698,11 @@
 
   /* ===== 정산 계산기 ===== */
   .tg.setl{background:var(--chip);color:var(--ink);cursor:pointer}
+  .tcnt{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding:8px 8px 8px 14px;background:var(--card);border:1px solid var(--line);border-radius:14px;font-size:13px;font-weight:800;color:var(--mut)}
+  .tcnt b{color:var(--ink);font-size:16px;font-weight:900}
+  .tcnt div{display:flex;gap:6px} .tcnt button{width:38px;height:34px;border-radius:11px;background:var(--chip);font-size:20px;font-weight:700;border:1px solid var(--line);box-shadow:0 2px 0 var(--line)} .tcnt button:disabled{opacity:.35}
+  .tcnt button:active{transform:translateY(2px);box-shadow:none}
+  .paid .x{width:28px;height:28px;border-radius:9px;color:var(--mut);display:grid;place-items:center;flex:none} .paid .x svg{width:15px;height:15px}
   .stl-sec{display:flex;align-items:center;gap:8px;margin:22px 2px 10px}
   .stl-sec i{font-style:normal;width:22px;height:22px;border-radius:8px;background:var(--acc);color:var(--accink);font-size:12px;font-weight:900;display:grid;place-items:center;box-shadow:0 2px 0 color-mix(in srgb,var(--acc) 55%,#000)}
   .stl-sec b{font-size:14px;font-weight:900;flex:1} .stl-sec small{font-size:11px;color:var(--mut);font-weight:700}
@@ -1909,12 +1914,24 @@ function statBets(kpi){ const y=statYear; const G=(DB.rounds||[]).filter(g=>g.me
 
 /* ---------- 정산 계산기 (내기와 따로) ----------
    명단(팀 승·패 / 개인 등수) → 항목마다 나누는 방식 → 선불 → 끝전 → 송금 */
-const RULE_LAB={eq:'1/n',all:'몰빵',rank:'등수 비율',man:'직접 입력'};
+const RULE_LAB={eq:'1/n',all:'몰빵',rank:'등수 비율',trank:'팀 비율',man:'직접 입력'};
+/* 팀: 사람마다 팀 순위(1~k) · 2팀이면 승·패 · 옛 기록 'W'/'L' 도 그대로 읽음 */
+const teamN=st=>Math.max(2,Math.min(6,+st.teamN||2));
+function tRank(st,p){ const t=p.team; if(t==='W') return 1; if(t==='L') return teamN(st); const n=+t; return n>=1&&n<=teamN(st)?n:null; }
+function teamTo(st,to){ if(to==='W') return 1; if(to==='L') return teamN(st); const m=/^T(\d)$/.exec(to||''); return m?+m[1]:null; }
+function teamLab(st,n,short){ const k=teamN(st); if(k===2) return short?(n===1?'승':'패'):(n===1?'이긴 팀':'진 팀'); return short?n+'위':(n===k?'꼴찌 팀':n+'위 팀'); }
+function ruleDesc(st,it){ const P=st.people; const k=teamN(st);
+  const base=it.rule==='all'?((teamTo(st,it.to)?teamLab(st,teamTo(st,it.to)):pName(st,it.to))+' 몰빵')
+    :it.rule==='rank'?'등수 비율 '+(it.ratio&&it.ratio.length===P.length?it.ratio:rankDefault(P.length)).join(':')
+    :it.rule==='trank'?'팀 비율 '+(it.tratio&&it.tratio.length===k?it.tratio:rankDefault(k)).join(':')
+    :it.rule==='eq'?((it.ex||[]).length?`1/n · ${it.ex.map(id=>pName(st,id)).join(', ')} 빼고`:'1/n'):'직접 입력';
+  const fx=Object.entries(it.fixed||{}).filter(([q,v])=>+v>0&&it.rule!=='man').map(([q,v])=>`${pName(st,q)} ${won(+v)} 고정`);
+  return fx.length?fx.join(' · ')+' · 나머지 '+base:base; }
 const ITEM_PRESET=['그린피','캐디피','카트비','캐디팁','식비','음료','상품','기타'];
 let SE=null;
 function rankDefault(n){ if(n<=1) return [100]; if(n===2) return [0,100]; if(n===3) return [0,40,60]; if(n===4) return [0,20,30,50]; if(n===5) return [0,10,20,30,40]; const w=[...Array(n)].map((_,i)=>i); const t=w.reduce((a,b)=>a+b,0); return w.map(x=>Math.round(x/t*100)); }
 function newSettle(){ const ms=myName(); const names=[ms||'나']; const t=today(); const rec=DB.records.filter(r=>r.date<=t).sort(recSort)[0];
-  return {id:'s'+uid(),created:Date.now(),name:'',mode:'team',people:names.map(n=>({id:uid(),name:n,team:null,rank:null})),items:[],paid:{},unit:100,absorb:null}; }
+  return {id:'s'+uid(),created:Date.now(),name:'',mode:'team',teamN:2,payers:[],people:names.map(n=>({id:uid(),name:n,team:null,rank:null})),items:[],paid:{},unit:100,absorb:null}; }
 const pName=(st,id)=>(st.people.find(p=>p.id===id)||{name:'?'}).name;
 /* 한 항목을 사람별로 나눔 → {id:금액(소수 그대로)} · 문제 있으면 err */
 function splitItem(st,it){ const P=st.people, amt=+it.amount||0, out={}; P.forEach(p=>out[p.id]=0); let err='';
@@ -1923,13 +1940,16 @@ function splitItem(st,it){ const P=st.people, amt=+it.amount||0, out={}; P.forEa
   let rest=amt-fsum; if(rest<-0.5) return {out,err:'고정 금액이 항목 금액보다 큼'};
   const skipFixed=it.keepFixed?false:true; const free=P.filter(p=>!(skipFixed&&(+fixed[p.id]||0)>0));
   if(it.rule==='eq'){ const ex=new Set(it.ex||[]); const who=free.filter(p=>!ex.has(p.id)); if(!who.length) return {out,err:'나눌 사람이 없음'}; who.forEach(p=>out[p.id]+=rest/who.length); }
-  else if(it.rule==='all'){ let who=[]; if(it.to==='L'||it.to==='W'){ who=free.filter(p=>p.team===it.to); if(!who.length) return {out,err:it.to==='L'?'진 팀이 안 정해짐':'이긴 팀이 안 정해짐'}; } else { const p=P.find(x=>x.id===it.to); if(!p) return {out,err:'낼 사람을 골라줘'}; who=[p]; } who.forEach(p=>out[p.id]+=rest/who.length); }
+  else if(it.rule==='trank'){ const k=teamN(st); const R=it.tratio&&it.tratio.length===k?it.tratio:rankDefault(k); if(free.some(p=>!tRank(st,p))) return {out,err:'팀 안 정한 사람이 있음'};
+    const by={}; free.forEach(p=>{ const t=tRank(st,p); (by[t]=by[t]||[]).push(p); }); const ts=Object.keys(by).map(Number); const tw=ts.reduce((a,t)=>a+(+R[t-1]||0),0); if(tw<=0) return {out,err:'비율 합이 0'};
+    ts.forEach(t=>{ const share=rest*(+R[t-1]||0)/tw; by[t].forEach(p=>out[p.id]+=share/by[t].length); }); }
+  else if(it.rule==='all'){ let who=[]; const tn=teamTo(st,it.to); if(tn){ who=free.filter(p=>tRank(st,p)===tn); if(!who.length) return {out,err:`${teamLab(st,tn)}이 안 정해짐`}; } else { const p=P.find(x=>x.id===it.to); if(!p) return {out,err:'낼 사람을 골라줘'}; who=[p]; } who.forEach(p=>out[p.id]+=rest/who.length); }
   else if(it.rule==='rank'){ const who=free.filter(p=>p.rank>0); if(who.length!==free.length) return {out,err:'등수 안 정한 사람이 있음'}; const R=it.ratio&&it.ratio.length?it.ratio:rankDefault(P.length);
     // 같은 등수는 그 자리들 비율을 평균
     const sorted=who.slice().sort((a,b)=>a.rank-b.rank); const w={}; let i=0; while(i<sorted.length){ let j=i; while(j<sorted.length&&sorted[j].rank===sorted[i].rank) j++; const avg=R.slice(i,j).reduce((a,b)=>a+(+b||0),0)/(j-i); for(let k=i;k<j;k++) w[sorted[k].id]=avg; i=j; }
     const tw=Object.values(w).reduce((a,b)=>a+b,0); if(tw<=0) return {out,err:'비율 합이 0'}; who.forEach(p=>out[p.id]+=rest*w[p.id]/tw); }
   return {out,err}; }
-function settleCalc(st){ const P=st.people; const burden={}, paid={}; P.forEach(p=>{ burden[p.id]=0; paid[p.id]=+(st.paid||{})[p.id]||0; }); const errs=[]; let total=0;
+function settleCalc(st){ const P=st.people; P.forEach(p=>{ if(p.team==='W'||p.team==='L') p.team=tRank(st,p); }); const burden={}, paid={}; P.forEach(p=>{ burden[p.id]=0; paid[p.id]=+(st.paid||{})[p.id]||0; }); const errs=[]; let total=0;
   const solo=[]; st.items.forEach(it=>{ const {out,err}=splitItem(st,it); if(err){ errs.push(`${it.name||'항목'}: ${err}`); return; } const who=Object.keys(out).filter(k=>out[k]>0.5); if(who.length===1&&(+it.amount||0)>0){ solo.push({it,id:who[0]}); return; } total+=+it.amount||0; Object.keys(out).forEach(k=>burden[k]+=out[k]); });
   const U=+st.unit||1; const rb={}; P.forEach(p=>rb[p.id]=Math.round(burden[p.id]/U)*U); const diff=total-Object.values(rb).reduce((a,b)=>a+b,0);
   const ab=st.absorb&&rb[st.absorb]!=null?st.absorb:(P.slice().sort((a,b)=>paid[b.id]-paid[a.id])[0]||{}).id; if(ab&&diff) rb[ab]+=diff;
@@ -1941,43 +1961,49 @@ function renderSetlList(){ DB.settles=DB.settles||[]; const box=$('#setlTiles');
   DB.settles.slice().sort((a,b)=>b.created-a.created).forEach(st=>{ const c=settleCalc(st); const b=document.createElement('button'); b.className='tile';
     b.innerHTML=`<div class="d">${dateLabel(st.created)}</div><b>${esc(st.name)||'정산'}</b><span class="kind ${c.errs.length||Math.abs(c.paidSum-c.total)>0.5?'':'live'}">${fmt(c.total)}원 · ${st.people.length}명</span>`;
     b.onclick=()=>{ SE=st; openSettle(false); }; longPress(b,()=>actionSheet(esc(st.name)||'정산',dateLabel(st.created),[{label:'복사해서 새로',icon:SV.copy,fn:()=>{ closeSheet(); const cp=JSON.parse(JSON.stringify(st)); cp.id='s'+uid(); cp.created=Date.now(); cp.name=(st.name||'정산')+' 복사'; cp.paid={}; SE=cp; openSettle(true); }},{label:'삭제',icon:SV.del,cls:'danger',fn:()=>confirmSheet('이 정산 지울까?',esc(st.name)||'','삭제',()=>{ DB.settles=DB.settles.filter(x=>x!==st); save(); renderSetlList(); toast('삭제됨'); })}])); box.appendChild(b); }); }
-let seNew=false;
-function openSettle(isNew){ seNew=isNew; $('#seTitle').textContent=isNew?'새 정산':'정산'; $('#seName').value=SE.name||''; renderSettle(); show('#s-setled'); }
+let seNew=false, seRndOpen=false;
+function openSettle(isNew){ seNew=isNew; seRndOpen=false; $('#seTitle').textContent=isNew?'새 정산':'정산'; $('#seName').value=SE.name||''; renderSettle(); show('#s-setled'); }
 function seSave(){ DB.settles=DB.settles||[]; if(!DB.settles.includes(SE)) DB.settles.push(SE); seNew=false; save(); }
 $('#seName').oninput=e=>{ SE.name=e.target.value.trim(); seSave(); };
 function renderSettle(){ if(renderSettle._busy) return; renderSettle._busy=1; try{ renderSettle0(); } finally{ renderSettle._busy=0; } }
 function renderSettle0(){ const st=SE, P=st.people; renderSeLink(); const c=settleCalc(st); const box=$('#seBody');
   $('#seSub').textContent=`${P.length}명 · 항목 ${st.items.length}개 · ${fmt(c.total)}원`;
-  const tm=p=>st.mode==='team'?`<div class="tm"><button class="w ${p.team==='W'?'on':''}" data-t="W">승</button><button class="l ${p.team==='L'?'on':''}" data-t="L">패</button></div>`:st.mode==='rank'?`<div class="tm">${P.map((_,i)=>`<button class="r ${p.rank===i+1?'on':''}" data-r="${i+1}">${i+1}</button>`).join('')}</div>`:'';
+  const K=teamN(st); const tm=p=>st.mode==='team'?`<div class="tm">${[...Array(K)].map((_,i)=>`<button class="${i===0?'w':i===K-1?'l':'r'} ${tRank(st,p)===i+1?'on':''}" data-t="${i+1}">${teamLab(st,i+1,true)}</button>`).join('')}</div>`:st.mode==='rank'?`<div class="tm">${P.map((_,i)=>`<button class="r ${p.rank===i+1?'on':''}" data-r="${i+1}">${i+1}</button>`).join('')}</div>`:'';
   const imp=linkCands().concat(DB.records.filter(r=>!r.plan).sort(recSort).slice(0,3)).filter((r,i,a)=>a.indexOf(r)===i&&(r.mates||[]).length).slice(0,4);
   let h=`<div class="stl-sec"><i>1</i><b>명단</b><small>${P.length}명</small></div>
-  <div class="seg" id="seMode"><button data-m="team">팀전 승·패</button><button data-m="rank">개인전 등수</button><button data-m="none">없음</button></div><div style="height:10px"></div>
+  <div class="seg" id="seMode"><button data-m="team">팀전</button><button data-m="rank">개인전 등수</button><button data-m="none">없음</button></div>
+  ${st.mode==='team'?`<div class="tcnt"><span>팀 <b>${K}</b>개${K===2?' · 승 · 패':' · 1위부터 순서대로'}</span><div><button id="seTm" ${K<=2?'disabled':''}>−</button><button id="seTp" ${K>=6?'disabled':''}>+</button></div></div>`:''}<div style="height:10px"></div>
   <div class="ppl">${P.map(p=>`<div class="pp" data-id="${p.id}"><span class="av">${esc(p.name.slice(0,1))}</span><span class="nm">${esc(p.name)}</span>${tm(p)}<button class="x" aria-label="빼기">${ICX}</button></div>`).join('')}</div>
   <div class="inrow" style="margin-top:8px"><input class="inp" id="sePn" placeholder="이름 쓰고 추가 · 쉼표로 여러 명" maxlength="40" autocomplete="off"><button class="btn sm" id="sePadd">추가</button></div>
   <div class="sugg" id="sePsug"></div>${imp.length?`<div class="lchips" style="margin-top:6px">${imp.map(r=>`<button data-r="${r.id}"><b>${esc(recShort(r))}</b><small>${esc([myName()||'나'].concat(r.mates).join(', '))}</small></button>`).join('')}</div>`:''}
   <div class="stl-sec"><i>2</i><b>항목</b><small>눌러서 나누는 방식</small></div>
-  ${st.items.map((it,i)=>{ const r=splitItem(st,it); const how=it.rule==='all'?(it.to==='L'?'진 팀 몰빵':it.to==='W'?'이긴 팀 몰빵':esc(pName(st,it.to))+' 몰빵'):it.rule==='rank'?'등수 비율 '+(it.ratio&&it.ratio.length?it.ratio:rankDefault(P.length)).join(':'):RULE_LAB[it.rule]; const fx=Object.entries(it.fixed||{}).filter(([k,v])=>+v>0&&it.rule!=='man').map(([k,v])=>`${pName(st,k)} ${won(+v)}`);
+  ${st.items.map((it,i)=>{ const r=splitItem(st,it); const how=esc(ruleDesc(st,it)); const fx=[];
     const one=!r.err&&Object.values(r.out).filter(v=>v>0.5).length===1;
-    return `<button class="itm ${r.err?'warn':''}" data-i="${i}" ${one?'style="opacity:.75"':''}><span class="ic2">${it.rule==='eq'?'1/n':it.rule==='all'?'몰빵':it.rule==='rank'?'등수':'직접'}</span><div class="tx"><b>${esc(it.name||'항목')}</b><small>${r.err?esc(r.err):one?`${esc(pName(st,Object.keys(r.out).find(k=>r.out[k]>0.5)))} 혼자 부담 · 송금 계산에서 빠짐`:how+(fx.length?' · 고정 '+esc(fx.join(', ')):'')}</small></div><span class="am">${won(+it.amount||0)}</span></button>`; }).join('')}
+    return `<button class="itm ${r.err?'warn':''}" data-i="${i}" ${one?'style="opacity:.75"':''}><span class="ic2">${it.rule==='eq'?'1/n':it.rule==='all'?'몰빵':it.rule==='rank'?'등수':it.rule==='trank'?'팀':'직접'}</span><div class="tx"><b>${esc(it.name||'항목')}</b><small>${r.err?esc(r.err):one?`${esc(pName(st,Object.keys(r.out).find(k=>r.out[k]>0.5)))} 혼자 부담 · 송금 계산에서 빠짐`:how+(fx.length?' · 고정 '+esc(fx.join(', ')):'')}</small></div><span class="am">${won(+it.amount||0)}</span></button>`; }).join('')}
   <button class="btn ghost sm" id="seIadd">${SV.plus}항목 추가</button>
   <div class="stl-sec"><i>3</i><b>먼저 낸 돈</b><small>카드 긁은 사람 · 현금 낸 사람</small></div>
-  <div class="card" style="padding:4px 12px">${P.map(p=>`<div class="paid" data-id="${p.id}"><span class="nm">${esc(p.name)}</span><label><input inputmode="numeric" placeholder="0" value="${(st.paid||{})[p.id]?(+st.paid[p.id]).toLocaleString('ko-KR'):''}"><em>원</em></label><button class="full">전액</button></div>`).join('')}</div>
-  <div class="chk ${Math.abs(c.paidSum-c.total)<0.5?(c.total?'ok':''):'bad'}" id="sePchk"><span>낸 돈 합 ${fmt(c.paidSum)}원</span><span>${c.solo.length?'나눠 내는 ':''}항목 합 ${fmt(c.total)}원${Math.abs(c.paidSum-c.total)<0.5?'':' · '+(c.paidSum>c.total?'더 냄 ':'모자람 ')+fmt(Math.abs(c.total-c.paidSum))}</span></div>
+  ${(()=>{ st.payers=(st.payers||[]).filter(id=>P.some(p=>p.id===id)); Object.keys(st.paid||{}).forEach(id=>{ if(!st.payers.includes(id)&&P.some(p=>p.id===id)) st.payers.push(id); }); const L=st.payers.map(id=>P.find(p=>p.id===id));
+    return (L.length?`<div class="card" style="padding:4px 12px">${L.map(p=>`<div class="paid" data-id="${p.id}"><span class="nm">${esc(p.name)}</span><label><input inputmode="numeric" placeholder="0" value="${(st.paid||{})[p.id]?(+st.paid[p.id]).toLocaleString('ko-KR'):''}"><em>원</em></label><button class="full">전액</button><button class="x" aria-label="빼기">${ICX}</button></div>`).join('')}</div><div style="height:8px"></div>`:'')+(L.length<P.length?`<button class="btn ghost sm" id="sePayAdd">${SV.plus}먼저 낸 사람 추가</button>`:''); })()}
+  <div class="chk ${Math.abs(c.paidSum-c.total)<0.5?(c.total?'ok':''):'bad'}" id="sePchk" ${!c.paidSum&&!c.total?'hidden':''}><span>낸 돈 합 ${fmt(c.paidSum)}원</span><span>${c.solo.length?'나눠 내는 ':''}항목 합 ${fmt(c.total)}원${Math.abs(c.paidSum-c.total)<0.5?'':' · '+(c.paidSum>c.total?'더 냄 ':'모자람 ')+fmt(Math.abs(c.total-c.paidSum))}</span></div>
   <div class="stl-sec"><i>4</i><b>끝전</b><small>맞출 단위 · 남는 돈 안고 갈 사람</small></div>
+  <button class="opt" id="seRnd"><span>${(+st.unit||1)===1?'1원 그대로':(+st.unit).toLocaleString('ko-KR')+'원 단위'}<small>${c.diff?`끝전 ${fmtS(c.diff)}원 → ${esc(pName(st,c.absorb))}`:'남는 돈 '+esc(pName(st,c.absorb)||'—')}</small></span><em>${seRndOpen?'접기':'바꾸기'}</em></button>
+  <div ${seRndOpen?'':'hidden'} style="margin-top:10px">
   <div class="units" id="seUnit">${[1,10,100,1000,10000].map(u=>`<button data-u="${u}" class="${(+st.unit||1)===u?'on':''}">${u===1?'1원 그대로':u.toLocaleString('ko-KR')+'원'}</button>`).join('')}</div>
   <div class="units" id="seAbs" style="margin-top:8px">${P.map(p=>`<button data-id="${p.id}" class="${c.absorb===p.id?'on':''}">${esc(p.name)}</button>`).join('')}</div>
-  <div class="note" style="margin-top:6px">${c.diff?`끝전 ${fmtS(c.diff)}원 → <b>${esc(pName(st,c.absorb))}</b> 부담에 더함`:'끝전 없음'} · 처음엔 제일 많이 낸 사람</div>
+  <div class="note" style="margin-top:6px">${c.diff?`끝전 ${fmtS(c.diff)}원 → <b>${esc(pName(st,c.absorb))}</b> 부담에 더함`:'끝전 없음'} · 처음엔 제일 많이 낸 사람</div></div>
   <div class="stl-sec"><i>5</i><b>결과</b><small>${c.errs.length?'항목 확인 필요':'누가 누구한테'}</small></div>
   ${c.errs.length?`<div class="chk bad" style="margin-bottom:10px">${c.errs.map(esc).join('<br>')}</div>`:''}
   ${c.solo.length?`<div class="chk" style="margin-bottom:10px;display:block"><b style="font-weight:900">혼자 내는 항목 · 송금 없음</b>${c.solo.map(x=>`<div style="display:flex;justify-content:space-between;margin-top:4px"><span>${esc(x.it.name||'항목')} · ${esc(pName(st,x.id))}</span><span>${fmt(+x.it.amount)}원</span></div>`).join('')}</div>`:''}
-  <div class="burden">${P.map(p=>{ const v=c.paid[p.id]-c.rb[p.id]; return `<div class="r"><div>${esc(p.name)}${p.team?`<small>${p.team==='W'?'이긴 팀':'진 팀'}</small>`:p.rank?`<small>${p.rank}등</small>`:''}</div><div class="v">${fmt(c.rb[p.id])}<small>부담</small></div><div class="v ${v>0.5?'up':v<-0.5?'dn':''}">${v>0.5?'+'+fmt(v):v<-0.5?fmt(v):'0'}<small>${v>0.5?'받을 돈':v<-0.5?'보낼 돈':'끝'}</small></div></div>`; }).join('')}</div>
+  <div class="burden">${P.map(p=>{ const v=c.paid[p.id]-c.rb[p.id]; return `<div class="r"><div>${esc(p.name)}${st.mode==='team'&&tRank(st,p)?`<small>${teamLab(st,tRank(st,p))}</small>`:st.mode==='rank'&&p.rank?`<small>${p.rank}등</small>`:''}</div><div class="v">${fmt(c.rb[p.id])}<small>부담</small></div><div class="v ${v>0.5?'up':v<-0.5?'dn':''}">${v>0.5?'+'+fmt(v):v<-0.5?fmt(v):'0'}<small>${v>0.5?'받을 돈':v<-0.5?'보낼 돈':'끝'}</small></div></div>`; }).join('')}</div>
   <div class="lbl">송금</div><div class="flow">${c.tr.length?flowsHTML(c.tr,P):'<div class="none" style="padding:14px 0;text-align:center;color:var(--mut);font-weight:700;font-size:13px">주고받을 돈 없음</div>'}</div>
   ${(()=>{ const lr=st.rec&&DB.records.find(x=>x.id===st.rec); return `<div style="height:12px"></div><div class="row"><button class="btn sm" id="seImg">${SV.share}이미지로 보내기</button>${lr?'<button class="btn ghost sm" id="seCost">내 비용 기록에 넣기</button>':''}</div>`; })()}
   <div style="height:14px"></div>${!seNew?'<button class="btn ghost sm" id="seDel" style="color:var(--red)">이 정산 삭제</button>':''}`;
   box.innerHTML=h;
+  const tcn=d=>{ const k=teamN(st), nk=Math.max(2,Math.min(6,k+d)); if(nk===k) return; st.people.forEach(p=>{ const t=tRank(st,p); p.team=t?(t===k?nk:Math.min(t,nk)):null; if(d<0&&t===k) p.team=nk; }); st.items.forEach(it=>{ if(it.to&&/^T\d$/.test(it.to)&&+it.to.slice(1)>=nk) it.to='L'; delete it.tratio; }); st.teamN=nk; vib(6); seSave(); renderSettle(); };
+  const tmb=$('#seTm'); if(tmb){ tmb.onclick=()=>tcn(-1); $('#seTp').onclick=()=>tcn(1); }
   $$('#seMode button').forEach(b=>{ b.classList.toggle('on',b.dataset.m===st.mode); b.onclick=()=>{ st.mode=b.dataset.m; vib(6); seSave(); renderSettle(); }; });
   box.querySelectorAll('.pp').forEach(el=>{ const p=P.find(x=>x.id===el.dataset.id);
-    el.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{ p.team=p.team===b.dataset.t?null:b.dataset.t; vib(5); seSave(); renderSettle(); });
+    el.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{ const n=+b.dataset.t; p.team=tRank(st,p)===n?null:n; vib(5); seSave(); renderSettle(); });
     el.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{ p.rank=p.rank===+b.dataset.r?null:+b.dataset.r; vib(5); seSave(); renderSettle(); });
     el.querySelector('.x').onclick=()=>{ st.people=P.filter(x=>x!==p); delete st.paid[p.id]; st.items.forEach(it=>{ if(it.fixed) delete it.fixed[p.id]; if(it.to===p.id) it.to=null; if(it.ex) it.ex=it.ex.filter(x=>x!==p.id); }); if(st.absorb===p.id) st.absorb=null; vib(8); seSave(); renderSettle(); };
     el.querySelector('.nm').onclick=()=>{ sheet(`<div class="amenu"><div class="ah"><b>이름 바꾸기</b></div><input class="inp" id="spn" maxlength="10" value="${esc(p.name)}"><div class="row" style="margin-top:10px"><button class="btn ghost sm" id="spX">취소</button><button class="btn sm" id="spO">확인</button></div></div>`); $('#spX').onclick=closeSheet; $('#spO').onclick=()=>{ const v=$('#spn').value.trim(); if(v){ p.name=v; seSave(); } closeSheet(); renderSettle(); }; }; });
@@ -1992,7 +2018,10 @@ function renderSettle0(){ const st=SE, P=st.people; renderSeLink(); const c=sett
   box.querySelectorAll('.paid').forEach(el=>{ const id=el.dataset.id; const inp=el.querySelector('input');
     inp.oninput=()=>{ const d=inp.value.replace(/\D/g,'').slice(0,9); st.paid=st.paid||{}; if(+d) st.paid[id]=+d; else delete st.paid[id]; inp.value=d?(+d).toLocaleString('ko-KR'):''; seSave(); };
     inp.onchange=()=>renderSettle();
-    el.querySelector('.full').onclick=()=>{ const t=settleCalc(st).total; st.paid={[id]:t}; vib(8); seSave(); renderSettle(); }; });
+    el.querySelector('.full').onclick=()=>{ const t=settleCalc(st).total; st.paid={[id]:t}; st.payers=[id]; vib(8); seSave(); renderSettle(); };
+    el.querySelector('.x').onclick=()=>{ delete st.paid[id]; st.payers=st.payers.filter(x=>x!==id); vib(6); seSave(); renderSettle(); }; });
+  const pa=$('#sePayAdd'); if(pa) pa.onclick=()=>actionSheet('누가 먼저 냈나','카드 긁거나 현금 낸 사람',P.filter(p=>!st.payers.includes(p.id)).map(p=>({label:esc(p.name),fn:()=>{ closeSheet(); st.payers.push(p.id); if(st.payers.length===1&&!+(st.paid||{})[p.id]){ st.paid=st.paid||{}; st.paid[p.id]=settleCalc(st).total; } seSave(); renderSettle(); setTimeout(()=>{ const i=document.querySelector(`.paid[data-id="${p.id}"] input`); if(i){ i.focus(); i.select(); } },80); }})));
+  $('#seRnd').onclick=()=>{ seRndOpen=!seRndOpen; vib(5); renderSettle(); };
   $$('#seUnit button').forEach(b=>b.onclick=()=>{ st.unit=+b.dataset.u; vib(5); seSave(); renderSettle(); });
   $$('#seAbs button').forEach(b=>b.onclick=()=>{ st.absorb=b.dataset.id; vib(5); seSave(); renderSettle(); });
   const del=$('#seDel'); if(del) del.onclick=()=>confirmSheet('이 정산 지울까?',esc(st.name)||'','삭제',()=>{ DB.settles=(DB.settles||[]).filter(x=>x!==st); save(); renderSetlList(); show('#s-setl'); toast('삭제됨'); });
@@ -2004,15 +2033,16 @@ function itemSheet(i,isNew){ const st=SE, P=st.people; const it=st.items[i]; it.
   const draw0=()=>{ const r=splitItem(st,it); const rk=it.ratio&&it.ratio.length===P.length?it.ratio:rankDefault(P.length);
     let opt='';
     if(it.rule==='eq') opt=`<div class="mut" style="font-size:12px;font-weight:800;margin:2px 2px 6px">나눌 사람 (빼려면 누르기)</div><div class="sugg" id="isEx">${P.map(p=>`<button data-id="${p.id}" class="${it.ex.includes(p.id)?'':'on'}">${esc(p.name)}</button>`).join('')}</div>`;
-    else if(it.rule==='all') opt=`<div class="mut" style="font-size:12px;font-weight:800;margin:2px 2px 6px">누가 다 내나</div><div class="sugg" id="isTo">${st.mode==='team'?`<button data-to="L" class="${it.to==='L'?'on':''}">진 팀</button><button data-to="W" class="${it.to==='W'?'on':''}">이긴 팀</button>`:''}${P.map(p=>`<button data-to="${p.id}" class="${it.to===p.id?'on':''}">${esc(p.name)}</button>`).join('')}</div>`;
+    else if(it.rule==='all') opt=`<div class="mut" style="font-size:12px;font-weight:800;margin:2px 2px 6px">누가 다 내나</div><div class="sugg" id="isTo">${st.mode==='team'?[...Array(teamN(st))].map((_,i)=>{ const n=teamN(st)-i; const v=n===teamN(st)?'L':n===1?'W':'T'+n; return `<button data-to="${v}" class="${teamTo(st,it.to)===n?'on':''}">${teamLab(st,n)}</button>`; }).join(''):''}${P.map(p=>`<button data-to="${p.id}" class="${it.to===p.id?'on':''}">${esc(p.name)}</button>`).join('')}</div>`;
     else if(it.rule==='rank') opt=`<div class="mut" style="font-size:12px;font-weight:800;margin:2px 2px 6px">등수별 비율 · 합 ${rk.reduce((a,b)=>a+(+b||0),0)} · 같은 등수는 평균</div><div class="ratio" id="isRk">${rk.map((v,k)=>`<label><small>${k+1}등</small><input inputmode="numeric" data-k="${k}" value="${v}"></label>`).join('')}</div>`;
+    else if(it.rule==='trank'){ const k=teamN(st); const tr=it.tratio&&it.tratio.length===k?it.tratio:rankDefault(k); opt=`<div class="mut" style="font-size:12px;font-weight:800;margin:2px 2px 6px">팀 순위별 비율 · 합 ${tr.reduce((a,b)=>a+(+b||0),0)} · 팀 안에서는 1/n</div><div class="ratio" id="isTr">${tr.map((v,q)=>`<label><small>${teamLab(st,q+1,true)}</small><input inputmode="numeric" data-k="${q}" value="${v}"></label>`).join('')}</div>`; }
     else opt=`<div class="mut" style="font-size:12px;font-weight:800;margin:2px 2px 6px">사람마다 낼 돈 직접</div>`;
     const showFix=it.rule==='man'||it._fix||Object.values(it.fixed).some(v=>+v>0);
     const fix=showFix?`${it.rule==='man'?'':`<div class="mut" style="font-size:12px;font-weight:800;margin:12px 2px 2px">고정 금액 (예: 파3 니어 2만) · 낸 사람은 나머지에서 빠짐</div>`}${P.map(p=>`<div class="fixr"><span>${esc(p.name)}</span><input inputmode="numeric" data-id="${p.id}" placeholder="0" value="${+it.fixed[p.id]?(+it.fixed[p.id]).toLocaleString('ko-KR'):''}"></div>`).join('')}`:`<button class="lk" id="isFixOn" style="margin-top:12px;font-size:12.5px;font-weight:900;color:var(--acc)">+ 고정 금액 넣기 (파3 니어처럼)</button>`;
     sheet(`<div class="amenu"><div class="ah"><b>${isNew?'항목 추가':'항목'}</b><small>이름 · 금액 · 나누는 방식</small></div>
       <div class="sugg" id="isPre" style="margin-bottom:8px">${ITEM_PRESET.map(n=>`<button data-n="${n}" class="${it.name===n?'on':''}">${n}</button>`).join('')}</div>
       <div class="inrow"><input class="inp" id="isName" placeholder="항목 이름" maxlength="14" value="${esc(it.name)}"><input class="inp" id="isAmt" inputmode="numeric" placeholder="금액" style="text-align:right;font-weight:900" value="${it.amount?(+it.amount).toLocaleString('ko-KR'):''}"></div>
-      <div class="seg" id="isRule" style="margin-top:10px">${Object.entries(RULE_LAB).map(([k,l])=>`<button data-r="${k}" class="${it.rule===k?'on':''}">${l}</button>`).join('')}</div>
+      <div class="seg" id="isRule" style="margin-top:10px">${Object.entries(RULE_LAB).filter(([k])=>(k!=='rank'||st.mode==='rank'||it.rule==='rank')&&(k!=='trank'||st.mode==='team'||it.rule==='trank')).map(([k,l])=>`<button data-r="${k}" class="${it.rule===k?'on':''}">${l}</button>`).join('')}</div>
       <div class="sopt">${opt}${fix}</div>
       <div class="prev">${r.err?`<div class="r" style="color:var(--red)">${esc(r.err)}</div>`:P.map(p=>`<div class="r"><span>${esc(p.name)}</span><b>${fmt(Math.round(r.out[p.id]))}</b></div>`).join('')}</div>
       <div class="row" style="margin-top:12px">${isNew?'<button class="btn ghost sm" id="isX">취소</button>':'<button class="btn ghost sm" id="isDel" style="color:var(--red)">항목 삭제</button>'}<button class="btn sm" id="isOk">확인</button></div></div>`);
@@ -2024,6 +2054,7 @@ function itemSheet(i,isNew){ const st=SE, P=st.people; const it=st.items[i]; it.
     $$('#isRule button').forEach(b=>b.onclick=()=>{ it.rule=b.dataset.r; if(it.rule==='all'&&!it.to) it.to=st.mode==='team'?'L':null; vib(6); draw(); });
     $$('#isEx button').forEach(b=>b.onclick=()=>{ const id=b.dataset.id; it.ex=it.ex.includes(id)?it.ex.filter(x=>x!==id):it.ex.concat(id); vib(5); draw(); });
     $$('#isTo button').forEach(b=>b.onclick=()=>{ it.to=b.dataset.to; vib(5); draw(); });
+    $$('#isTr input').forEach(inp=>{ inp.oninput=()=>{ const k=teamN(st); const a=(it.tratio&&it.tratio.length===k?it.tratio:rankDefault(k)).slice(); a[+inp.dataset.k]=num(inp.value); it.tratio=a; }; inp.onchange=()=>draw(); });
     $$('#isRk input').forEach(inp=>{ inp.oninput=()=>{ const a=(it.ratio&&it.ratio.length===P.length?it.ratio:rankDefault(P.length)).slice(); a[+inp.dataset.k]=num(inp.value); it.ratio=a; }; inp.onchange=()=>draw(); });
     const fo=$('#isFixOn'); if(fo) fo.onclick=()=>{ it._fix=true; draw(); };
     $$('.fixr input').forEach(inp=>{ inp.oninput=()=>{ const n=num(inp.value); if(n) it.fixed[inp.dataset.id]=n; else delete it.fixed[inp.dataset.id]; inp.value=n?n.toLocaleString('ko-KR'):''; }; inp.onchange=()=>draw(); });
@@ -2032,7 +2063,7 @@ function itemSheet(i,isNew){ const st=SE, P=st.people; const it=st.items[i]; it.
     $('#isOk').onclick=()=>{ if(!it.amount){ toast('금액 넣어줘'); $('#isAmt').focus(); return; } if(!it.name) it.name='항목'; delete it._fix; seSave(); vib([10,30,10]); closeSheet(); renderSettle(); }; };
   draw(); }
 function shareSettle(st){ const c=settleCalc(st); const L=[`[버디로그 정산] ${st.name||dateLabel(st.created)}`];
-  st.items.forEach(it=>{ const how=it.rule==='all'?(it.to==='L'?'진 팀':it.to==='W'?'이긴 팀':pName(st,it.to))+' 몰빵':it.rule==='rank'?'등수 비율':RULE_LAB[it.rule]; L.push(`· ${it.name} ${fmt(+it.amount)} (${how})`); });
+  st.items.forEach(it=>L.push(`· ${it.name} ${fmt(+it.amount)} (${ruleDesc(st,it)})`));
   if(c.solo.length){ L.push('— 혼자 내는 항목 (송금 없음)'); c.solo.forEach(x=>L.push(`${x.it.name} ${fmt(+x.it.amount)} · ${pName(st,x.id)}`)); }
   L.push('— 각자 부담'); st.people.forEach(p=>L.push(`${p.name} ${fmt(c.rb[p.id])}`));
   if(c.tr.length){ L.push('— 송금'); c.tr.forEach(x=>L.push(`${st.people[x.from].name} → ${st.people[x.to].name} ${fmt(x.v)}`)); }
@@ -2064,7 +2095,7 @@ function settleToCost(st){ const rec=st.rec&&DB.records.find(x=>x.id===st.rec); 
 function settleImage(st){ const c=settleCalc(st), P=st.people; const W=1080, PADX=64, S=2; const F="'Noto Sans KR','Inter','Apple SD Gothic Neo',sans-serif";
   const C={bg:'#ffffff',ink:'#0f1115',mut:'#6b7280',line:'#e5e7eb',soft:'#f4f6f8',acc:'#16a34a',accs:'#e8f6ee',red:'#e5484d',reds:'#fdecec',blue:'#2f6fed',blues:'#eaf1fe'};
   const rec=st.rec&&DB.records.find(x=>x.id===st.rec);
-  const ruleTxt=it=>{ const fx=Object.entries(it.fixed||{}).filter(([k,v])=>+v>0&&it.rule!=='man').map(([k,v])=>`${pName(st,k)} ${won(+v)} 고정`); const base=it.rule==='all'?(it.to==='L'?'진 팀 몰빵':it.to==='W'?'이긴 팀 몰빵':pName(st,it.to)+' 몰빵'):it.rule==='rank'?'등수 비율 '+(it.ratio&&it.ratio.length===P.length?it.ratio:rankDefault(P.length)).join(':'):it.rule==='eq'?((it.ex||[]).length?`1/n · ${it.ex.map(id=>pName(st,id)).join(', ')} 빼고`:'1/n'):'직접 입력'; return fx.length?fx.join(' · ')+' · 나머지 '+base:base; };
+  const ruleTxt=it=>ruleDesc(st,it);
   const rows=st.items.length, ppl=P.length, trn=Math.max(1,c.tr.length);
   const H=290+(70+trn*96+24)+(70+ppl*84+46)+(70+rows*84+26)+(c.diff?40:0)+110;
   const cv=document.createElement('canvas'); cv.width=W*S/2; cv.height=H*S/2; const x=cv.getContext('2d'); x.scale(S/2,S/2);
@@ -2090,7 +2121,7 @@ function settleImage(st){ const c=settleCalc(st), P=st.people; const W=1080, PAD
   // 사람별
   sec('사람별','부담 · 낸 돈 · 차액');
   P.forEach((p,i)=>{ const bal=c.paid[p.id]-c.rb[p.id]; if(i) { x.fillStyle=C.line; x.fillRect(PADX,y-2,W-PADX*2,2); }
-    T(p.name,PADX,y+40,{s:31,w:900,max:250}); if(p.team||p.rank){ const tag=p.team?(p.team==='W'?'승':'패'):p.rank+'등'; const tc=p.team==='W'?C.blue:p.team==='L'?C.red:C.mut; R(PADX+260,y+24,64,34,17,p.team==='W'?C.blues:p.team==='L'?C.reds:C.soft); T(tag,PADX+292,y+41,{s:20,w:900,c:tc,a:'center'}); }
+    T(p.name,PADX,y+40,{s:31,w:900,max:250}); const tr=st.mode==='team'?tRank(st,p):null, rk=st.mode==='rank'?p.rank:null; if(tr||rk){ const K=teamN(st); const tag=tr?teamLab(st,tr,true):rk+'등'; const tc=tr===1?C.blue:tr===K?C.red:C.mut; R(PADX+260,y+24,64,34,17,tr===1?C.blues:tr===K?C.reds:C.soft); T(tag,PADX+292,y+41,{s:20,w:900,c:tc,a:'center'}); }
     T(fmt(c.rb[p.id]),W-PADX-430,y+30,{s:28,w:800,a:'right'}); T('부담',W-PADX-430,y+60,{s:18,w:700,c:C.mut,a:'right'});
     T(fmt(c.paid[p.id]),W-PADX-240,y+30,{s:28,w:800,a:'right'}); T('낸 돈',W-PADX-240,y+60,{s:18,w:700,c:C.mut,a:'right'});
     T(bal>0.5?'+'+fmt(bal):bal<-0.5?fmt(bal):'0',W-PADX,y+30,{s:30,w:900,a:'right',c:bal>0.5?C.acc:bal<-0.5?C.red:C.mut}); T(bal>0.5?'받을 돈':bal<-0.5?'보낼 돈':'끝',W-PADX,y+60,{s:18,w:700,c:C.mut,a:'right'});
