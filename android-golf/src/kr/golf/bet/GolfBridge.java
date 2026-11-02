@@ -26,6 +26,21 @@ public class GolfBridge {
     ctx.getSharedPreferences("golf", Context.MODE_PRIVATE).edit().putString("nseen", json == null ? "{}" : json).apply();
   }
 
+  /** 테마 바뀌면 상태바 · 아래 내비 바 색도 맞춤 (밝은 바탕이면 아이콘을 어둡게) */
+  @JavascriptInterface public void setBars(final String hex, final boolean light) {
+    if (!(act instanceof MainActivity)) return;
+    act.runOnUiThread(new Runnable() { @Override public void run() {
+      try {
+        int c = android.graphics.Color.parseColor(hex);
+        android.view.Window w = act.getWindow(); w.setStatusBarColor(c); w.setNavigationBarColor(c); wv.setBackgroundColor(c);
+        int f = w.getDecorView().getSystemUiVisibility();
+        if (android.os.Build.VERSION.SDK_INT >= 23) f = light ? (f | 0x2000) : (f & ~0x2000);
+        if (android.os.Build.VERSION.SDK_INT >= 26) f = light ? (f | 0x10) : (f & ~0x10);
+        w.getDecorView().setSystemUiVisibility(f);
+      } catch (Exception ignored) {}
+    } });
+  }
+
   /** 정산 보고서 이미지 보내기: PNG(base64) → 앱 캐시에 저장 → 공유 창 */
   @JavascriptInterface public void shareImage(final String b64, final String text) {
     try {

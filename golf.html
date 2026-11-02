@@ -67,7 +67,7 @@
   .hero .holes i.f{background:var(--heroink);opacity:.9} .hero .holes i.cur{outline:2px solid var(--heroink);outline-offset:1px;background:transparent}
   .hero .foot{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
   .hero .lead{font-size:13px;font-weight:800} .hero .lead b{font-size:16px}
-  .hero .go{width:42px;height:42px;border-radius:14px;background:var(--heroink);color:var(--hero);display:grid;place-items:center}
+  .hero .go{width:42px;height:42px;border-radius:14px;background:var(--heroink);color:var(--hero1,var(--hero));display:grid;place-items:center}
   .hero .ring{position:absolute;right:-50px;top:-60px;width:180px;height:180px;border-radius:50%;border:28px solid rgba(0,0,0,.1)}
   html[data-theme=light] .hero .ring{border-color:rgba(255,255,255,.08)}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -122,7 +122,7 @@
   .back{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:800;color:var(--mut);margin-bottom:12px;padding:4px 0}
   .hdr-sw{display:flex;align-items:center;justify-content:space-between;background:var(--hero);color:var(--heroink);border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:var(--sh)}
   .hdr-sw b{font-size:18px;display:block;letter-spacing:-.3px} .hdr-sw small{font-size:12px;opacity:.75;font-weight:600}
-  .hdr-sw .sw{border-color:transparent;background:rgba(0,0,0,.25)} .hdr-sw .sw.on{background:var(--heroink)} .hdr-sw .sw.on::after{background:var(--hero)}
+  .hdr-sw .sw{border-color:transparent;background:rgba(0,0,0,.25)} .hdr-sw .sw.on{background:var(--heroink)} .hdr-sw .sw.on::after{background:var(--hero1,var(--hero))}
   .inp{width:100%;height:50px;border-radius:14px;background:var(--card);border:1px solid var(--line);padding:0 14px;font-size:15px;font-weight:700;outline:none;color:var(--ink)}
   .inp:focus{border-color:var(--acc)}
   .inp::placeholder{color:var(--mut);font-weight:600}
@@ -229,7 +229,7 @@
   .pod .nm{font-size:13px;font-weight:800;text-align:center} .pod .nm small{display:block;font-size:12px;font-weight:900}
   .pod .bar{width:100%;border-radius:14px 14px 5px 5px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font-weight:900;font-size:15px;color:var(--mut);animation:grow .7s cubic-bezier(.2,.9,.3,1) both;transform-origin:bottom}
   @keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
-  .pod.p1 .bar{height:74px;background:var(--hero);color:var(--heroink);border-color:var(--hero)} .pod.p2 .bar{height:52px} .pod.p3 .bar{height:34px} .pod.p4 .bar{height:22px}
+  .pod.p1 .bar{height:74px;background:var(--hero);color:var(--heroink);border-color:var(--hero1,var(--hero))} .pod.p2 .bar{height:52px} .pod.p3 .bar{height:34px} .pod.p4 .bar{height:22px}
   .pod.p1 .av{border:3px solid var(--acc)}
   .flow{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:6px 12px;box-shadow:var(--sh)}
   .flow .r{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;padding:9px 0;border-bottom:1px solid var(--line)}
@@ -363,7 +363,7 @@
   .kpi b{display:block;font-size:30px;font-weight:900;letter-spacing:-1.3px;margin-top:4px;line-height:1.05}
   .kpi b em{font-style:normal;font-size:13px;color:var(--mut);font-weight:800;margin-left:3px;letter-spacing:0}
   .kpi span{display:block;font-size:11px;color:var(--mut);font-weight:600;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .kpi.hero{background:var(--hero);color:var(--heroink);border-color:var(--hero)}
+  .kpi.hero{background:var(--hero);color:var(--heroink);border-color:var(--hero1,var(--hero))}
   .kpi.hero small,.kpi.hero span,.kpi.hero b em{color:inherit;opacity:.78}
   .split{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:10px;box-shadow:var(--sh)}
   .split .hd{display:flex;justify-content:space-between;font-size:13px;font-weight:800;margin-bottom:10px}
@@ -749,6 +749,38 @@
   .prev .r b{font-weight:900}
   .fixr{display:flex;align-items:center;gap:8px;margin-top:6px} .fixr span{width:60px;font-size:13px;font-weight:800;flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .fixr input{flex:1;min-width:0;height:40px;border-radius:12px;background:var(--bg);border:1px solid var(--line);box-shadow:inset 0 2px 5px rgba(0,0,0,.25);padding:0 12px;text-align:right;font-size:15px;font-weight:800;color:var(--ink);outline:none}
+
+  /* ===== 테마 (설정에서 고름) · 모두 밝은 바탕이라 data-theme=light 위에 덮어씀 ===== */
+  html[data-skin=fairway]{--bg:#f1f4f1;--card:#ffffff;--card2:#f6f9f7;--ink:#0f2219;--mut:#6c7a72;--line:#e2e8e3;--chip:#eef2ef;--acc:#0f9d58;--accs:rgba(15,157,88,.11);--accink:#fff;--hero:linear-gradient(135deg,#12a862 0%,#0b7a45 70%,#095f37 100%);--hero1:#0b7a45;--heroink:#fff;--sh:0 14px 30px -22px rgba(16,40,28,.45);--blue:#2f6fed;--blues:rgba(47,111,237,.11);--red:#e5484d;--reds:rgba(229,72,77,.11);--c1:#0f9d58;--c2:#2f6fed}
+  html[data-skin=ocean]{--bg:#f1f5fb;--card:#ffffff;--card2:#f6f8fc;--ink:#0f1b2d;--mut:#6b7789;--line:#e1e7f0;--chip:#edf1f7;--acc:#1f6fe5;--accs:rgba(31,111,229,.11);--accink:#fff;--hero:linear-gradient(135deg,#2f80ff 0%,#1a5fd0 70%,#1449a6 100%);--hero1:#1a5fd0;--heroink:#fff;--sh:0 14px 30px -22px rgba(16,32,64,.45);--blue:#7c5cff;--blues:rgba(124,92,255,.12);--red:#e5484d;--reds:rgba(229,72,77,.11);--c1:#1f6fe5;--c2:#16a34a}
+  html[data-skin=bold]{--bg:#fdf6e3;--card:#ffffff;--card2:#fffaf0;--ink:#111111;--mut:#555555;--line:#111111;--chip:#fff1c2;--acc:#ff5c8a;--accs:#ffe0ea;--accink:#111111;--hero:#b9f27c;--hero1:#b9f27c;--heroink:#111111;--sh:4px 4px 0 #111111;--blue:#2f6fed;--blues:#dce9ff;--red:#e5484d;--reds:#ffe1e1;--c1:#ff5c8a;--c2:#4aa8ff}
+  html[data-skin] .yhero .chips span{background:rgba(255,255,255,.18)}
+  html[data-skin] .yhero .ring,html[data-skin] .hero .ring{border-color:rgba(255,255,255,.12)}
+  html[data-skin] .tabbar{background:color-mix(in srgb,var(--bg) 78%,transparent)}
+  /* 볼드 블록: 굵은 검정 테두리 · 블록 그림자 */
+  html[data-skin=bold] :is(.card,.rec,.tile:not(.new),.kpi,.rank,.sub,.chart,.rule,.flow,.costs,.burden,.itm,.pp,.inp,.ic,.yhero,.hero,.nextl,.cal,.dial,.opt,.onl,.wxp,.hsmini,.lnkcard,.pt,.near,.ticker,.split,.codebox,.stats,.prev,.chk,.tcnt,.bkst div,.hdr-sw,.kpi.hero){border:2px solid #111!important;box-shadow:4px 4px 0 #111!important}
+  html[data-skin=bold] :is(.rank .r,.sub .it,.paid,.burden .r,.costs .cr,.pay,.frow,.prev .r){border-color:rgba(17,17,17,.14)!important}
+  html[data-skin=bold] .btn{border:2px solid #111;box-shadow:3px 3px 0 #111;color:#111} html[data-skin=bold] .btn:active{transform:translate(3px,3px);box-shadow:none}
+  html[data-skin=bold] .btn.ghost{background:#fff} html[data-skin=bold] .btn.danger{background:var(--red);color:#fff}
+  html[data-skin=bold] .seg{border:2px solid #111;background:#fff} html[data-skin=bold] .seg button.on{background:#111;color:#fff;box-shadow:none}
+  html[data-skin=bold] .tabbar{border-top:2px solid #111;background:var(--bg)} html[data-skin=bold] .tabbar button.on{background:var(--acc);color:#111;border:2px solid #111;box-shadow:3px 3px 0 #111} html[data-skin=bold] .tabbar button.on svg{color:#111}
+  html[data-skin=bold] .fab{border:2px solid #111;box-shadow:4px 4px 0 #111!important}
+  html[data-skin=bold] .rec .dt{background:#fff1c2;border:2px solid #111} html[data-skin=bold] .tg{border:1.5px solid #111;color:#111}
+  html[data-skin=bold] .yhero .chips span{background:#fff;border:2px solid #111}
+  html[data-skin=bold] .amenu button.ai{border:2px solid #111;box-shadow:3px 3px 0 #111} html[data-skin=bold] .sheet{border-top:2px solid #111}
+  html[data-skin=bold] .cal .dc.pl span{border:2px solid #111} html[data-skin=bold] .toast{border:2px solid #111}
+  /* 테마 고르기 시트 */
+  .thpick{display:grid;gap:10px}
+  .thpick button{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:12px;border-radius:18px;background:var(--card);border:2px solid var(--line);transition:transform .1s}
+  .thpick button.on{border-color:var(--acc);box-shadow:0 0 0 3px var(--accs)}
+  .thpick button:active{transform:scale(.98)}
+  .thpick .sw2{width:86px;height:58px;border-radius:14px;flex:none;position:relative;overflow:hidden}
+  .thpick .sw2 i{position:absolute;left:8px;right:8px;bottom:8px;height:14px;border-radius:5px;background:#fff}
+  .thpick .sw2 i::after{content:'';position:absolute;right:4px;top:3px;width:8px;height:8px;border-radius:50%;background:var(--dot)}
+  .thpick b{display:block;font-size:15.5px;font-weight:900} .thpick small{display:block;font-size:11.5px;color:var(--mut);font-weight:700;margin-top:2px}
+  .thpick .ck{margin-left:auto;width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;flex:none}
+  .thpick button.on .ck{background:var(--acc);border-color:var(--acc);color:var(--accink)}
+  .thpick .ck svg{width:15px;height:15px;stroke-width:3}
 </style>
 </head>
 <body>
@@ -852,7 +884,7 @@
       <button class="ic" id="remBtn" aria-label="라운드 알림"><svg class="i" viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg></button>
       <button class="ic" id="matesBtn" aria-label="동행자 관리"><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16.5 14.6c2.6.1 4.5 1.8 5 4.6"/></svg></button>
       <button class="ic" id="recImportBtn" aria-label="가져오기 · 백업"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg></button>
-      <button class="ic" id="themeBtn" aria-label="테마"><svg class="i" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.5 0-1-.1-1.4A5.5 5.5 0 0 1 13.4 3.1 9 9 0 0 0 12 3z"/></svg></button>
+      <button class="ic" id="themeBtn" aria-label="테마"><svg class="i" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0 0 18c1.4 0 2-1 2-2 0-.6-.3-1-.6-1.4-.3-.4-.5-.8-.5-1.3 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4c0-4.1-4-7.5-9-7.5z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7.2" r="1.2"/><circle cx="15" cy="7.8" r="1.2"/></svg></button>
     </div>
   </div>
   <div class="yrchips" id="recYears"></div>
@@ -1009,9 +1041,18 @@ const vib=p=>{ try{ navigator.vibrate&&navigator.vibrate(p); }catch(e){} };
 function toast(m,ms=1600){ const t=$('#toast'); t.textContent=m; t.classList.toggle('top',$('#sheetBg').classList.contains('show')||$('#s-recform').classList.contains('active')); t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),ms); }
 const TABS={'#s-rec':'rec','#s-stats':'stats','#s-list':'bet','#s-setl':'settle'};
 function show(id){ $$('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); window.scrollTo({top:0}); const t=TABS[id]||''; document.body.classList.toggle('has-tabs',!!t); document.body.dataset.tab=t; $$('#tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.t===t)); }
-function applyTheme(){ document.documentElement.setAttribute('data-theme',DB.theme==='light'?'light':'dark'); document.querySelector('meta[name=theme-color]').content=DB.theme==='light'?'#f2f3f5':'#0e1014'; }
+const SKINS={fairway:{name:'페어웨이',desc:'에메랄드 그린 · 밝고 깔끔',bg:'#f1f4f1',hero:'linear-gradient(135deg,#12a862,#0b7a45 70%,#095f37)',dot:'#0f9d58',head:['#12a862','#0b7a45'],headInk:'#ffffff'},
+  ocean:{name:'오션',desc:'파랑 · 시원하고 또렷함',bg:'#f1f5fb',hero:'linear-gradient(135deg,#2f80ff,#1a5fd0 70%,#1449a6)',dot:'#1f6fe5',head:['#2f80ff','#1a5fd0'],headInk:'#ffffff'},
+  bold:{name:'볼드 블록',desc:'굵은 테두리 · 블록 그림자 · 파스텔',bg:'#fdf6e3',hero:'#b9f27c',dot:'#ff5c8a',head:['#b9f27c','#b9f27c'],headInk:'#111111'}};
+function skin(){ return SKINS[DB.skin]?DB.skin:'fairway'; }
+function applyTheme(){ const k=skin(), S2=SKINS[k]; document.documentElement.setAttribute('data-theme','light'); document.documentElement.setAttribute('data-skin',k); document.querySelector('meta[name=theme-color]').content=S2.bg;
+  try{ if(window.GolfNative&&GolfNative.setBars&&!POPUP) GolfNative.setBars(S2.bg,true); }catch(e){} }
 applyTheme();
-$('#themeBtn').onclick=()=>{ DB.theme=DB.theme==='light'?'dark':'light'; save(); applyTheme(); vib(8); };
+$('#themeBtn').onclick=()=>themeSheet();
+function themeSheet(){ const cur=skin();
+  sheet(`<div class="amenu"><div class="ah"><b>테마</b><small>고르면 앱 전체 · 정산 이미지 머리 색이 바로 바뀜</small></div><div class="thpick">${Object.entries(SKINS).map(([k,v])=>`<button data-k="${k}" class="${k===cur?'on':''}"><span class="sw2" style="background:${v.hero};--dot:${v.dot};${k==='bold'?'border:2px solid #111;box-shadow:3px 3px 0 #111':''}"><i></i></span><div><b>${v.name}</b><small>${v.desc}</small></div><span class="ck">${k===cur?SV.done:''}</span></button>`).join('')}</div><div style="height:12px"></div><button class="btn ghost sm" id="thX">닫기</button></div>`);
+  $$('#sheet .thpick button').forEach(b=>b.onclick=()=>{ DB.skin=b.dataset.k; save(); applyTheme(); vib(10); themeSheet(); if($('#s-stats').classList.contains('active')) renderStats(); });
+  $('#thX').onclick=closeSheet; }
 
 /* =================== 룰 정의 =================== */
 const RULES={
@@ -1552,7 +1593,7 @@ $('#wipeAll').onclick=()=>{ const n=DB.records.length, g=(DB.rounds||[]).length+
   sheet(`<div class="amenu"><div class="ah"><b>모든 기록 지울까?</b><small>기록 ${n}개 · 내기 ${g}개 · 사진 · 동행자 · 알림 전부 · 되돌릴 수 없음</small></div><div class="mut" style="font-size:12.5px;font-weight:800;margin:6px 2px 8px">확인하려면 <b style="color:var(--red)">지우기</b> 라고 쓰기</div><input class="inp" id="wpIn" autocomplete="off" placeholder="지우기"><div class="row" style="margin-top:12px"><button class="btn ghost sm" id="wpNo">취소</button><button class="btn danger sm" id="wpOk" disabled>전부 지우기</button></div></div>`);
   $('#wpIn').oninput=e=>{ $('#wpOk').disabled=e.target.value.trim()!=='지우기'; };
   $('#wpNo').onclick=closeSheet;
-  $('#wpOk').onclick=async()=>{ const keep={theme:DB.theme,seeds:DB.seeds||[],migs:DB.migs||[]};
+  $('#wpOk').onclick=async()=>{ const keep={theme:DB.theme,skin:DB.skin,seeds:DB.seeds||[],migs:DB.migs||[]};
     Object.keys(DB).forEach(k=>delete DB[k]); Object.assign(DB,{rounds:[],records:[],names:[],settles:[]},keep);
     try{ const d=await PH.db(); d.close(); }catch(e){} PH._db=null; PH.url.forEach(u=>URL.revokeObjectURL(u)); PH.url.clear(); try{ indexedDB.deleteDatabase('golf-photos'); }catch(e){}
     try{ localStorage.removeItem(WXK); }catch(e){} WX={};
@@ -2104,11 +2145,13 @@ function settleImage(st){ const c=settleCalc(st), P=st.people; const W=Math.max(
   const R=(rx,ry,rw,rh,r,fill)=>{ x.beginPath(); if(x.roundRect) x.roundRect(rx,ry,rw,rh,r); else x.rect(rx,ry,rw,rh); x.fillStyle=fill; x.fill(); };
   x.fillStyle=C.bg; x.fillRect(0,0,W,H);
   // 머리
-  R(0,0,W,250,0,C.acc); x.fillStyle='rgba(255,255,255,.12)'; x.beginPath(); x.arc(W-90,40,170,0,7); x.fill();
-  T('버디로그 정산',PADX,62,{s:28,w:800,c:'rgba(255,255,255,.85)'});
-  T(st.name||'정산',PADX,128,{s:58,w:900,c:'#fff',max:W-PADX*2});
+  const SK=SKINS[skin()], hi=SK.headInk, hg=x.createLinearGradient(0,0,W,250); hg.addColorStop(0,SK.head[0]); hg.addColorStop(1,SK.head[1]);
+  x.fillStyle=hg; x.fillRect(0,0,W,250); if(skin()==='bold'){ x.fillStyle='#111'; x.fillRect(0,246,W,4); } x.fillStyle=hi==='#ffffff'?'rgba(255,255,255,.12)':'rgba(0,0,0,.06)'; x.beginPath(); x.arc(W-90,40,170,0,7); x.fill();
+  const hiA=a=>hi==='#ffffff'?`rgba(255,255,255,${a})`:`rgba(17,17,17,${a})`;
+  T('버디로그 정산',PADX,62,{s:28,w:800,c:hiA(.85)});
+  T(st.name||'정산',PADX,128,{s:58,w:900,c:hi,max:W-PADX*2});
   const cn=rec&&(rec.course||rec.region); const sub=[dateLabel(st.created),cn&&!(st.name||'').includes(cn)?cn:'',`${ppl}명`,`총 ${fmt(c.total)}원`].filter(Boolean).join('  ·  ');
-  T(sub,PADX,196,{s:28,w:700,c:'rgba(255,255,255,.9)',max:W-PADX*2});
+  T(sub,PADX,196,{s:28,w:700,c:hiA(.9),max:W-PADX*2});
   let y=290;
   const sec=(t,n)=>{ T(t,PADX,y+20,{s:34,w:900}); if(n) T(n,W-PADX,y+20,{s:24,w:700,c:C.mut,a:'right'}); y+=70; };
   // 송금 먼저 (제일 중요)

@@ -29,8 +29,9 @@ public class MainActivity extends Activity {
   @Override protected void onCreate(Bundle b) {
     super.onCreate(b);
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    getWindow().setStatusBarColor(Color.parseColor("#0e1014"));
-    getWindow().setNavigationBarColor(Color.parseColor("#0e1014"));
+    getWindow().setStatusBarColor(Color.parseColor("#f1f4f1"));
+    getWindow().getDecorView().setSystemUiVisibility(android.os.Build.VERSION.SDK_INT >= 26 ? 0x2010 : 0x2000);
+    getWindow().setNavigationBarColor(Color.parseColor("#f1f4f1"));
 
     wv = new WebView(this);
     WebSettings s = wv.getSettings();
@@ -45,7 +46,7 @@ public class MainActivity extends Activity {
     s.setLoadWithOverviewMode(true);
     s.setUseWideViewPort(true);
     s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
-    wv.setBackgroundColor(Color.parseColor("#0e1014"));
+    wv.setBackgroundColor(Color.parseColor("#f1f4f1"));
     wv.setOverScrollMode(View.OVER_SCROLL_NEVER);
 
     wv.setWebViewClient(new AppWebClient(this, new Runnable() { @Override public void run() {
