@@ -1584,7 +1584,8 @@ $('#rfSave').onclick=()=>{
   const gone=editRec?(editRec.photos||[]).filter(id=>!(F.photos||[]).includes(id)):[]; if(gone.length) PH.del(gone); delete F._newPh;
   if(editRec){ Object.assign(editRec,F); ['cost','photos','hs','hp'].forEach(k=>{ if(!(k in F)) delete editRec[k]; }); } else DB.records.push(F);
   if(F.plan) askNotify();
-  save(); vib([10,30,10]); if(POPUP){ popupClose(); return; } if(formReturn&&RL){ toast(editRec?'수정됨':'저장'); formReturn(); return; } recYear=yearOf(F); calY=+F.date.slice(0,4); calM=+F.date.slice(5,7); selDay=null; recView='month'; const sn=F.plan&&!F.shared?shareTargets(F).length:0; toast((editRec?'수정됨':(F.plan?'예정 저장':'기록 저장'))+(sn?` · ${sn}명에게 공유`:'')); renderRecords(); show('#s-rec');
+  save(); vib([10,30,10]);
+  if(goSettle&&!POPUP){ const rr=editRec||F; formReturn=null; RL=null; const ex=setlOf(rr); if(ex){ SE=ex; const add=linkSettle(rr); seSave(); openSettle(false); toast(add.length?`${add.join(', ')} 항목 더함`:'연결된 정산 열기',2200); } else { SE=newSettle(); const add=linkSettle(rr); seSave(); openSettle(false); toast(add.length?`${add.join(', ')} 채움 · 방식은 눌러서 바꾸기`:'정산 시작',2400); } return; } if(POPUP){ popupClose(); return; } if(formReturn&&RL){ toast(editRec?'수정됨':'저장'); formReturn(); return; } recYear=yearOf(F); calY=+F.date.slice(0,4); calM=+F.date.slice(5,7); selDay=null; recView='month'; const sn=F.plan&&!F.shared?shareTargets(F).length:0; toast((editRec?'수정됨':(F.plan?'예정 저장':'기록 저장'))+(sn?` · ${sn}명에게 공유`:'')); renderRecords(); show('#s-rec');
 };
 $('#rfDel').onclick=()=>{ sheet(`<h4>이 기록 삭제할까?</h4><div class="mut" style="font-size:13px;font-weight:600;margin-bottom:14px">${esc(F.date)} ${esc(F.course||F.region)}</div><div class="row"><button class="btn ghost sm" id="dno">취소</button><button class="btn danger sm" id="dyes">삭제</button></div>`); $('#dno').onclick=closeSheet; $('#dyes').onclick=()=>{ DB.records=DB.records.filter(r=>r!==editRec); PH.del((editRec.photos||[]).concat(F._newPh||[])); dropShared(editRec); save(); closeSheet(); toast('삭제됨'); renderRecords(); show('#s-rec'); }; };
 $('#recImportBtn').onclick=()=>openImport();
@@ -1657,11 +1658,12 @@ function costTotal(r){ const c=r&&r.cost; if(!c) return 0; return COSTS.reduce((
 function manwon(n){ const m=Math.round(n/1000)/10; return Number.isInteger(m)?String(m):m.toFixed(1); }
 function won(n){ n=Math.round(n||0); return n>=10000?manwon(n)+'만원':n.toLocaleString('ko-KR')+'원'; }
 function cleanCost(r){ if(!r.cost) return; if(!r.caddie){ delete r.cost.caddie; delete r.cost.tip; } COSTS.forEach(([k])=>{ if(!(+r.cost[k]>0)) delete r.cost[k]; }); if(!Object.keys(r.cost).length) delete r.cost; }
-let costOpen=false;
+let costOpen=false, goSettle=false;
 function renderCosts(){ const box=$('#fCosts');
   if(!costOpen){ box.innerHTML=`<button class="opt" type="button" id="costOpen"><span>그린피 · 캐디피 · 카트비 · 캐디팁 · 기타<small>안 넣어도 됨</small></span><em>넣기 +</em></button>`; $('#costOpen').onclick=()=>{ costOpen=true; vib(6); renderCosts(); const i=$('#fCosts input'); if(i) setTimeout(()=>i.focus(),60); }; return; }
   const c=F.cost||(F.cost={}); const n=(F.mates||[]).length+1; const rows=COSTS.filter(([k])=>F.caddie||(k!=='caddie'&&k!=='tip'));
-  box.innerHTML=`<div class="costs">${rows.map(([k,l])=>`<div class="cr"><span>${l}</span><label><input data-k="${k}" inputmode="numeric" autocomplete="off" placeholder="0" value="${c[k]?(+c[k]).toLocaleString('ko-KR'):''}"><em>원</em></label>${n>1?`<button class="dv" type="button" data-k="${k}" aria-label="${n}명으로 나누기">1/${n}</button>`:''}</div>`).join('')}<div class="ct"><div>내 비용 합계<small>${n>1?`팀 금액 넣었으면 1/${n} 눌러 내 몫으로`:'혼자 낸 금액 그대로'}</small></div><b id="costTot"></b></div></div>`;
+  box.innerHTML=`<div class="costs">${rows.map(([k,l])=>`<div class="cr"><span>${l}</span><label><input data-k="${k}" inputmode="numeric" autocomplete="off" placeholder="0" value="${c[k]?(+c[k]).toLocaleString('ko-KR'):''}"><em>원</em></label>${n>1?`<button class="dv" type="button" data-k="${k}" aria-label="${n}명으로 나누기">1/${n}</button>`:''}</div>`).join('')}<div class="ct"><div>내 비용 합계<small>${n>1?`팀 금액 넣었으면 1/${n} 눌러 내 몫으로`:'혼자 낸 금액 그대로'}</small></div><b id="costTot"></b></div></div>${POPUP?'':`<button class="opt" type="button" id="costSetl" style="margin-top:8px"><span>이 금액으로 정산하기<small>저장하고 정산으로 · ${n}명 · 내 몫 × 인원, 1/n</small></span><em>정산 ›</em></button>`}`;
+  const cs=$('#costSetl'); if(cs) cs.onclick=()=>{ if(!costTotal(F)){ toast('비용부터 넣기'); return; } goSettle=true; $('#rfSave').click(); goSettle=false; };
   const tot=()=>{ $('#costTot').textContent=costTotal(F)?won(costTotal(F)):'0원'; }; tot();
   box.querySelectorAll('input').forEach(i=>i.oninput=()=>{ const d=i.value.replace(/\D/g,'').slice(0,8); c[i.dataset.k]=+d||0; i.value=d?(+d).toLocaleString('ko-KR'):''; tot(); });
   box.querySelectorAll('.dv').forEach(b=>b.onclick=()=>{ const k=b.dataset.k, v=+c[k]||0; const l=COSTS.find(x=>x[0]===k)[1]; if(!v){ toast(`${l} 팀 전체 금액부터 넣기`); box.querySelector(`input[data-k=${k}]`).focus(); return; } const each=Math.round(v/n/100)*100; c[k]=each; vib(8); toast(`${l} ${won(v)} ÷ ${n}명 = ${won(each)}`); renderCosts(); }); }
@@ -2014,7 +2016,7 @@ function renderSettle(){ if(renderSettle._busy) return; renderSettle._busy=1; tr
 function renderSettle0(){ const st=SE, P=st.people; renderSeLink(); const c=settleCalc(st); const box=$('#seBody');
   $('#seSub').textContent=`${P.length}명 · 항목 ${st.items.length}개 · ${fmt(c.total)}원`;
   const K=teamN(st); const tm=p=>st.mode==='team'?`<div class="tm">${[...Array(K)].map((_,i)=>`<button class="${i===0?'w':i===K-1?'l':'r'} ${tRank(st,p)===i+1?'on':''}" data-t="${i+1}">${teamLab(st,i+1,true)}</button>`).join('')}</div>`:st.mode==='rank'?`<div class="tm">${P.map((_,i)=>`<button class="r ${p.rank===i+1?'on':''}" data-r="${i+1}">${i+1}</button>`).join('')}</div>`:'';
-  const imp=linkCands().concat(DB.records.filter(r=>!r.plan).sort(recSort).slice(0,3)).filter((r,i,a)=>a.indexOf(r)===i&&(r.mates||[]).length).slice(0,4);
+  const imp=linkCands().concat(DB.records.filter(r=>!r.plan).sort(recSort).slice(0,3)).filter((r,i,a)=>a.indexOf(r)===i&&(r.mates||[]).length&&r.id!==st.rec).slice(0,4);
   let h=`<div class="stl-sec"><i>1</i><b>명단</b><small>${P.length}명</small></div>
   <div class="seg" id="seMode"><button data-m="team">팀전</button><button data-m="rank">개인전 등수</button><button data-m="none">없음</button></div>
   ${st.mode==='team'?`<div class="tcnt"><span>팀 <b>${K}</b>개${K===2?' · 승 · 패':' · 1위부터 순서대로'}</span><div><button id="seTm" ${K<=2?'disabled':''}>−</button><button id="seTp" ${K>=6?'disabled':''}>+</button></div></div>`:''}<div style="height:10px"></div>
@@ -2119,13 +2121,16 @@ function setlOf(rec){ return (DB.settles||[]).find(st=>st.rec===rec.id)||null; }
 function setlMe(st){ const nm=myName(); return st.people.find(p=>p.name===nm)||st.people.find(p=>p.name==='나')||null; }
 function setlTag(r){ const st=setlOf(r); if(!st) return ''; const me=setlMe(st); let v=null; if(me){ try{ v=settleCalc(st).rb[me.id]; }catch(e){} } return `<span class="tg setl" data-st="${st.id}" role="button">정산${v!=null?' '+won(v):''}</span>`; }
 function linkSettle(rec){ const st=SE; st.rec=rec.id; if(!st.name) st.name=`${+rec.date.slice(5,7)}/${+rec.date.slice(8,10)} ${rec.course||rec.region||''}`.trim(); const [y,m,d]=rec.date.split('-').map(Number); st.created=new Date(y,m-1,d,12).getTime();
-  [myName()||'나'].concat(rec.mates||[]).forEach(n=>{ if(n&&!st.people.some(p=>p.name===n)) st.people.push({id:uid(),name:n,team:null,rank:null}); }); }
+  [myName()||'나'].concat(rec.mates||[]).forEach(n=>{ if(n&&!st.people.some(p=>p.name===n)) st.people.push({id:uid(),name:n,team:null,rank:null}); });
+  // 기록 비용은 내 몫 → 항목 금액 = 내 몫 × 인원 · 1/n (이미 같은 이름 항목 있으면 안 건드림)
+  const n=st.people.length, add=[]; COSTS.forEach(([k,l])=>{ const v=+((rec.cost||{})[k])||0; if(v>0&&!st.items.some(it=>(it.name||'').replace(/\s/g,'')===l)){ st.items.push({id:uid(),name:l,amount:v*n,rule:'eq',ex:[],fixed:{}}); add.push(l); } });
+  return add; }
 function renderSeLink(){ const box=$('#seLink'); const st=SE; const rec=st.rec&&DB.records.find(x=>x.id===st.rec);
   if(rec){ box.innerHTML=`<div class="lnkcard"><span class="ico">${SV.link}</span><div class="tx"><b>${esc(recShort(rec))}</b><small>${rec.plan?'예정':'다녀온'} 라운드와 연결 · 기록 카드에 정산 표시</small></div><button class="lk" id="seUnlink">풀기</button></div>`; $('#seUnlink').onclick=()=>{ delete st.rec; vib(6); seSave(); renderSettle(); }; return; }
   const t0=today(); const cs=DB.records.filter(r=>!setlOf(r)&&dday(r.date)>=-14&&dday(r.date)<=30).sort((a,b)=>Math.abs(dday(a.date))-Math.abs(dday(b.date))).slice(0,6);
   if(!cs.length){ box.innerHTML=''; return; }
   box.innerHTML=`<div class="lbl" style="margin-top:0"><span>라운드에서 불러오기</span><small class="mut">이름 · 날짜 · 명단 채움</small></div><div class="lchips">${cs.map(x=>{ const d=dday(x.date); return `<button data-id="${x.id}"><b>${+x.date.slice(5,7)}/${+x.date.slice(8,10)} ${esc(x.course||x.region)}</b><small>${x.plan?(d===0?'오늘':d>0?'D-'+d:'지난 예정'):'다녀옴'}${(x.mates||[]).length?' · '+esc(x.mates.join(', ')):''}</small></button>`; }).join('')}</div>`;
-  box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const r=DB.records.find(x=>x.id===b.dataset.id); if(!r) return; linkSettle(r); $('#seName').value=st.name; vib([10,30,10]); toast(`${recShort(r)} 연결`); seSave(); renderSettle(); }); }
+  box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const r=DB.records.find(x=>x.id===b.dataset.id); if(!r) return; const add=linkSettle(r); $('#seName').value=st.name; vib([10,30,10]); toast(add.length?`${recShort(r)} 연결 · ${add.join(', ')} 채움`:`${recShort(r)} 연결`,2400); seSave(); renderSettle(); }); }
 const COST_OF={그린피:'green',캐디피:'caddie',카트비:'cart',캐디팁:'tip'};
 function settleToCost(st){ const rec=st.rec&&DB.records.find(x=>x.id===st.rec); if(!rec) return;
   const go=me=>{ const add={}; st.items.forEach(it=>{ const {out,err}=splitItem(st,it); if(err) return; const v=Math.round(out[me.id]||0); if(!v) return; const k=COST_OF[(it.name||'').replace(/\s/g,'')]||'etc'; add[k]=(add[k]||0)+v; });
