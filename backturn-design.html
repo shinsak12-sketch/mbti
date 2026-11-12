@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>뒤돌아봐 캐릭터 시안</title>
+<style>
+  :root{--felt:#124635;--felt-2:#0d3628;--felt-3:#082a1f;--gold:#e9c96a;--gold-2:#c9a13d;--cream:#f6ecd4;--txt:#f2efe4;--muted:#a9c2b6;--red:#c8322b}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Pretendard',-apple-system,'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;color:var(--txt);background:linear-gradient(180deg,var(--felt) 0%,var(--felt-2) 60%,var(--felt-3) 100%);min-height:100vh;padding:24px 16px 60px}
+  .wrap{max-width:1100px;margin:0 auto}
+  h1{font-size:24px;font-weight:900;letter-spacing:-.5px}
+  .lead{font-size:13px;color:var(--muted);font-weight:600;margin:4px 0 22px}
+  h2{font-size:15px;font-weight:900;color:var(--gold);margin:26px 0 12px;letter-spacing:.02em}
+  .row{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
+  .cell{background:rgba(0,0,0,.18);border:1px solid rgba(233,201,106,.18);border-radius:18px;padding:10px 6px 8px;text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+  .cell svg{width:100%;height:auto;display:block}
+  .cell small{display:block;font-size:11px;font-weight:800;color:var(--muted);margin-top:4px}
+  .cell.bad{border-color:rgba(200,50,43,.6);background:rgba(200,50,43,.12)}
+  .cell.ok{border-color:rgba(233,201,106,.45)}
+  /* 미니 무대 */
+  .stage{position:relative;margin-top:6px;border-radius:24px;padding:18px 10px 6px;background:radial-gradient(120% 80% at 50% 0%,rgba(255,255,255,.06),transparent 60%),linear-gradient(180deg,#0f3a2c,#0a2d22);border:1px solid rgba(233,201,106,.25);box-shadow:inset 0 2px 12px rgba(0,0,0,.45)}
+  .stage .floor{position:absolute;left:0;right:0;bottom:0;height:46px;border-radius:0 0 24px 24px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.25))}
+  .line{display:flex;justify-content:center;gap:4px;position:relative;z-index:1}
+  .ch{width:118px;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent}
+  .ch .num{position:absolute;left:50%;top:-4px;transform:translateX(-50%);font-size:11px;font-weight:900;color:#0d3628;background:var(--gold);border-radius:999px;padding:1px 8px;box-shadow:0 2px 0 var(--gold-2);z-index:2}
+  .ch .body{transform-origin:50% 100%;animation:sway 2.6s ease-in-out infinite}
+  .ch:nth-child(2n) .body{animation-duration:3.1s;animation-delay:-.7s} .ch:nth-child(3n) .body{animation-duration:2.3s;animation-delay:-1.3s}
+  @keyframes sway{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
+  .ch .hair-swing{transform-origin:70px 44px;animation:swing 2.6s ease-in-out infinite}
+  @keyframes swing{0%,100%{transform:rotate(2deg)}50%{transform:rotate(-2deg)}}
+  .ch .turn{transition:transform .28s ease-in}
+  .ch.turning .turn{transform:scaleX(0)}
+  .ch.hop .body{animation:hop .5s cubic-bezier(.3,1.6,.5,1)}
+  @keyframes hop{0%{transform:translateY(0)}35%{transform:translateY(-18px)}100%{transform:translateY(0)}}
+  .ch.shake .body{animation:shake .5s linear 2}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px) rotate(-3deg)}40%{transform:translateX(6px) rotate(3deg)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+  .ch .tag{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%) scale(0);font-weight:900;font-size:18px;padding:6px 12px;border-radius:12px;white-space:nowrap;z-index:3;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
+  .ch .tag.ok{background:var(--gold);color:#0d3628;box-shadow:0 3px 0 var(--gold-2)} .ch .tag.bad{background:var(--red);color:#fff;box-shadow:0 3px 0 #8e1f1a}
+  .ch.done .tag{transform:translate(-50%,-50%) scale(1) rotate(-6deg)}
+  .ctl{display:flex;gap:8px;justify-content:center;margin-top:12px}
+  .ctl button{font:inherit;font-weight:900;font-size:14px;padding:11px 18px;border-radius:14px;border:0;background:var(--gold);color:#0d3628;box-shadow:0 4px 0 var(--gold-2),0 10px 18px -8px rgba(0,0,0,.6);cursor:pointer}
+  .ctl button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--gold-2)}
+  .note{font-size:12px;color:var(--muted);font-weight:600;margin-top:10px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>뒤돌아봐 · 캐릭터 시안</h1>
+  <div class="lead">뒷모습은 전부 여자처럼 · 돌아서면 여자는 통과, 남자는 걸림 · 남자도 뒷모습은 똑같이 꾸며서 티 안 남</div>
+
+  <h2>뒷모습 · 머리 6종 × 옷 · 소품 랜덤</h2>
+  <div class="row" id="backs"></div>
+
+  <h2>돌아섰을 때</h2>
+  <div class="row" id="fronts"></div>
+
+  <h2>미니 무대 · 눌러서 돌려보기 (남자 1명 숨어 있음)</h2>
+  <div class="stage"><div class="line" id="line"></div><div class="floor"></div></div>
+  <div class="ctl"><button id="again">다시 섞기</button></div>
+  <div class="note">실제 게임에선 누르면 북소리 1초 → 휙 돌아섬 · 여자는 꽃가루와 "통과", 남자는 화면 흔들림과 "걸림!"</div>
+</div>
+<script>
+const HAIR=['#1d1a1a','#3b2a20','#6b3f24','#b9864a','#7a2836','#8b8b93','#2b2440'];
+const SKIN=['#f6d2b8','#efc29f','#e7b48e'];
+const OUT=[['#e85d75','#ffd7de'],['#5b7cfa','#dfe6ff'],['#f2b134','#fff1cc'],['#2fb38a','#d6f5ea'],['#9b6bd6','#ece0fa'],['#ef7d3c','#ffe3d1'],['#2d2d38','#e6e6ee'],['#e94f9b','#ffd9ec']];
+const HAIRSTYLE=['long','pony','braids','bob','bun','ribbon'];
+const HNAME={long:'긴 생머리',pony:'포니테일',braids:'양갈래 땋은 머리',bob:'단발 웨이브',bun:'똥머리',ribbon:'반묶음 리본'};
+let seed=7; const rnd=()=>{ seed=(seed*16807)%2147483647; return (seed-1)/2147483646; }; const pick=a=>a[Math.floor(rnd()*a.length)];
+function make(style){ return {style:style||pick(HAIRSTYLE),hair:pick(HAIR),skin:pick(SKIN),out:pick(OUT),top:pick(['cardi','blouse','dress']),skirt:pick(['flare','pleat','dress']),acc:pick(['bag','earring','pearl','headband','none']),pat:pick(['plain','dot','stripe'])}; }
+
+/* 캐릭터 한 명 SVG · view: back | front · man: 앞모습에서만 차이 남 */
+function chSVG(c,view,man,id){ const H=c.hair, S=c.skin, [O1,O2]=c.out, uid=id||Math.floor(Math.random()*1e9);
+  const pat=c.pat==='dot'?`<pattern id="p${uid}" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="${O1}"/><circle cx="4" cy="4" r="1.6" fill="${O2}"/></pattern>`:c.pat==='stripe'?`<pattern id="p${uid}" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(90)"><rect width="8" height="8" fill="${O1}"/><rect width="3" height="8" fill="${O2}" opacity=".55"/></pattern>`:'';
+  const fill=c.pat==='plain'?O1:`url(#p${uid})`;
+  let g=`<defs>${pat}<linearGradient id="sh${uid}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".18"/></linearGradient></defs>`;
+  g+=`<ellipse cx="70" cy="232" rx="34" ry="6" fill="#000" opacity=".28"/><!--B-->`;
+  // 다리 · 신발(하이힐)
+  const leg=(x)=>`<rect x="${x}" y="158" width="9" height="66" rx="4.5" fill="${S}"/>${man&&view==='front'?[0,1,2,3,4].map(k=>`<path d="M${x+2+(k%2)*4} ${172+k*9} l2 -3" stroke="#3a2a20" stroke-width="1.2" stroke-linecap="round"/>`).join(''):''}`;
+  g+=leg(57)+leg(74);
+  const shoe=(x,f)=>`<path d="M${x-2} 224 q0 -5 6 -5 h6 q5 0 6 6 v1 h-18z" fill="${O1}"/><rect x="${f?x+12:x-2}" y="225" width="2.4" height="7" rx="1" fill="${O1}"/>`;
+  g+=shoe(56,0)+shoe(73,1);
+  // 치마
+  const skirt=c.skirt==='pleat'?`<path d="M48 118 L92 118 L104 168 L36 168 Z" fill="${fill}"/>${[0,1,2,3,4,5].map(k=>`<path d="M${50+k*8} 120 L${42+k*12} 167" stroke="#000" stroke-opacity=".12" stroke-width="1.5"/>`).join('')}`
+    :`<path d="M49 116 Q70 112 91 116 Q104 140 106 166 Q70 176 34 166 Q36 140 49 116 Z" fill="${fill}"/>`;
+  g+=skirt+`<path d="M49 116 Q70 112 91 116 Q104 140 106 166 Q70 176 34 166 Q36 140 49 116 Z" fill="url(#sh${uid})"/>`;
+  // 몸통 · 팔
+  const topC=c.top==='dress'?fill:(c.top==='cardi'?O2:'#ffffff');
+  g+=`<rect x="40" y="82" width="11" height="54" rx="5.5" fill="${topC}"/><rect x="89" y="82" width="11" height="54" rx="5.5" fill="${topC}"/>`;
+  g+=`<circle cx="45.5" cy="140" r="5.5" fill="${S}"/><circle cx="94.5" cy="140" r="5.5" fill="${S}"/>`;
+  g+=`<path d="M50 80 Q70 72 90 80 L92 122 Q70 126 48 122 Z" fill="${topC}"/>`;
+  if(c.top==='cardi') g+=view==='front'?`<path d="M70 80 L70 122" stroke="${O1}" stroke-width="2"/><circle cx="70" cy="92" r="1.6" fill="${O1}"/><circle cx="70" cy="104" r="1.6" fill="${O1}"/>`:`<path d="M52 118 Q70 121 88 118" stroke="${O1}" stroke-width="3" fill="none"/>`;
+  if(c.top==='blouse'&&view==='front') g+=`<path d="M62 78 L70 88 L78 78" fill="none" stroke="${O1}" stroke-width="2"/>`;
+  // 가방
+  if(c.acc==='bag') g+=`<path d="M92 112 Q100 96 106 112" stroke="#6b3f24" stroke-width="2" fill="none"/><rect x="96" y="128" width="20" height="16" rx="4" fill="#6b3f24"/><rect x="96" y="128" width="20" height="5" rx="2.5" fill="#8a5432"/><circle cx="106" cy="134" r="1.6" fill="#e9c96a"/>`;
+  // 목
+  g+=`<rect x="64" y="66" width="12" height="16" rx="5" fill="${S}"/>`;
+  if(c.acc==='pearl') g+=`<path d="M62 76 Q70 ${view==='front'?86:80} 78 76" fill="none" stroke="#fff" stroke-width="2.6" stroke-dasharray=".1 4" stroke-linecap="round"/>`;
+  // 머리 (뒷모습: 머리카락이 머리를 덮음)
+  const back=view==='back';
+  let behind='', cap='', front='';
+  const hs=c.style;
+  if(hs==='long'||hs==='ribbon') behind+=`<path d="M38 44 Q38 18 70 16 Q102 18 102 44 L104 112 Q70 124 36 112 Z" fill="${H}"/>${back?`<path d="M52 60 Q54 92 50 112 M70 62 L70 118 M88 60 Q86 92 90 112" stroke="#fff" stroke-opacity=".08" stroke-width="2" fill="none"/>`:''}`;
+  if(hs==='pony') behind+=`<g class="hair-swing"><path d="M70 40 Q86 70 80 104 Q74 120 66 108 Q72 76 62 50 Z" fill="${H}"/></g>`;
+  if(hs==='braids') behind+=[[44,-1],[96,1]].map(([x,s])=>`<g class="hair-swing">${[0,1,2,3,4].map(k=>`<ellipse cx="${x+s*2}" cy="${70+k*12}" rx="6.5" ry="7.5" fill="${H}"/>`).join('')}<circle cx="${x+s*2}" cy="${132}" r="4" fill="${O1}"/></g>`).join('');
+  if(hs==='bob') behind+=`<path d="M36 46 Q36 14 70 14 Q104 14 104 46 L104 70 Q98 78 92 72 Q86 80 80 73 Q74 81 70 74 Q66 81 60 73 Q54 80 48 72 Q42 78 36 70 Z" fill="${H}"/>`;
+  // 얼굴 · 머리통
+  cap+=`<circle cx="70" cy="46" r="30" fill="${back?H:S}"/>`;
+  if(back){ cap+=`<path d="M46 34 Q70 22 94 34" stroke="#fff" stroke-opacity=".12" stroke-width="3" fill="none"/>`;
+    if(c.acc==='earring'||c.acc==='pearl') cap+=`<circle cx="39" cy="58" r="2.4" fill="#e9c96a"/><circle cx="39" cy="64" r="3" fill="#e9c96a"/><circle cx="101" cy="58" r="2.4" fill="#e9c96a"/><circle cx="101" cy="64" r="3" fill="#e9c96a"/>`; }
+  else {
+    // 앞머리 · 옆머리
+    cap+=`<path d="M40 44 Q40 16 70 16 Q100 16 100 44 Q92 30 80 32 Q74 26 66 30 Q54 26 46 36 Q42 40 40 44Z" fill="${H}"/>`;
+    if(hs!=='bob'&&hs!=='bun') cap+=`<path d="M40 44 Q38 60 42 72 L46 70 Q44 56 46 44Z M100 44 Q102 60 98 72 L94 70 Q96 56 94 44Z" fill="${H}"/>`;
+    if(hs==='bob') cap+=`<path d="M38 44 Q36 64 44 74 L48 66 Q44 54 46 42Z M102 44 Q104 64 96 74 L92 66 Q96 54 94 42Z" fill="${H}"/>`;
+    if(!man){ cap+=`<path d="M56 48 q4 -5 8 0" stroke="#2a1d17" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M76 48 q4 -5 8 0" stroke="#2a1d17" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M55 45 l-3 -2 M85 45 l3 -2" stroke="#2a1d17" stroke-width="1.6" stroke-linecap="round"/>`;
+      cap+=`<ellipse cx="54" cy="57" rx="5.5" ry="3.2" fill="#ff8fa3" opacity=".55"/><ellipse cx="86" cy="57" rx="5.5" ry="3.2" fill="#ff8fa3" opacity=".55"/><path d="M64 61 Q70 67 76 61" stroke="#d9364f" stroke-width="2.6" fill="#ff6b81" stroke-linecap="round"/>`; }
+    else { cap+=`<path d="M53 41 h12" stroke="#1b1410" stroke-width="5" stroke-linecap="round"/><path d="M75 41 h12" stroke="#1b1410" stroke-width="5" stroke-linecap="round"/><circle cx="60" cy="49" r="3" fill="#1b1410"/><circle cx="80" cy="49" r="3" fill="#1b1410"/>`;
+      cap+=`<path d="M48 58 Q48 76 70 77 Q92 76 92 58 Q86 70 70 70 Q54 70 48 58Z" fill="#5a6b78" opacity=".35"/>${[0,1,2,3,4,5,6,7].map(k=>`<circle cx="${52+k*5}" cy="${64+(k%2)*4}" r=".9" fill="#2c3a44"/>`).join('')}`;
+      cap+=`<path d="M56 60 Q63 54 70 60 Q77 54 84 60 Q78 66 70 62 Q62 66 56 60Z" fill="#1b1410"/><ellipse cx="70" cy="68" rx="3.4" ry="4" fill="#5b1d1d"/>`;
+      cap+=`<path d="M98 34 q4 6 0 9 q-4 -3 0 -9z" fill="#7cc6ff"/>`; }
+    if(c.acc==='earring'||c.acc==='pearl') cap+=`<circle cx="39" cy="60" r="2.4" fill="#e9c96a"/><circle cx="101" cy="60" r="2.4" fill="#e9c96a"/>`; }
+  // 묶음 · 장식
+  if(hs==='pony') front+=`<circle cx="70" cy="${back?40:22}" r="5" fill="${O1}"/>`;
+  if(hs==='bun') front+=`<circle cx="70" cy="16" r="13" fill="${H}"/><path d="M60 14 Q70 6 80 14" stroke="#fff" stroke-opacity=".15" stroke-width="2" fill="none"/><path d="M58 24 Q70 30 82 24" stroke="${O1}" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+  if(hs==='ribbon'||c.acc==='headband') front+=hs==='ribbon'?`<g transform="translate(70 ${back?34:20})"><path d="M0 0 L-16 -9 Q-20 0 -16 9 Z M0 0 L16 -9 Q20 0 16 9 Z" fill="${O1}"/><circle r="4" fill="${O2}"/></g>`:`<path d="M42 34 Q70 ${back?18:14} 98 34" stroke="${O1}" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+  return `<svg viewBox="0 0 140 240" xmlns="http://www.w3.org/2000/svg">${back?g+cap+behind:g.replace('<!--B-->',behind)+cap}${front}</svg>`; }
+
+// 뒷모습 12개 (머리 6종이 두 번씩 · 옷 · 소품 랜덤)
+seed=11; const backs=[...HAIRSTYLE,...HAIRSTYLE].map(s=>make(s));
+document.getElementById('backs').innerHTML=backs.map((c,i)=>`<div class="cell">${chSVG(c,'back',false,'b'+i)}<small>${HNAME[c.style]}</small></div>`).join('');
+// 앞모습: 여자 3 · 남자 3 (같은 옷 그대로 돌아섬)
+document.getElementById('fronts').innerHTML=[0,2,4].map(i=>`<div class="cell ok">${chSVG(backs[i],'front',false,'fw'+i)}<small>통과 · ${HNAME[backs[i].style]}</small></div>`).join('')
+ +[1,3,5].map(i=>`<div class="cell bad">${chSVG(backs[i],'front',true,'fm'+i)}<small style="color:#ff9b93">걸림 · 수염 · 털 다리</small></div>`).join('');
+
+// 미니 무대
+function deal(){ seed=Math.floor(Math.random()*1e6)+1; const n=5, man=Math.floor(Math.random()*n); const cs=[...Array(n)].map(()=>make());
+  const line=document.getElementById('line'); line.innerHTML=cs.map((c,i)=>`<div class="ch" data-i="${i}"><span class="num">${i+1}</span><div class="body"><div class="turn">${chSVG(c,'back',false,'s'+i)}</div></div><span class="tag"></span></div>`).join('');
+  line.querySelectorAll('.ch').forEach(el=>el.onclick=()=>{ if(el.classList.contains('done')||el.classList.contains('turning')) return; const i=+el.dataset.i, isMan=i===man;
+    el.classList.add('turning'); setTimeout(()=>{ el.querySelector('.turn').innerHTML=chSVG(cs[i],'front',isMan,'r'+i); el.classList.remove('turning'); el.classList.add(isMan?'shake':'hop','done'); const t=el.querySelector('.tag'); t.className='tag '+(isMan?'bad':'ok'); t.textContent=isMan?'걸림!':'통과'; },300); }); }
+document.getElementById('again').onclick=deal; deal();
+</script>
+</body>
+</html>
