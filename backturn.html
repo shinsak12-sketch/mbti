@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover" />
+<title>뒤돌아봐 · 점심 복불복</title>
+<meta name="theme-color" content="#0d3628" />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root{
+    --felt:#124635; --felt-2:#0d3628; --felt-3:#082a1f;
+    --gold:#e9c96a; --gold-2:#c9a13d; --gold-3:#8d6b1a;
+    --cream:#f6ecd4; --red:#c8322b; --red-2:#8e1f1a;
+    --txt:#f2efe4; --muted:#a9c2b6; --r:22px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  [hidden]{display:none!important;}
+  html,body{height:100%;}
+  body{
+    font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
+    color:var(--txt);background:var(--felt-2);
+    background-image:radial-gradient(120% 80% at 50% -10%, rgba(255,255,255,.10), transparent 55%),radial-gradient(90% 60% at 50% 110%, rgba(0,0,0,.55), transparent 60%),repeating-linear-gradient(45deg, rgba(255,255,255,.012) 0 2px, transparent 2px 4px),linear-gradient(180deg, var(--felt) 0%, var(--felt-2) 60%, var(--felt-3) 100%);
+    min-height:100dvh;display:flex;flex-direction:column;align-items:center;
+    padding:16px 14px calc(28px + env(safe-area-inset-bottom));line-height:1.5;-webkit-font-smoothing:antialiased;
+    user-select:none;-webkit-user-select:none;touch-action:manipulation;overflow-x:hidden;
+  }
+  .wrap{width:100%;max-width:760px;margin:0 auto;}
+  .screen{display:none;}
+  .screen.active{display:block;animation:rise .45s cubic-bezier(.2,.7,.3,1);}
+  @keyframes rise{from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:none}}
+  .panel{background:linear-gradient(150deg,#175540 0%,#0f3d2e 55%,#0b3225 100%);border-radius:var(--r);
+    box-shadow:14px 14px 32px rgba(0,0,0,.5),-8px -8px 22px rgba(255,255,255,.055),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(0,0,0,.35);position:relative;}
+  .inset{background:linear-gradient(160deg,#0a2e22,#0d3829);border-radius:18px;box-shadow:inset 7px 7px 16px rgba(0,0,0,.58),inset -4px -4px 10px rgba(255,255,255,.06),0 1px 0 rgba(255,255,255,.08);}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;font-family:inherit;font-weight:800;border-radius:16px;padding:14px 18px;font-size:16px;color:#2a1d05;
+    background:linear-gradient(180deg,#f3d98a 0%,var(--gold) 45%,var(--gold-2) 100%);
+    box-shadow:0 8px 0 var(--gold-3),0 16px 26px -8px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.7),inset 0 -2px 0 rgba(0,0,0,.12);transition:transform .08s,box-shadow .08s;}
+  .btn:active{transform:translateY(6px);box-shadow:0 2px 0 var(--gold-3),0 6px 12px -6px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.5);}
+  .btn.ghost{color:var(--txt);background:linear-gradient(180deg,#1b5a45,#124635);box-shadow:0 6px 0 #061d15,0 14px 22px -10px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.14);}
+  .btn.ghost:active{transform:translateY(5px);box-shadow:0 1px 0 #061d15;}
+  .btn.sm{padding:10px 14px;font-size:14px;border-radius:13px;}
+  .btn.block{width:100%;font-size:19px;padding:18px 20px;border-radius:20px;}
+  .home-link{position:absolute;left:14px;top:14px;text-decoration:none;color:var(--muted);font-weight:800;font-size:13px;padding:8px 12px;border-radius:999px;background:rgba(0,0,0,.28);box-shadow:inset 3px 3px 7px rgba(0,0,0,.6),inset -2px -2px 5px rgba(255,255,255,.06);}
+
+  /* 설정 */
+  .setup{max-width:520px;margin:0 auto;padding:30px 24px 26px;}
+  .logo{text-align:center;margin-bottom:18px;}
+  .logo .tag{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.14em;color:var(--gold);padding:6px 12px;border-radius:999px;background:rgba(0,0,0,.28);box-shadow:inset 3px 3px 7px rgba(0,0,0,.6),inset -2px -2px 5px rgba(255,255,255,.06);}
+  .logo h1{margin-top:14px;font-size:44px;font-weight:900;letter-spacing:-1.5px;line-height:1.05;background:linear-gradient(180deg,#fff2c4 0%,var(--gold) 50%,var(--gold-2) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)) drop-shadow(0 12px 22px rgba(0,0,0,.4));}
+  .logo p{margin-top:10px;color:var(--muted);font-size:14px;font-weight:600;}
+  .peek{display:flex;justify-content:center;gap:2px;margin:6px 0 4px;height:132px;}
+  .peek .c{width:76px;transform-origin:50% 100%;animation:sway 2.6s ease-in-out infinite}
+  .peek .c:nth-child(2){animation-delay:-.8s} .peek .c:nth-child(3){animation-delay:-1.6s} .peek .c:nth-child(4){animation-delay:-2.2s}
+  .field-label{font-size:13px;font-weight:800;color:var(--muted);letter-spacing:.06em;margin:20px 4px 10px;display:flex;justify-content:space-between;align-items:center;}
+  .field-label small{font-weight:600;letter-spacing:0;opacity:.8;}
+  .stepper{display:flex;align-items:center;gap:14px;padding:14px;}
+  .stepper .num{flex:1;text-align:center;font-size:52px;font-weight:900;letter-spacing:-2px;line-height:1;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.6);}
+  .stepper .num small{display:block;font-size:12px;letter-spacing:.14em;color:var(--muted);font-weight:800;margin-top:6px;}
+  .round{width:62px;height:62px;border-radius:50%;border:none;cursor:pointer;font-size:30px;font-weight:900;color:#2a1d05;font-family:inherit;background:linear-gradient(180deg,#f3d98a,var(--gold) 50%,var(--gold-2));box-shadow:0 6px 0 var(--gold-3),0 12px 18px -6px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.7);transition:transform .08s,box-shadow .08s;flex:none;}
+  .round:active{transform:translateY(5px);box-shadow:0 1px 0 var(--gold-3);}
+  .round:disabled{filter:grayscale(.7) brightness(.6);}
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;margin-top:14px;}
+  .toggle-row b{font-size:15px;display:block;} .toggle-row small{color:var(--muted);font-size:12px;font-weight:600;display:block;margin-top:2px;}
+  .switch{position:relative;width:60px;height:34px;border-radius:999px;background:rgba(0,0,0,.45);flex:none;cursor:pointer;box-shadow:inset 4px 4px 9px rgba(0,0,0,.7),inset -2px -2px 5px rgba(255,255,255,.06);transition:background .25s;}
+  .switch::after{content:'';position:absolute;top:4px;left:4px;width:26px;height:26px;border-radius:50%;background:linear-gradient(180deg,#f4f0e4,#cfc6ad);box-shadow:0 3px 6px rgba(0,0,0,.5),inset 0 1px 0 #fff;transition:transform .25s cubic-bezier(.3,1.5,.5,1);}
+  .switch.on{background:linear-gradient(180deg,#d2b053,#a67d1f);} .switch.on::after{transform:translateX(26px);}
+  .rule{margin-top:14px;padding:14px 16px;font-size:13px;font-weight:600;color:var(--muted);line-height:1.7;word-break:keep-all}
+  .rule b{color:var(--gold)}
+  .start-wrap{margin-top:22px;}
+
+  /* 게임 */
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;margin-bottom:12px;}
+  .topbar .title{font-weight:900;font-size:18px;letter-spacing:-.4px;display:flex;align-items:center;gap:10px;}
+  .pill{font-size:12px;font-weight:800;color:var(--gold);padding:5px 10px;border-radius:999px;background:rgba(0,0,0,.3);box-shadow:inset 3px 3px 6px rgba(0,0,0,.6),inset -2px -2px 4px rgba(255,255,255,.05);}
+  .turnbox{text-align:center;padding:14px 14px 12px;margin-bottom:12px;}
+  .turnbox .big{font-size:30px;font-weight:900;letter-spacing:-1px;line-height:1.1}
+  .turnbox .big b{background:linear-gradient(180deg,#fff2c4,var(--gold) 55%,var(--gold-2));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .turnbox small{display:block;font-size:12.5px;color:var(--muted);font-weight:700;margin-top:4px}
+  .turnbox.pop{animation:popin .45s cubic-bezier(.3,1.6,.5,1)}
+  @keyframes popin{0%{transform:scale(.85);opacity:.4}100%{transform:none;opacity:1}}
+  .seats{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px}
+  .seats span{min-width:44px;padding:6px 8px;border-radius:12px;font-size:12px;font-weight:900;text-align:center;color:var(--muted);background:rgba(0,0,0,.28);box-shadow:inset 3px 3px 6px rgba(0,0,0,.55),inset -2px -2px 4px rgba(255,255,255,.05)}
+  .seats span small{display:block;font-size:10px;font-weight:800;opacity:.85}
+  .seats span.now{color:#2a1d05;background:linear-gradient(180deg,#f3d98a,var(--gold-2));box-shadow:0 3px 0 var(--gold-3);animation:breathe 1.2s ease-in-out infinite}
+  .seats span.ok{color:#cfe8dc;background:rgba(80,190,140,.18)}
+  .seats span.bad{color:#fff;background:linear-gradient(180deg,#e0554b,#b3271f);box-shadow:0 3px 0 #5f130f}
+  @keyframes breathe{50%{transform:translateY(-2px)}}
+  .stage{position:relative;padding:22px 8px 10px;border-radius:24px;overflow:hidden;
+    background:radial-gradient(90% 60% at 50% -10%,rgba(255,240,190,.10),transparent 60%),linear-gradient(180deg,#0f3a2c,#0a2d22);
+    box-shadow:inset 7px 7px 18px rgba(0,0,0,.6),inset -4px -4px 10px rgba(255,255,255,.05);}
+  .grid{display:grid;gap:4px 2px;justify-content:center;position:relative;z-index:1}
+  .ch{position:relative;cursor:pointer;}
+  .ch .body{transform-origin:50% 100%;animation:sway 2.6s ease-in-out infinite}
+  .ch:nth-child(2n) .body{animation-duration:3.1s;animation-delay:-.7s} .ch:nth-child(3n) .body{animation-duration:2.3s;animation-delay:-1.3s}
+  @keyframes sway{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}
+  .hair-swing{transform-origin:70px 44px;animation:swing 2.6s ease-in-out infinite}
+  @keyframes swing{0%,100%{transform:rotate(2deg)}50%{transform:rotate(-2deg)}}
+  .ch svg{width:100%;height:auto;display:block}
+  .ch .turn{transition:transform .26s ease-in}
+  .ch.turning .turn{transform:scaleX(0)}
+  .ch.spot::before{content:'';position:absolute;left:-6%;right:-6%;top:-14px;bottom:0;border-radius:50% 50% 10px 10px;background:radial-gradient(60% 70% at 50% 30%,rgba(255,240,180,.38),transparent 70%);animation:spot .5s ease-in-out infinite alternate;pointer-events:none}
+  @keyframes spot{to{opacity:.55}}
+  .ch.spot .body{animation:jitter .09s linear infinite}
+  @keyframes jitter{0%{transform:translateX(-1px) rotate(-.6deg)}50%{transform:translateX(1px) rotate(.6deg)}100%{transform:translateX(-1px)}}
+  .ch.hop .body{animation:hop .55s cubic-bezier(.3,1.6,.5,1)}
+  @keyframes hop{0%{transform:translateY(0)}35%{transform:translateY(-20px)}100%{transform:translateY(0)}}
+  .ch.shake .body{animation:shake .45s linear 3}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px) rotate(-3deg)}40%{transform:translateX(6px) rotate(3deg)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+  .ch.flipped{cursor:default}
+  .ch.flipped:not(.man) .turn{filter:saturate(.9)}
+  .ch .tag{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%) scale(0);font-weight:900;font-size:15px;padding:5px 10px;border-radius:12px;white-space:nowrap;z-index:3;transition:transform .38s cubic-bezier(.3,1.6,.5,1);text-align:center;line-height:1.15}
+  .ch .tag small{display:block;font-size:10.5px;opacity:.85}
+  .ch .tag.ok{background:linear-gradient(180deg,#f3d98a,var(--gold-2));color:#2a1d05;box-shadow:0 3px 0 var(--gold-3)} .ch .tag.bad{background:linear-gradient(180deg,#e0554b,#b3271f);color:#fff;box-shadow:0 3px 0 #5f130f;border:2px solid #fff2c4}
+  .ch.flipped .tag{transform:translate(-50%,-50%) scale(1) rotate(-6deg)}
+  .ch .kk{position:absolute;right:-4px;top:2px;font-weight:900;font-size:20px;color:#fff2c4;text-shadow:0 2px 0 #8e1f1a;opacity:0;pointer-events:none}
+  .ch.man .kk{animation:kk 1.4s ease-out .2s 2}
+  @keyframes kk{0%{opacity:0;transform:translateY(6px) scale(.6)}20%{opacity:1;transform:translateY(0) scale(1.1)}80%{opacity:1;transform:translateY(-10px)}100%{opacity:0;transform:translateY(-16px)}}
+  .flash{position:fixed;inset:0;background:radial-gradient(circle at 50% 45%,rgba(200,50,43,.0),rgba(200,50,43,.55));pointer-events:none;opacity:0;z-index:30}
+  .flash.go{animation:flash .9s ease-out}
+  @keyframes flash{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+  body.quake .wrap{animation:quake .5s linear}
+  @keyframes quake{0%,100%{transform:none}20%{transform:translate(-5px,2px)}40%{transform:translate(5px,-2px)}60%{transform:translate(-3px,1px)}80%{transform:translate(3px,-1px)}}
+  .conf{position:fixed;width:8px;height:12px;border-radius:2px;pointer-events:none;z-index:40}
+  .result{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(4,16,12,.6);backdrop-filter:blur(4px)}
+  .result.show{display:flex;animation:rise .4s cubic-bezier(.2,.7,.3,1)}
+  .result .card{width:100%;max-width:400px;text-align:center;padding:24px 22px 22px}
+  .result .who{width:150px;margin:-70px auto 0;filter:drop-shadow(0 14px 18px rgba(0,0,0,.55))}
+  .result h2{font-size:38px;font-weight:900;letter-spacing:-1.4px;line-height:1.1;margin-top:4px}
+  .result h2 b{color:#ffb4ad}
+  .result p{color:var(--muted);font-weight:700;font-size:14px;margin-top:6px;word-break:keep-all}
+  .result .acts{display:grid;gap:12px;margin-top:20px}
+  .toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translate(-50%,20px);padding:12px 18px;border-radius:999px;font-weight:800;font-size:14px;color:#2a1d05;background:linear-gradient(180deg,#f3d98a,var(--gold-2));box-shadow:0 4px 0 var(--gold-3),0 14px 24px -8px rgba(0,0,0,.7);opacity:0;transition:.3s;z-index:60;pointer-events:none;white-space:nowrap}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section id="scr-setup" class="screen active">
+    <div class="panel setup">
+      <a class="home-link" href="lunch.html">‹ 홈</a>
+      <div class="logo">
+        <span class="tag">TURN AROUND</span>
+        <h1>뒤돌아봐</h1>
+        <p>다 여자 같은 뒷모습 · 돌려세웠는데 남자면 쏨</p>
+      </div>
+      <div class="peek" id="peek"></div>
+      <div class="field-label">인원 <small>자리 번호 순서로 한 명씩</small></div>
+      <div class="inset stepper">
+        <button class="round" id="nminus" aria-label="빼기">−</button>
+        <div class="num"><span id="nval">4</span><small>명</small></div>
+        <button class="round" id="nplus" aria-label="더하기">+</button>
+      </div>
+      <div class="inset toggle-row"><div><b>소리</b><small>북소리 · 통과 · 걸림 효과음</small></div><span class="switch on" id="snd" role="switch" aria-checked="true"></span></div>
+      <div class="inset rule">인원만큼 서 있고 그중 <b>남자 1명</b>이 여자처럼 꾸미고 숨어 있음 · 1번부터 차례로 하나씩 골라 돌려세움 · <b>남자를 돌린 사람이 쏨</b></div>
+      <div class="start-wrap"><button class="btn block" id="startBtn">시작</button></div>
+    </div>
+  </section>
+
+  <section id="scr-game" class="screen">
+    <div class="panel topbar">
+      <div class="title">뒤돌아봐 <span class="pill" id="info"></span></div>
+      <div><button class="btn ghost sm" id="quitBtn">처음으로</button></div>
+    </div>
+    <div class="panel turnbox" id="turnbox"><div class="big" id="turnBig"></div><small id="turnSub"></small></div>
+    <div class="seats" id="seats"></div>
+    <div class="stage"><div class="grid" id="grid"></div></div>
+  </section>
+</div>
+<div class="flash" id="flash"></div>
+<div class="result" id="result"><div class="panel card"><div class="who" id="resWho"></div><h2 id="resH"></h2><p id="resP"></p>
+  <div class="acts"><button class="btn block" id="againBtn">같은 인원으로 한 판 더</button><button class="btn ghost" id="setupBtn">인원 바꾸기</button><a class="btn ghost" href="lunch.html" style="text-decoration:none">다른 게임</a></div></div></div>
+<div class="toast" id="toast"></div>
+<script>
+/* ---------- 공통 ---------- */
+const $=s=>document.querySelector(s);
+function rand(n){ const a=new Uint32Array(1); crypto.getRandomValues(a); return a[0]%n; }
+const pick=a=>a[rand(a.length)];
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const vib=p=>{ try{ navigator.vibrate&&navigator.vibrate(p); }catch(e){} };
+const state={ n:4, sound:true, busy:false, chars:[], man:-1, turn:1, result:{} };
+let actx=null;
+const S={
+  ctx(){ if(!state.sound) return null; try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==='suspended') actx.resume(); return actx; }catch(e){ return null; } },
+  noise(dur=.08,vol=.25,f=1800){ const c=this.ctx(); if(!c) return; const b=c.createBuffer(1,Math.max(1,c.sampleRate*dur),c.sampleRate), d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length); const s=c.createBufferSource(), f2=c.createBiquadFilter(), g=c.createGain(); f2.type='lowpass'; f2.frequency.value=f; g.gain.value=vol; s.buffer=b; s.connect(f2).connect(g).connect(c.destination); s.start(); },
+  tone(freq=660,dur=.12,vol=.18,type='triangle',slide=0){ const c=this.ctx(); if(!c) return; const o=c.createOscillator(), g=c.createGain(); o.type=type; o.frequency.value=freq; if(slide) o.frequency.exponentialRampToValueAtTime(Math.max(40,freq+slide),c.currentTime+dur); g.gain.setValueAtTime(vol,c.currentTime); g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+dur); o.connect(g).connect(c.destination); o.start(); o.stop(c.currentTime+dur+.02); },
+  tick(){ this.noise(.03,.08,3000); },
+  drum(ms){ let t=0; const step=()=>{ this.noise(.05,.22+t/ms*.25,420); t+=70; if(t<ms) setTimeout(step,70); }; step(); },
+  whoosh(){ this.noise(.22,.18,2600); },
+  pass(){ this.tone(660,.12,.15); setTimeout(()=>this.tone(880,.14,.15),90); setTimeout(()=>this.tone(1320,.2,.12,'sine'),180); },
+  caught(){ this.tone(520,.18,.18,'sawtooth',-120); setTimeout(()=>this.tone(390,.18,.18,'sawtooth',-90),170); setTimeout(()=>this.tone(260,.5,.2,'sawtooth',-140),340);
+    setTimeout(()=>{ [0,1,2,3].forEach(k=>setTimeout(()=>this.tone(300+k*15,.09,.12,'square',60),k*110)); },900); }
+};
+function toast(m,ms=1700){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),ms); }
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); window.scrollTo({top:0}); }
+
+/* ---------- 캐릭터 그림 ---------- */
+const HAIR=['#1d1a1a','#3b2a20','#6b3f24','#b9864a','#7a2836','#2b2440','#a0522d'];
+const SKIN=['#f6d2b8','#efc29f','#e7b48e'];
+const OUT=[['#e85d75','#ffd7de'],['#5b7cfa','#dfe6ff'],['#f2b134','#fff1cc'],['#2fb38a','#d6f5ea'],['#9b6bd6','#ece0fa'],['#ef7d3c','#ffe3d1'],['#2d2d38','#e6e6ee'],['#e94f9b','#ffd9ec'],['#22a3c4','#d7f3fb']];
+const STYLES=['long','pony','braids','bob','bun','ribbon'];
+function makeChar(style){ return {style:style||pick(STYLES),hair:pick(HAIR),skin:pick(SKIN),out:pick(OUT),top:pick(['cardi','blouse','dress']),skirt:pick(['flare','pleat']),acc:pick(['bag','earring','pearl','headband','none']),pat:pick(['plain','plain','dot','stripe'])}; }
+let svgId=0;
+function chSVG(c,view,man){ const H=c.hair, S2=c.skin, [O1,O2]=c.out, u=++svgId, back=view==='back';
+  const pat=c.pat==='dot'?`<pattern id="p${u}" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="${O1}"/><circle cx="4" cy="4" r="1.6" fill="${O2}"/></pattern>`:c.pat==='stripe'?`<pattern id="p${u}" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(90)"><rect width="8" height="8" fill="${O1}"/><rect width="3" height="8" fill="${O2}" opacity=".55"/></pattern>`:'';
+  const fill=c.pat==='plain'?O1:`url(#p${u})`;
+  let g=`<defs>${pat}<linearGradient id="sh${u}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".18"/></linearGradient></defs><ellipse cx="70" cy="232" rx="34" ry="6" fill="#000" opacity=".28"/><!--B-->`;
+  const leg=x=>`<rect x="${x}" y="158" width="9" height="66" rx="4.5" fill="${S2}"/>${man&&!back?[0,1,2,3,4,5].map(k=>`<path d="M${x+2+(k%2)*4} ${168+k*9} l2 -3" stroke="#3a2a20" stroke-width="1.2" stroke-linecap="round"/>`).join(''):''}`;
+  g+=leg(57)+leg(74);
+  const shoe=(x,f)=>`<path d="M${x-2} 224 q0 -5 6 -5 h6 q5 0 6 6 v1 h-18z" fill="${O1}"/><rect x="${f?x+12:x-2}" y="225" width="2.4" height="7" rx="1" fill="${O1}"/>`;
+  g+=shoe(56,0)+shoe(73,1);
+  g+=(c.skirt==='pleat'?`<path d="M48 118 L92 118 L104 168 L36 168 Z" fill="${fill}"/>${[0,1,2,3,4,5].map(k=>`<path d="M${50+k*8} 120 L${42+k*12} 167" stroke="#000" stroke-opacity=".12" stroke-width="1.5"/>`).join('')}`:`<path d="M49 116 Q70 112 91 116 Q104 140 106 166 Q70 176 34 166 Q36 140 49 116 Z" fill="${fill}"/>`)+`<path d="M49 116 Q70 112 91 116 Q104 140 106 166 Q70 176 34 166 Q36 140 49 116 Z" fill="url(#sh${u})"/>`;
+  const topC=c.top==='dress'?fill:(c.top==='cardi'?O2:'#ffffff');
+  g+=`<rect x="40" y="82" width="11" height="54" rx="5.5" fill="${topC}"/><rect x="89" y="82" width="11" height="54" rx="5.5" fill="${topC}"/><circle cx="45.5" cy="140" r="5.5" fill="${S2}"/><circle cx="94.5" cy="140" r="5.5" fill="${S2}"/><path d="M50 80 Q70 72 90 80 L92 122 Q70 126 48 122 Z" fill="${topC}"/>`;
+  if(c.top==='cardi') g+=back?`<path d="M52 118 Q70 121 88 118" stroke="${O1}" stroke-width="3" fill="none"/>`:`<path d="M70 80 L70 122" stroke="${O1}" stroke-width="2"/><circle cx="70" cy="92" r="1.6" fill="${O1}"/><circle cx="70" cy="104" r="1.6" fill="${O1}"/>`;
+  if(c.top==='blouse'&&!back) g+=`<path d="M62 78 L70 88 L78 78" fill="none" stroke="${O1}" stroke-width="2"/>`;
+  if(c.acc==='bag') g+=`<path d="M92 112 Q100 96 106 112" stroke="#6b3f24" stroke-width="2" fill="none"/><rect x="96" y="128" width="20" height="16" rx="4" fill="#6b3f24"/><rect x="96" y="128" width="20" height="5" rx="2.5" fill="#8a5432"/><circle cx="106" cy="134" r="1.6" fill="#e9c96a"/>`;
+  g+=`<rect x="64" y="66" width="12" height="16" rx="5" fill="${S2}"/>`;
+  if(c.acc==='pearl') g+=`<path d="M62 76 Q70 ${back?80:86} 78 76" fill="none" stroke="#fff" stroke-width="2.6" stroke-dasharray=".1 4" stroke-linecap="round"/>`;
+  let behind='', cap='', front=''; const hs=c.style;
+  if(hs==='long'||hs==='ribbon') behind+=`<path d="M38 44 Q38 18 70 16 Q102 18 102 44 L104 112 Q70 124 36 112 Z" fill="${H}"/>${back?`<path d="M52 60 Q54 92 50 112 M70 62 L70 118 M88 60 Q86 92 90 112" stroke="#fff" stroke-opacity=".08" stroke-width="2" fill="none"/>`:''}`;
+  if(hs==='pony') behind+=`<g class="hair-swing"><path d="M70 40 Q86 70 80 104 Q74 120 66 108 Q72 76 62 50 Z" fill="${H}"/></g>`;
+  if(hs==='braids') behind+=[[44,-1],[96,1]].map(([x,s])=>`<g class="hair-swing">${[0,1,2,3,4].map(k=>`<ellipse cx="${x+s*2}" cy="${70+k*12}" rx="6.5" ry="7.5" fill="${H}"/>`).join('')}<circle cx="${x+s*2}" cy="132" r="4" fill="${O1}"/></g>`).join('');
+  if(hs==='bob') behind+=`<path d="M36 46 Q36 14 70 14 Q104 14 104 46 L104 70 Q98 78 92 72 Q86 80 80 73 Q74 81 70 74 Q66 81 60 73 Q54 80 48 72 Q42 78 36 70 Z" fill="${H}"/>`;
+  cap+=`<circle cx="70" cy="46" r="30" fill="${back?H:S2}"/>`;
+  if(back){ cap+=`<path d="M46 34 Q70 22 94 34" stroke="#fff" stroke-opacity=".12" stroke-width="3" fill="none"/>`;
+    if(c.acc==='earring'||c.acc==='pearl') cap+=`<circle cx="39" cy="58" r="2.4" fill="#e9c96a"/><circle cx="39" cy="64" r="3" fill="#e9c96a"/><circle cx="101" cy="58" r="2.4" fill="#e9c96a"/><circle cx="101" cy="64" r="3" fill="#e9c96a"/>`; }
+  else {
+    cap+=`<path d="M40 44 Q40 16 70 16 Q100 16 100 44 Q92 30 80 32 Q74 26 66 30 Q54 26 46 36 Q42 40 40 44Z" fill="${H}"/>`;
+    if(hs!=='bob'&&hs!=='bun') cap+=`<path d="M40 44 Q38 60 42 72 L46 70 Q44 56 46 44Z M100 44 Q102 60 98 72 L94 70 Q96 56 94 44Z" fill="${H}"/>`;
+    if(hs==='bob') cap+=`<path d="M38 44 Q36 64 44 74 L48 66 Q44 54 46 42Z M102 44 Q104 64 96 74 L92 66 Q96 54 94 42Z" fill="${H}"/>`;
+    if(!man){ cap+=`<path d="M56 48 q4 -5 8 0" stroke="#2a1d17" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M76 48 q4 -5 8 0" stroke="#2a1d17" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M55 45 l-3 -2 M85 45 l3 -2" stroke="#2a1d17" stroke-width="1.6" stroke-linecap="round"/><ellipse cx="54" cy="57" rx="5.5" ry="3.2" fill="#ff8fa3" opacity=".55"/><ellipse cx="86" cy="57" rx="5.5" ry="3.2" fill="#ff8fa3" opacity=".55"/><path d="M64 61 Q70 67 76 61" stroke="#d9364f" stroke-width="2.6" fill="#ff6b81" stroke-linecap="round"/>`; }
+    else {
+      // 간사하게 비웃는 얼굴: 한쪽 눈썹 치켜올림 · 반쯤 감은 곁눈질 · 말린 콧수염 · 한쪽만 올라간 입꼬리
+      const D='#1b1410';
+      cap+=`<path d="M51 39 Q57 29 66 35" stroke="${D}" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M74 41 L88 38" stroke="${D}" stroke-width="3.6" stroke-linecap="round"/>`;
+      cap+=[[59,48],[81,48]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="6.2" ry="4" fill="#fff"/><circle cx="${x+3}" cy="${y+1}" r="2.5" fill="${D}"/><circle cx="${x+3.8}" cy="${y+.2}" r=".8" fill="#fff"/><path d="M${x-7} ${y} Q${x} ${y-8} ${x+7} ${y} Z" fill="${S2}"/><path d="M${x-6.8} ${y} L${x+6.8} ${y}" stroke="${D}" stroke-width="2.2" stroke-linecap="round"/>`).join('');
+      cap+=`<path d="M70 50 q4 6 -1 8" stroke="#b07a5a" stroke-width="1.8" fill="none" stroke-linecap="round"/>`;
+      cap+=`<path d="M48 58 Q48 76 70 77 Q92 76 92 58 Q86 70 70 70 Q54 70 48 58Z" fill="#5a6b78" opacity=".32"/>${[0,1,2,3,4,5,6,7].map(k=>`<circle cx="${52+k*5}" cy="${66+(k%2)*4}" r=".9" fill="#2c3a44"/>`).join('')}`;
+      cap+=`<path d="M70 60 Q63 56 57 59 Q52 62 49 57 Q48 62 53 64 Q60 66 70 62 Z" fill="${D}"/><path d="M70 60 Q77 56 83 59 Q88 62 91 57 Q92 62 87 64 Q80 66 70 62 Z" fill="${D}"/>`;
+      cap+=`<path d="M61 71.5 Q73 74 83 66.5" stroke="${D}" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M85 64.5 q2.6 2.4 .8 5.6" stroke="${D}" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+    }
+    if(c.acc==='earring'||c.acc==='pearl') cap+=`<circle cx="39" cy="60" r="2.4" fill="#e9c96a"/><circle cx="101" cy="60" r="2.4" fill="#e9c96a"/>`; }
+  if(hs==='pony') front+=`<circle cx="70" cy="${back?40:22}" r="5" fill="${O1}"/>`;
+  if(hs==='bun') front+=`<circle cx="70" cy="16" r="13" fill="${H}"/><path d="M60 14 Q70 6 80 14" stroke="#fff" stroke-opacity=".15" stroke-width="2" fill="none"/><path d="M58 24 Q70 30 82 24" stroke="${O1}" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+  if(hs==='ribbon') front+=`<g transform="translate(70 ${back?34:20})"><path d="M0 0 L-16 -9 Q-20 0 -16 9 Z M0 0 L16 -9 Q20 0 16 9 Z" fill="${O1}"/><circle r="4" fill="${O2}"/></g>`;
+  else if(c.acc==='headband') front+=`<path d="M42 34 Q70 ${back?18:14} 98 34" stroke="${O1}" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+  return `<svg viewBox="0 0 140 240" xmlns="http://www.w3.org/2000/svg">${back?g+cap+behind:g.replace('<!--B-->',behind)+cap}${front}</svg>`; }
+
+/* ---------- 설정 ---------- */
+function renderSetup(){ $('#nval').textContent=state.n; $('#nminus').disabled=state.n<=2; $('#nplus').disabled=state.n>=12; }
+$('#nminus').onclick=()=>{ if(state.n>2){ state.n--; renderSetup(); S.tick(); vib(6); } };
+$('#nplus').onclick=()=>{ if(state.n<12){ state.n++; renderSetup(); S.tick(); vib(6); } };
+$('#snd').onclick=function(){ state.sound=!state.sound; this.classList.toggle('on',state.sound); this.setAttribute('aria-checked',state.sound); S.tick(); };
+$('#peek').innerHTML=['long','pony','braids','bun'].map(s=>`<div class="c">${chSVG(makeChar(s),'back')}</div>`).join('');
+$('#startBtn').onclick=()=>{ S.tick(); vib(10); startGame(); };
+$('#quitBtn').onclick=()=>{ if(state.busy) return; show('#scr-setup'); };
+
+/* ---------- 게임 ---------- */
+function startGame(){
+  const n=state.n; const styles=[...Array(n)].map((_,i)=>STYLES[i%STYLES.length]).sort(()=>rand(3)-1);
+  state.chars=styles.map(s=>makeChar(s)); state.man=rand(n); state.turn=1; state.result={}; state.picked={}; state.busy=false;
+  $('#info').textContent=`${n}명 · 남자 1`;
+  const cols=n<=4?n:(n<=6?3:4); const g=$('#grid'); g.style.gridTemplateColumns=`repeat(${cols}, minmax(0, ${n<=4?120:104}px))`;
+  g.innerHTML=state.chars.map((c,i)=>`<div class="ch" data-i="${i}"><div class="body"><div class="turn">${chSVG(c,'back')}</div></div><span class="tag"></span><span class="kk">ㅋㅋ</span></div>`).join('');
+  g.querySelectorAll('.ch').forEach(el=>el.onclick=()=>flip(+el.dataset.i,el));
+  renderTurn(); show('#scr-game'); $('#result').classList.remove('show');
+}
+function renderTurn(){ const n=state.n, t=state.turn;
+  $('#turnBig').innerHTML=`<b>${t}번</b> 차례`; $('#turnSub').textContent=t===n?'마지막 한 명 · 남은 하나를 돌려세우기':'뒷모습 하나 골라서 눌러 · 남자면 쏨';
+  const tb=$('#turnbox'); tb.classList.remove('pop'); void tb.offsetWidth; tb.classList.add('pop');
+  $('#seats').innerHTML=[...Array(n)].map((_,k)=>{ const p=k+1, r=state.result[p]; return `<span class="${r==='bad'?'bad':r==='ok'?'ok':p===t?'now':''}">${p}번<small>${r==='bad'?'걸림':r==='ok'?'통과':p===t?'차례':'대기'}</small></span>`; }).join(''); }
+async function flip(i,el){
+  if(state.busy||el.classList.contains('flipped')) return; state.busy=true; const p=state.turn, isMan=i===state.man;
+  vib(12); el.classList.add('spot'); S.drum(1000); await wait(1000);
+  el.classList.remove('spot'); el.classList.add('turning'); S.whoosh(); await wait(260);
+  el.querySelector('.turn').innerHTML=chSVG(state.chars[i],'front',isMan); el.classList.remove('turning'); el.classList.add('flipped',isMan?'man':'woman',isMan?'shake':'hop');
+  const tag=el.querySelector('.tag'); tag.className='tag '+(isMan?'bad':'ok'); tag.innerHTML=isMan?`걸림!<small>${p}번</small>`:`통과<small>${p}번</small>`;
+  state.result[p]=isMan?'bad':'ok';
+  if(!isMan){ S.pass(); vib([10,40,10]); confetti(el); await wait(700); state.turn++; renderTurn(); state.busy=false; return; }
+  S.caught(); vib([60,40,120,40,200]); const fl=$('#flash'); fl.classList.remove('go'); void fl.offsetWidth; fl.classList.add('go');
+  document.body.classList.add('quake'); setTimeout(()=>document.body.classList.remove('quake'),520);
+  renderTurn(); $('#turnBig').innerHTML=`<b>${p}번</b> 걸림`; $('#turnSub').textContent='여장 남자 발견 · 오늘 점심은 이 사람';
+  await wait(1700);
+  $('#resWho').innerHTML=chSVG(state.chars[i],'front',true); $('#resH').innerHTML=`<b>${p}번</b>이 쏨`; $('#resP').textContent=`${state.n}명 중 ${p}번째 차례에서 남자 발견 · 잘 먹겠음`;
+  $('#result').classList.add('show'); state.busy=false; }
+function confetti(el){ const r=el.getBoundingClientRect(); const cols=['#e9c96a','#ff8fa3','#7cc6ff','#9be7b4','#fff2c4'];
+  for(let k=0;k<22;k++){ const d=document.createElement('i'); d.className='conf'; d.style.background=cols[k%cols.length]; d.style.left=(r.left+r.width/2)+'px'; d.style.top=(r.top+r.height*.3)+'px'; document.body.appendChild(d);
+    const a=Math.random()*Math.PI*2, v=60+Math.random()*90; d.animate([{transform:'translate(0,0) rotate(0)',opacity:1},{transform:`translate(${Math.cos(a)*v}px,${Math.sin(a)*v+90}px) rotate(${Math.random()*720}deg)`,opacity:0}],{duration:900+Math.random()*400,easing:'cubic-bezier(.2,.7,.3,1)'}).onfinish=()=>d.remove(); } }
+$('#againBtn').onclick=()=>{ S.tick(); startGame(); };
+$('#setupBtn').onclick=()=>{ $('#result').classList.remove('show'); show('#scr-setup'); };
+renderSetup();
+</script>
+</body>
+</html>
