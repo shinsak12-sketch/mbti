@@ -108,8 +108,8 @@
   @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px) rotate(-3deg)}40%{transform:translateX(6px) rotate(3deg)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
   .ch.flipped{cursor:default}
   .ch.flipped:not(.man) .turn{filter:saturate(.9)}
-  .ch .tag{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%) scale(0);font-weight:900;font-size:15px;padding:5px 10px;border-radius:12px;white-space:nowrap;z-index:3;transition:transform .38s cubic-bezier(.3,1.6,.5,1);text-align:center;line-height:1.15}
-  .ch .tag small{display:block;font-size:10.5px;opacity:.85}
+  .ch .tag{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%) scale(0);font-weight:900;font-size:clamp(14px,calc(var(--cw,110px)*.13),22px);padding:5px 10px;border-radius:12px;white-space:nowrap;z-index:3;transition:transform .38s cubic-bezier(.3,1.6,.5,1);text-align:center;line-height:1.15}
+  .ch .tag small{display:block;font-size:.7em;opacity:.85}
   .ch .tag.ok{background:linear-gradient(180deg,#f3d98a,var(--gold-2));color:#2a1d05;box-shadow:0 3px 0 var(--gold-3)} .ch .tag.bad{background:linear-gradient(180deg,#e0554b,#b3271f);color:#fff;box-shadow:0 3px 0 #5f130f;border:2px solid #fff2c4}
   .ch.flipped .tag{transform:translate(-50%,-50%) scale(1) rotate(-6deg)}
   .ch .kk{position:absolute;right:-4px;top:2px;font-weight:900;font-size:20px;color:#fff2c4;text-shadow:0 2px 0 #8e1f1a;opacity:0;pointer-events:none}
@@ -260,11 +260,19 @@ function startGame(){
   const n=state.n; const styles=[...Array(n)].map((_,i)=>STYLES[i%STYLES.length]).sort(()=>rand(3)-1);
   state.chars=styles.map(s=>makeChar(s)); state.man=rand(n); state.turn=1; state.result={}; state.picked={}; state.busy=false;
   $('#info').textContent=`${n}명 · 남자 1`;
-  const cols=n<=4?n:(n<=6?3:4); const g=$('#grid'); g.style.gridTemplateColumns=`repeat(${cols}, minmax(0, ${n<=4?120:104}px))`;
+  const g=$('#grid');
   g.innerHTML=state.chars.map((c,i)=>`<div class="ch" data-i="${i}"><div class="body"><div class="turn">${chSVG(c,'back')}</div></div><span class="tag"></span><span class="kk">ㅋㅋ</span></div>`).join('');
   g.querySelectorAll('.ch').forEach(el=>el.onclick=()=>flip(+el.dataset.i,el));
-  renderTurn(); show('#scr-game'); $('#result').classList.remove('show');
+  renderTurn(); show('#scr-game'); layoutGrid(); $('#result').classList.remove('show');
 }
+const COLS={2:2,3:3,4:2,5:3,6:3,7:4,8:4,9:3,10:4,11:4,12:4};
+function layoutGrid(){ const g=$('#grid'); if(!g.children.length||!$('#scr-game').classList.contains('active')) return;
+  const n=state.n, cols=COLS[n]||4, rows=Math.ceil(n/cols), gx=6, gy=8;
+  const W=g.parentElement.clientWidth-16, top=g.parentElement.getBoundingClientRect().top+window.scrollY;
+  const H=Math.max(260,window.innerHeight-top-44);
+  const w=Math.floor(Math.min((W-gx*(cols-1))/cols,((H-gy*(rows-1))/rows)*140/240,210));
+  g.style.gap=`${gy}px ${gx}px`; g.style.gridTemplateColumns=`repeat(${cols}, ${w}px)`; g.style.setProperty('--cw',w+'px'); }
+addEventListener('resize',layoutGrid);
 function renderTurn(){ const n=state.n, t=state.turn;
   $('#turnBig').innerHTML=`<b>${t}번</b> 차례`; $('#turnSub').textContent=t===n?'마지막 한 명 · 남은 하나를 돌려세우기':'뒷모습 하나 골라서 눌러 · 남자면 쏨';
   const tb=$('#turnbox'); tb.classList.remove('pop'); void tb.offsetWidth; tb.classList.add('pop');
