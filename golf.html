@@ -815,7 +815,7 @@
 
 <!-- 정산 계산기 -->
 <section class="screen" id="s-setl">
-  <div class="top"><div><h1>정산</h1><div class="sm" id="setlSub">그린피 · 식비 · 상품 나누고 송금까지</div></div></div>
+  <div class="top"><div><h1>정산</h1><div class="sm" id="setlSub">그린피 · 식비 · 상품 나누고 송금까지</div></div><button class="ic" id="setlGear" aria-label="정산 설정"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div>
   <div class="grid2" id="setlTiles"></div>
 </section>
 <section class="screen" id="s-setled">
@@ -2047,6 +2047,25 @@ function settleCalc(st){ seSync(st); const P=st.people; P.forEach(p=>{ if(p.team
   const paidSum=Object.values(paid).reduce((a,b)=>a+b,0); const bal=P.map(p=>paid[p.id]-rb[p.id]);
   const payers=P.filter(p=>paid[p.id]>0.5); const tr=transfers(bal); if(st._revErr) errs.unshift('역산: '+st._revErr);
   return {burden,rb,paid,total,paidSum,diff,absorb:ab,errs,tr,payers,onePayer:payers.length===1?payers[0]:null}; }
+/* 입금계좌: 앱 사용자 계좌 하나 · 정산마다 넣을지 고름 (기본: 내가 받는 정산이면 켬) */
+const BANKS=['카카오뱅크','토스뱅크','국민','신한','우리','하나','농협','기업','새마을','우체국','케이뱅크','SC제일'];
+function acctTxt(){ const a=DB.acct; return a&&a.no?[a.bank,a.no,a.holder].filter(Boolean).join(' '):''; }
+function acctOn(st,c){ if(!acctTxt()) return false; if(st.acct!=null) return !!st.acct; const me=setlMe(st); if(!me) return false; c=c||settleCalc(st); return c.tr.some(t=>st.people[t.to]&&st.people[t.to].id===me.id); }
+function acctSheet(after){ const a=DB.acct||{};
+  sheet(`<div class="amenu"><div class="ah"><b>계좌번호 세팅</b><small>정산 이미지 맨 아래에 입금계좌로 나옴 · 정산마다 넣을지 고름</small></div>
+    <div class="sugg" id="acB" style="margin-bottom:8px">${BANKS.map(b=>`<button data-b="${b}" class="${a.bank===b?'on':''}">${b}</button>`).join('')}</div>
+    <input class="inp" id="acBank" placeholder="은행" maxlength="12" value="${esc(a.bank||'')}">
+    <input class="inp" id="acNo" placeholder="계좌번호 (예: 3333-01-1234567)" inputmode="tel" maxlength="24" style="margin-top:8px;font-weight:900" value="${esc(a.no||'')}">
+    <input class="inp" id="acHolder" placeholder="예금주" maxlength="10" style="margin-top:8px" value="${esc(a.holder||'')}">
+    <div class="row" style="margin-top:12px">${a.no?'<button class="btn ghost sm" id="acDel" style="color:var(--red)">지우기</button>':'<button class="btn ghost sm" id="acX">취소</button>'}<button class="btn sm" id="acOk">저장</button></div></div>`);
+  $$('#acB button').forEach(b=>b.onclick=()=>{ $('#acBank').value=b.dataset.b; $$('#acB button').forEach(x=>x.classList.toggle('on',x===b)); vib(5); });
+  $('#acNo').oninput=e=>{ e.target.value=e.target.value.replace(/[^\d-]/g,''); };
+  const x=$('#acX'); if(x) x.onclick=closeSheet;
+  const d=$('#acDel'); if(d) d.onclick=()=>{ delete DB.acct; save(); closeSheet(); toast('계좌 지움'); if(after) after(); };
+  $('#acOk').onclick=()=>{ const no=$('#acNo').value.trim(); if(!no){ toast('계좌번호 넣어줘'); $('#acNo').focus(); return; } DB.acct={bank:$('#acBank').value.trim(),no,holder:$('#acHolder').value.trim()}; save(); closeSheet(); vib([10,30,10]); toast('계좌 저장됨'); if(after) after(); };
+  if(!a.no) setTimeout(()=>$('#acNo').focus(),80); }
+function setlSettings(){ actionSheet('정산 설정','',[{label:`계좌번호 세팅<small style="margin-left:auto;color:var(--mut);font-weight:700;font-size:12px">${esc(acctTxt())||'안 넣음'}</small>`,fn:()=>{ closeSheet(); setTimeout(()=>acctSheet(),60); }}]); }
+$('#setlGear').onclick=()=>{ vib(6); setlSettings(); };
 function renderSetlList(){ DB.settles=DB.settles||[]; const box=$('#setlTiles'); box.innerHTML='';
   $('#setlSub').textContent=DB.settles.length?`${DB.settles.length}건 · 길게 누르면 메뉴`:'그린피 · 식비 · 상품 나누고 송금까지';
   const nb=document.createElement('button'); nb.className='tile new'; nb.innerHTML=`<div>${SV.plus}새 정산</div>`; nb.onclick=()=>{ SE=newSettle(); openSettle(true); }; box.appendChild(nb);
@@ -2088,6 +2107,7 @@ function renderSettle0(){ const st=SE, P=st.people; renderSeLink(); const c=sett
   ${c.errs.length?`<div class="chk bad" style="margin-bottom:10px">${c.errs.map(esc).join('<br>')}</div>`:''}
   <div class="burden"><div class="hd"><span>이름</span><span>낸 돈</span><span>부담</span><span>차액</span></div>${P.map(p=>{ const v=c.paid[p.id]-c.rb[p.id], pd=c.paid[p.id]; return `<div class="r c3"><div>${esc(p.name)}${st.mode==='team'&&tRank(st,p)?`<small>${teamLab(st,tRank(st,p))}</small>`:st.mode==='rank'&&p.rank?`<small>${p.rank}등</small>`:''}</div><div class="v ${pd>0.5?'pd':'nil'}">${pd>0.5?fmt(pd):'—'}<small>${pd>0.5?'먼저 냄':'안 냄'}</small></div><div class="v">${fmt(c.rb[p.id])}<small>부담</small></div><div class="v ${v>0.5?'up':v<-0.5?'dn':''}">${v>0.5?'+'+fmt(v):v<-0.5?fmt(v):'0'}<small>${v>0.5?'받을 돈':v<-0.5?'보낼 돈':'끝'}</small></div></div>`; }).join('')}</div>
   ${c.onePayer&&c.tr.length?`<div class="onepay"><span class="av">${esc(c.onePayer.name.slice(0,1))}</span><div><b>모두 ${esc(c.onePayer.name)}에게</b><small>각자 위 <em>보낼 돈</em>만큼 보내면 끝 · ${c.tr.length}명</small></div></div>`:`<div class="lbl">송금</div><div class="flow">${c.tr.length?flowsHTML(c.tr,P):'<div class="none" style="padding:14px 0;text-align:center;color:var(--mut);font-weight:700;font-size:13px">주고받을 돈 없음</div>'}</div>`}
+  ${(()=>{ const on=acctOn(st,c), at=acctTxt(); return `<div class="revbox" style="margin:12px 0 0"><div class="top" id="seAcct"><div class="tx"><b>입금계좌 넣기</b><small>${at?esc(at)+(on?' · 이미지 맨 아래':' · 안 넣음'):'계좌 아직 안 넣음 · 눌러서 넣기'}</small></div><span class="sw ${on?'on':''}"></span></div></div>`; })()}
   ${(()=>{ const lr=st.rec&&DB.records.find(x=>x.id===st.rec); return `<div style="height:12px"></div><div class="row"><button class="btn sm" id="seImg">${SV.share}이미지로 보내기</button>${lr?'<button class="btn ghost sm" id="seCost">내 비용 기록에 넣기</button>':''}</div>`; })()}
   <div style="height:14px"></div>${!seNew?'<button class="btn ghost sm" id="seDel" style="color:var(--red)">이 정산 삭제</button>':''}`;
   box.innerHTML=h;
@@ -2124,6 +2144,7 @@ function renderSettle0(){ const st=SE, P=st.people; renderSeLink(); const c=sett
   const del=$('#seDel'); if(del) del.onclick=()=>confirmSheet('이 정산 지울까?',esc(st.name)||'','삭제',()=>{ DB.settles=(DB.settles||[]).filter(x=>x!==st); save(); renderSetlList(); show('#s-setl'); toast('삭제됨'); });
   $('#seShare').onclick=()=>actionSheet('정산 보내기',esc(st.name)||'',[{label:'이미지로 보내기 (보고서)',icon:SV.img,cls:'blue',fn:()=>{ closeSheet(); shareSettleImage(st); }},{label:'글로 보내기',icon:SV.copy,fn:()=>{ closeSheet(); shareSettle(st); }}]);
   $('#seImg').onclick=()=>shareSettleImage(st);
+  $('#seAcct').onclick=()=>{ if(!acctTxt()){ acctSheet(()=>{ if(acctTxt()) st.acct=true; seSave(); renderSettle(); }); return; } st.acct=!acctOn(st); vib(6); seSave(); renderSettle(); };
   const sc=$('#seCost'); if(sc) sc.onclick=()=>settleToCost(st); }
 function itemSheet(i,isNew){ const st=SE, P=st.people; const it=st.items[i]; it.fixed=it.fixed||{}; it.ex=it.ex||[];
   const draw=()=>{ if(draw._b) return; draw._b=1; try{ draw0(); } finally{ draw._b=0; } };
@@ -2163,12 +2184,13 @@ function itemSheet(i,isNew){ const st=SE, P=st.people; const it=st.items[i]; it.
     const dl=$('#isDel'); if(dl) dl.onclick=()=>{ st.items.splice(st.items.indexOf(it),1); seSave(); closeSheet(); renderSettle(); toast('항목 삭제'); };
     $('#isOk').onclick=()=>{ if(!it.amount&&!isR){ toast('금액 넣어줘'); $('#isAmt').focus(); return; } if(!it.name) it.name='항목'; delete it._fix; delete it._per; seSave(); vib([10,30,10]); closeSheet(); renderSettle(); }; };
   draw(); }
-function shareSettle(st){ const c=settleCalc(st); const L=[`[버디로그 정산] ${st.name||dateLabel(st.created)}`];
+function shareSettle(st){ const c=settleCalc(st); const L=[`[비용 정산] ${st.name||dateLabel(st.created)}`];
   st.items.forEach(it=>{ L.push(`· ${it.name} ${fmt(+it.amount)} (${ruleDesc(st,it)})`); const {out}=splitItem(st,it); const ps=st.people.filter(p=>(out[p.id]||0)>0.5).map(p=>`${p.name} ${fmt(Math.round(out[p.id]))}`); if(ps.length) L.push('   '+ps.join(' · ')); });
   if(c.payers.length){ L.push('— 먼저 낸 돈'); c.payers.forEach(p=>L.push(`${p.name} ${fmt(c.paid[p.id])}`)); }
   L.push('— 각자 부담'); st.people.forEach(p=>L.push(`${p.name} ${fmt(c.rb[p.id])}`));
   if(c.onePayer&&c.tr.length) L.push(`— 모두 ${c.onePayer.name}에게 각자 부담만큼 보내기`);
   else if(c.tr.length){ L.push('— 송금'); c.tr.forEach(x=>L.push(`${st.people[x.from].name} → ${st.people[x.to].name} ${fmt(x.v)}`)); }
+  if(acctOn(st,c)) L.push(`— 입금계좌 ${acctTxt()}`);
   const txt=L.join('\n'); try{ if(window.GolfNative&&GolfNative.shareText){ GolfNative.shareText(txt); return; } }catch(e){} if(navigator.share) navigator.share({text:txt}).catch(()=>{}); else { copyText(txt); toast('복사됨 · 카톡에 붙여넣기'); } }
 
 
@@ -2210,7 +2232,7 @@ function settleImage(st){ const c=settleCalc(st), P=st.people; const W=Math.max(
   const SK=SKINS[skin()], hi=SK.headInk, hg=x.createLinearGradient(0,0,W,250); hg.addColorStop(0,SK.head[0]); hg.addColorStop(1,SK.head[1]);
   x.fillStyle=hg; x.fillRect(0,0,W,250); if(skin()==='bold'){ x.fillStyle='#111'; x.fillRect(0,246,W,4); } x.fillStyle=hi==='#ffffff'?'rgba(255,255,255,.12)':'rgba(0,0,0,.06)'; x.beginPath(); x.arc(W-90,40,170,0,7); x.fill();
   const hiA=a=>hi==='#ffffff'?`rgba(255,255,255,${a})`:`rgba(17,17,17,${a})`;
-  T('버디로그 정산',PADX,62,{s:28,w:800,c:hiA(.85)});
+  T('비용 정산',PADX,62,{s:28,w:800,c:hiA(.85)});
   T(st.name||'정산',PADX,128,{s:58,w:900,c:hi,max:W-PADX*2});
   const cn=rec&&(rec.course||rec.region); const sub=[dateLabel(st.created),cn&&!(st.name||'').includes(cn)?cn:'',`${ppl}명`,`총 ${fmt(c.total)}원`].filter(Boolean).join('  ·  ');
   T(sub,PADX,196,{s:28,w:700,c:hiA(.9),max:W-PADX*2});
@@ -2220,7 +2242,7 @@ function settleImage(st){ const c=settleCalc(st), P=st.people; const W=Math.max(
   if(c.payers.length){ const PH=72; R(PADX,y,W-PADX*2,PH,20,C.blues); T('먼저 낸 돈',PADX+24,y+PH/2,{s:24,w:900,c:C.blue});
     const txt=c.payers.map(p=>`${p.name} ${fmt(c.paid[p.id])}원`).join('  ·  '); T(txt,W-PADX-24,y+PH/2,{s:28,w:900,a:'right',max:W-PADX*2-210}); y+=PH+28; }
   // 송금 먼저 (제일 중요)
-  sec('송금',one?'':c.tr.length?`${c.tr.length}번이면 끝`:'');
+  sec('송금','');
   if(one){ R(PADX,y,W-PADX*2,80,20,C.accs); R(PADX+16,y+16,48,48,24,C.acc); T(c.onePayer.name.slice(0,1),PADX+40,y+40,{s:24,w:900,c:'#fff',a:'center'}); T(`모두 ${c.onePayer.name}에게`,PADX+80,y+40,{s:34,w:900,max:520}); T('각자 합계만큼',W-PADX-24,y+40,{s:24,w:800,c:C.mut,a:'right'}); y+=96; }
   else if(!c.tr.length){ R(PADX,y,W-PADX*2,80,20,C.soft); T('주고받을 돈 없음',W/2,y+40,{s:30,w:800,c:C.mut,a:'center'}); y+=96; }
   if(!one) c.tr.forEach(t=>{ R(PADX,y,W-PADX*2,80,20,C.soft); const fn=P[t.from].name, tn=P[t.to].name;
@@ -2264,10 +2286,12 @@ function settleImage(st){ const c=settleCalc(st), P=st.people; const W=Math.max(
   x.fillStyle=C.line; x.fillRect(PADX+NW+SW,y-RH*P.length-TH-6,2,RH*P.length+TH+6); x.fillRect(PADX+NW0+8,y-RH*P.length-TH-6,2,RH*P.length+TH+6);
   y+=26;
   y+=12; if(c.diff){ T(`끝전 ${fmtS(c.diff)}원은 ${pName(st,c.absorb)} 부담에 포함 · ${(+st.unit||1).toLocaleString('ko-KR')}원 단위`,PADX,y,{s:22,w:700,c:C.mut}); y+=40; }
-  y+=20; x.fillStyle=C.line; x.fillRect(PADX,y,W-PADX*2,2); T('버디로그로 계산함',W/2,y+42,{s:22,w:700,c:C.mut,a:'center'}); y+=90;
+  if(acctOn(st,c)){ y+=16; const AH=150; R(PADX,y,W-PADX*2,AH,24,C.ink); T('입금계좌',PADX+32,y+40,{s:24,w:800,c:'rgba(255,255,255,.65)'});
+    const a=DB.acct; T([a.bank,a.no].filter(Boolean).join('  '),PADX+32,y+98,{s:46,w:900,c:'#fff',max:W-PADX*2-64-(a.holder?220:0)}); if(a.holder) T(a.holder,W-PADX-32,y+98,{s:36,w:900,c:'#9be7b4',a:'right',max:200}); y+=AH; }
+  y+=48;
   const outc=document.createElement('canvas'); outc.width=W; outc.height=Math.min(H,y); outc.getContext('2d').drawImage(cv,0,0); return outc; }
 function shareSettleImage(st){ const c=settleCalc(st); if(c.errs.length){ toast('항목 확인부터: '+c.errs[0],2600); return; } if(!st.items.length){ toast('항목부터 넣기'); return; }
-  const go=()=>{ const cv=settleImage(st); const text=`[버디로그 정산] ${st.name||''}`.trim();
+  const go=()=>{ const cv=settleImage(st); const text=`[비용 정산] ${st.name||''}`.trim()+(acctOn(st,c)?`\n입금계좌 ${acctTxt()}`:'');
     try{ if(window.GolfNative&&GolfNative.shareImage){ GolfNative.shareImage(cv.toDataURL('image/png').split(',')[1],text); return; } }catch(e){}
     cv.toBlob(async b=>{ const f=new File([b],'정산.png',{type:'image/png'}); try{ if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f],text}); return; } }catch(e){}
       const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`${st.name||'정산'}.png`; document.body.appendChild(a); a.click(); a.remove(); toast('이미지 저장됨'); },'image/png'); };
